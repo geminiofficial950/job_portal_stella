@@ -1,25 +1,25 @@
 /* Stella Jobs — red & white palette (red dominant + navy accents) */
 :root {
   --bg: #ffffff;
-  --bg-1: #fffafa;
-  --bg-2: #fef2f2;
+  --bg-1: #ffffff;
+  --bg-2: #ffffff;
   --line: #fee2e2;
   --line-2: #fecaca;
-  --ink: #b91c1c;
-  --ink-2: #991b1b;
-  --ink-3: #9f1239;
-  --ink-4: #d97777;
+  --ink: #111827;
+  --ink-2: #374151;
+  --ink-3: #4b5563;
+  --ink-4: #6b7280;
   --ac: #dc2626;
   --ac-2: #b91c1c;
   --ac-soft: #fef2f2;
   --ac-line: #fecaca;
-  --navy: #001f6f;
-  --navy-2: #0a2a8a;
-  --navy-soft: #eef2ff;
-  --grad-brand: linear-gradient(135deg, #001f6f 0%, #7f1d1d 48%, #dc2626 100%);
-  --grad-brand-soft: linear-gradient(135deg, rgba(0, 31, 111, 0.08) 0%, rgba(220, 38, 38, 0.1) 100%);
-  --grad-cta: linear-gradient(125deg, #001f6f 0%, #1e3a8a 35%, #b91c1c 70%, #dc2626 100%);
-  --grad-btn: linear-gradient(135deg, #001f6f 0%, #dc2626 100%);
+  --navy: #b91c1c;
+  --navy-2: #dc2626;
+  --navy-soft: #fef2f2;
+  --grad-brand: #b91c1c;
+  --grad-brand-soft: #fef2f2;
+  --grad-cta: #b91c1c;
+  --grad-btn: #dc2626;
   --wait: #8a6206;
   --wait-soft: #fbf2df;
   --ui: var(--font-ui), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -387,10 +387,8 @@
   overflow: hidden;
   padding: 0;
   text-align: center;
-  background:
-    radial-gradient(ellipse 70% 55% at 15% 20%, rgba(0, 31, 111, 0.1) 0%, transparent 55%),
-    radial-gradient(ellipse 65% 50% at 88% 75%, rgba(220, 38, 38, 0.12) 0%, transparent 50%),
-    linear-gradient(180deg, #fffafa 0%, #ffffff 55%, #f8fafc 100%);
+  background: #ffffff;
+  color: #111827;
 }
 
 .stella-home .hero-next {
@@ -416,8 +414,8 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #001f6f;
-  -webkit-text-fill-color: #001f6f;
+  color: #dc2626;
+  -webkit-text-fill-color: #dc2626;
   background: none;
 }
 
@@ -428,8 +426,8 @@
   font-weight: 500;
   line-height: 1.02;
   letter-spacing: -0.03em;
-  color: #b91c1c;
-  -webkit-text-fill-color: #b91c1c;
+  color: #111827;
+  -webkit-text-fill-color: #111827;
   background: none;
 }
 
@@ -448,8 +446,8 @@
 }
 
 .stella-home .hero-search-pill:focus-within {
-  border-color: #fca5a5;
-  box-shadow: 0 10px 36px rgba(185, 28, 28, 0.1);
+  border-color: #d1d5db;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
 .stella-home .hero-search-field {
@@ -676,11 +674,7 @@
 }
 
 .stella-home .hero-bg .dots {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, rgba(185, 28, 28, 0.08) 1px, transparent 0);
-  background-size: 26px 26px;
-  opacity: 0.45;
+  display: none;
 }
 
 .stella-home #net {
@@ -1054,7 +1048,7 @@
   overflow: hidden;
   padding: 26px 0;
   border-bottom: 1px solid transparent;
-  background: linear-gradient(90deg, #001f6f 0%, #7f1d1d 50%, #dc2626 100%);
+  background: #dc2626;
   mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
@@ -1206,7 +1200,7 @@
 }
 
 .stella-home #support {
-  background: #001f6f;
+  background: #b91c1c;
   color: #fff;
 }
 
@@ -2144,7 +2138,7 @@
 .stella-home .cta {
   border: 1px solid transparent;
   border-radius: 18px;
-  background: var(--grad-cta);
+  background: #b91c1c;
   padding: 82px 40px;
   text-align: center;
   position: relative;
@@ -2153,26 +2147,11 @@
 }
 
 .stella-home .cta .glow {
-  display: block;
-  position: absolute;
-  inset: -40% -20% auto auto;
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(220, 38, 38, 0.35) 0%, transparent 70%);
-  pointer-events: none;
+  display: none;
 }
 
 .stella-home .cta::before {
-  content: "";
-  position: absolute;
-  left: -12%;
-  bottom: -35%;
-  width: 380px;
-  height: 380px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 31, 111, 0.45) 0%, transparent 70%);
-  pointer-events: none;
+  display: none;
 }
 
 .stella-home .cta > * {
@@ -2202,7 +2181,7 @@
 .stella-home .cta .btn.ac {
   background: #fff;
   border-color: #fff;
-  color: #001f6f;
+  color: #b91c1c;
 }
 
 .stella-home .cta .btn.ac:hover {
@@ -2236,8 +2215,8 @@
 .stella-home footer {
   border-top: 1px solid transparent;
   padding: 46px 0 60px;
-  color: rgba(255, 255, 255, 0.65);
-  background: linear-gradient(180deg, #001f6f 0%, #7f1d1d 55%, #b91c1c 100%);
+  color: rgba(255, 255, 255, 0.85);
+  background: #b91c1c;
 }
 
 .stella-home .foot {

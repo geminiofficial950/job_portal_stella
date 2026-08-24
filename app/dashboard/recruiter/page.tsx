@@ -62,9 +62,9 @@ export default async function RecruiterOverviewPage() {
       icon: Briefcase,
       href: "/dashboard/recruiter/jobs",
       gradient: "from-[#dc2626] to-[#b91c1c]",
-      bg: "from-[#ede9fe] to-[#ddd6fe]",
+      bg: "from-[#fef2f2] to-[#fee2e2]",
       iconBg: "bg-[#dc2626]",
-      textColor: "text-[#4c1d95]",
+      textColor: "text-[#b91c1c]",
       pill: "🟢 Live",
     },
     {
@@ -72,10 +72,10 @@ export default async function RecruiterOverviewPage() {
       value: totalJobs,
       icon: FileText,
       href: "/dashboard/recruiter/jobs",
-      gradient: "from-[#dc2626] to-[#dc2626]",
-      bg: "from-[#cffafe] to-[#a5f3fc]",
+      gradient: "from-[#dc2626] to-[#b91c1c]",
+      bg: "from-[#fef2f2] to-[#fee2e2]",
       iconBg: "bg-[#dc2626]",
-      textColor: "text-[#164e63]",
+      textColor: "text-[#b91c1c]",
       pill: "📋 All",
     },
     {
@@ -83,10 +83,10 @@ export default async function RecruiterOverviewPage() {
       value: pausedCount + draftCount,
       icon: PauseCircle,
       href: "/dashboard/recruiter/jobs",
-      gradient: "from-[#f59e0b] to-[#fb923c]",
-      bg: "from-[#fef3c7] to-[#fde68a]",
-      iconBg: "bg-[#d97706]",
-      textColor: "text-[#78350f]",
+      gradient: "from-[#dc2626] to-[#b91c1c]",
+      bg: "from-[#fef2f2] to-[#fee2e2]",
+      iconBg: "bg-[#dc2626]",
+      textColor: "text-[#b91c1c]",
       pill: "⏸ Inactive",
     },
   ];
@@ -97,7 +97,7 @@ export default async function RecruiterOverviewPage() {
     <main className="px-5 py-8 sm:px-8 lg:px-10">
 
       {/* ── Hero header ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#b91c1c] via-[#1a3a8f] to-[#dc2626] p-6 sm:p-8 mb-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c] p-6 sm:p-8 mb-8">
         {/* Decorative blobs */}
         <div className="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[#dc2626]/25 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full bg-[#b91c1c]/30 blur-2xl" />
@@ -268,7 +268,7 @@ export default async function RecruiterOverviewPage() {
       <section className="mt-6 rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#f59e0b] to-[#fb923c] text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#dc2626] to-[#b91c1c] text-white">
               <Briefcase className="h-4 w-4" />
             </span>
             <h2 className="font-bold text-[#b91c1c] tracking-tight">Recent Jobs</h2>

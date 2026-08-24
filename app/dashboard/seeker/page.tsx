@@ -62,9 +62,9 @@ export default async function SeekerOverviewPage() {
       value: openJobs,
       icon: Briefcase,
       href: "/dashboard/seeker/jobs",
-      bg: "from-[#ede9fe] to-[#ddd6fe]",
+      bg: "from-[#fef2f2] to-[#fee2e2]",
       iconBg: "bg-[#dc2626]",
-      textColor: "text-[#4c1d95]",
+      textColor: "text-[#b91c1c]",
       pill: "🔍 Browse",
     },
     {
@@ -72,9 +72,9 @@ export default async function SeekerOverviewPage() {
       value: 0,
       icon: FileText,
       href: "/dashboard/seeker/applications",
-      bg: "from-[#d1fae5] to-[#a7f3d0]",
-      iconBg: "bg-[#059669]",
-      textColor: "text-[#065f46]",
+      bg: "from-[#fef2f2] to-[#fee2e2]",
+      iconBg: "bg-[#dc2626]",
+      textColor: "text-[#b91c1c]",
       pill: "📋 Track",
     },
     {
@@ -82,9 +82,9 @@ export default async function SeekerOverviewPage() {
       value: 0,
       icon: Bookmark,
       href: "/dashboard/seeker/saved",
-      bg: "from-[#fce7f3] to-[#fbcfe8]",
-      iconBg: "bg-[#db2777]",
-      textColor: "text-[#831843]",
+      bg: "from-[#fef2f2] to-[#fee2e2]",
+      iconBg: "bg-[#dc2626]",
+      textColor: "text-[#b91c1c]",
       pill: "❤️ Saved",
     },
     {
@@ -92,9 +92,9 @@ export default async function SeekerOverviewPage() {
       value: 0,
       icon: CalendarCheck,
       href: "/dashboard/seeker/interviews",
-      bg: "from-[#ffedd5] to-[#fed7aa]",
-      iconBg: "bg-[#ea580c]",
-      textColor: "text-[#7c2d12]",
+      bg: "from-[#fef2f2] to-[#fee2e2]",
+      iconBg: "bg-[#dc2626]",
+      textColor: "text-[#b91c1c]",
       pill: "📅 Upcoming",
     },
   ];
@@ -113,31 +113,26 @@ export default async function SeekerOverviewPage() {
       copy: "Add skills, experience, and a resume link.",
       href: "/dashboard/seeker/profile",
       icon: UserRound,
-      iconBg: "bg-[#d97706]",
-      hoverBorder: "hover:border-[#d97706]/40",
+      iconBg: "bg-[#dc2626]",
+      hoverBorder: "hover:border-[#dc2626]/40",
     },
     {
       title: "Track Applications",
       copy: "Follow every role you apply to.",
       href: "/dashboard/seeker/applications",
       icon: FileText,
-      iconBg: "bg-[#059669]",
-      hoverBorder: "hover:border-[#059669]/40",
+      iconBg: "bg-[#dc2626]",
+      hoverBorder: "hover:border-[#dc2626]/40",
     },
   ];
 
-  const profileColor =
-    percent < 30
-      ? { bar: "from-[#ef4444] to-[#f97316]", text: "text-[#dc2626]" }
-      : percent < 70
-      ? { bar: "from-[#f59e0b] to-[#fbbf24]", text: "text-[#d97706]" }
-      : { bar: "from-[#10b981] to-[#34d399]", text: "text-[#059669]" };
+  const profileColor = { bar: "from-[#dc2626] to-[#b91c1c]", text: "text-[#b91c1c]" };
 
   return (
     <main className="px-5 py-8 sm:px-8 lg:px-10">
 
       {/* ── Hero banner ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#b91c1c] via-[#7c3aed] to-[#dc2626] p-6 sm:p-8 mb-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c] p-6 sm:p-8 mb-8">
         <div className="pointer-events-none absolute -top-12 -right-12 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-1/3 h-36 w-36 rounded-full bg-[#a5f3fc]/20 blur-2xl" />
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -251,7 +246,7 @@ export default async function SeekerOverviewPage() {
         {/* Quick actions */}
         <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm lg:col-span-2">
           <div className="flex items-center gap-2 mb-5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#f59e0b] to-[#fb923c] shadow-md">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c] shadow-md">
               <MousePointerClick className="h-4 w-4 text-white" />
             </span>
             <h2 className="font-bold text-[#b91c1c] tracking-tight">Quick Actions</h2>
@@ -315,9 +310,9 @@ export default async function SeekerOverviewPage() {
               step: "03",
               title: "Apply & Track",
               copy: "Applications and interviews will show up here as you apply.",
-              color: "from-[#059669] to-[#34d399]",
-              bg: "bg-[#f0fdf4]",
-              text: "text-[#065f46]",
+              color: "from-[#dc2626] to-[#b91c1c]",
+              bg: "bg-[#fef2f2]",
+              text: "text-[#b91c1c]",
             },
           ].map((s) => (
             <li key={s.step} className={`rounded-xl ${s.bg} p-5 border border-white`}>

@@ -84,7 +84,9 @@ export type CompanyDocument = InferSchemaType<typeof CompanySchema> & {
   _id: mongoose.Types.ObjectId;
 };
 
-export const Company = models.Company || model("Company", CompanySchema);
+export const Company: mongoose.Model<CompanyDocument> =
+  (models.Company as mongoose.Model<CompanyDocument> | undefined) ??
+  model<CompanyDocument>("Company", CompanySchema);
 
 export function serializeCompany(doc: {
   _id: mongoose.Types.ObjectId;

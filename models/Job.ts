@@ -149,7 +149,9 @@ export type JobDocument = InferSchemaType<typeof JobSchema> & {
   _id: mongoose.Types.ObjectId;
 };
 
-export const Job = models.Job || model("Job", JobSchema);
+export const Job: mongoose.Model<JobDocument> =
+  (models.Job as mongoose.Model<JobDocument> | undefined) ??
+  model<JobDocument>("Job", JobSchema);
 
 export function serializeJob(doc: {
   _id: mongoose.Types.ObjectId;

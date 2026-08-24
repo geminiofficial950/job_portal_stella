@@ -23,7 +23,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       companies: companies.map((c) => ({
-        ...serializeCompany(c as Parameters<typeof serializeCompany>[0]),
+        ...serializeCompany(c as unknown as Parameters<typeof serializeCompany>[0]),
         owner: ownerMap.get(String(c.ownerId))
           ? {
               name: ownerMap.get(String(c.ownerId))!.name,

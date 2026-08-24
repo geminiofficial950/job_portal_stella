@@ -179,13 +179,13 @@ export function serializeRecruiterSettings(user: {
       emailInterviewReminders?: boolean;
       emailWeeklyDigest?: boolean;
       emailJobStatus?: boolean;
-    };
+    } | null;
     hiring?: {
       defaultEmploymentType?: string;
       defaultWorkMode?: string;
       showSalaryPublicly?: boolean;
       autoPauseAfterDays?: number;
-    };
+    } | null;
     teamInvites?: Array<{
       _id?: mongoose.Types.ObjectId;
       email: string;

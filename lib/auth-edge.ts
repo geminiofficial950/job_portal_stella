@@ -50,7 +50,7 @@ export function canAccessDashboard(
   if (role === "admin") return true;
   if (dashboard === "recruiter") return role === "recruiter";
   if (dashboard === "seeker") return role === "user";
-  if (dashboard === "admin") return role === "admin";
+  if (dashboard === "admin") return false;
   return false;
 }
 

@@ -39,7 +39,7 @@ export async function GET(request: Request) {
       jobs: jobs.map((job) => {
         const company = companyMap.get(String(job.companyId));
         return {
-          ...serializeJob(job as Parameters<typeof serializeJob>[0]),
+          ...serializeJob(job as unknown as Parameters<typeof serializeJob>[0]),
           company: company
             ? {
                 name: company.name,

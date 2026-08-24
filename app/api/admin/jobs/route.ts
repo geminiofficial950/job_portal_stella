@@ -49,7 +49,7 @@ export async function GET(request: Request) {
       success: true,
       jobs: jobs.map((job) => {
         const serialized = serializeJob(
-          job as Parameters<typeof serializeJob>[0]
+          job as unknown as Parameters<typeof serializeJob>[0]
         );
         const recruiter = recruiterMap.get(String(job.recruiterId));
         const company = companyMap.get(String(job.companyId));

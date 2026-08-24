@@ -2,7 +2,9 @@ import Link from "next/link";
 import { requireAuth } from "@/lib/requireAuth";
 import { connectDB } from "@/lib/db";
 import { Job } from "@/models/Job";
+import type { JobDocument } from "@/models/Job";
 import { Company } from "@/models/Company";
+import type { CompanyDocument } from "@/models/Company";
 import {
   Briefcase,
   FileText,
@@ -45,8 +47,8 @@ export default async function RecruiterOverviewPage() {
 
   const [company, jobs, openCount, draftCount, pausedCount, closedCount] =
     await Promise.all([
-      Company.findOne({ ownerId: auth.sub }).lean(),
-      Job.find({ recruiterId: auth.sub }).sort({ createdAt: -1 }).limit(5).lean(),
+      Company.findOne({ ownerId: auth.sub }).lean() as Promise<(CompanyDocument & { createdAt?: Date; updatedAt?: Date }) | null>,
+      Job.find({ recruiterId: auth.sub }).sort({ createdAt: -1 }).limit(5).lean() as Promise<(JobDocument & { createdAt?: Date; updatedAt?: Date })[]>,
       Job.countDocuments({ recruiterId: auth.sub, status: "open" }),
       Job.countDocuments({ recruiterId: auth.sub, status: "draft" }),
       Job.countDocuments({ recruiterId: auth.sub, status: "paused" }),

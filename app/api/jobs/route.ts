@@ -22,7 +22,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       jobs: jobs.map((job) =>
-        serializeJob(job as Parameters<typeof serializeJob>[0])
+        serializeJob(job as unknown as Parameters<typeof serializeJob>[0])
       ),
     });
   } catch (error) {

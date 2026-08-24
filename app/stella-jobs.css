@@ -1,0 +1,2466 @@
+/* Stella Jobs — red & white palette (red dominant + navy accents) */
+:root {
+  --bg: #ffffff;
+  --bg-1: #fffafa;
+  --bg-2: #fef2f2;
+  --line: #fee2e2;
+  --line-2: #fecaca;
+  --ink: #b91c1c;
+  --ink-2: #991b1b;
+  --ink-3: #9f1239;
+  --ink-4: #d97777;
+  --ac: #dc2626;
+  --ac-2: #b91c1c;
+  --ac-soft: #fef2f2;
+  --ac-line: #fecaca;
+  --navy: #001f6f;
+  --navy-2: #0a2a8a;
+  --navy-soft: #eef2ff;
+  --grad-brand: linear-gradient(135deg, #001f6f 0%, #7f1d1d 48%, #dc2626 100%);
+  --grad-brand-soft: linear-gradient(135deg, rgba(0, 31, 111, 0.08) 0%, rgba(220, 38, 38, 0.1) 100%);
+  --grad-cta: linear-gradient(125deg, #001f6f 0%, #1e3a8a 35%, #b91c1c 70%, #dc2626 100%);
+  --grad-btn: linear-gradient(135deg, #001f6f 0%, #dc2626 100%);
+  --wait: #8a6206;
+  --wait-soft: #fbf2df;
+  --ui: var(--font-ui), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --shell: 1240px;
+  --sh-sm: 0 1px 2px rgba(185, 28, 28, 0.06);
+  --sh: 0 1px 2px rgba(185, 28, 28, 0.06), 0 10px 30px -14px rgba(185, 28, 28, 0.14);
+  --sh-lg: 0 2px 4px rgba(185, 28, 28, 0.05), 0 24px 60px -22px rgba(185, 28, 28, 0.16);
+}
+
+.stella-home {
+  box-sizing: border-box;
+  background: var(--bg-1);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 16.5px;
+  line-height: 1.55;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.stella-home *,
+.stella-home *::before,
+.stella-home *::after {
+  box-sizing: border-box;
+}
+
+.stella-home .shell {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.stella-home h1,
+.stella-home h2,
+.stella-home h3 {
+  margin: 0;
+  font-weight: 500;
+}
+
+.stella-home h1 {
+  font-size: clamp(2.8rem, 6vw, 4.9rem);
+  line-height: 0.99;
+  letter-spacing: -0.048em;
+}
+
+.stella-home h2 {
+  font-size: clamp(1.95rem, 3.7vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.042em;
+}
+
+.stella-home h3 {
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.024em;
+  line-height: 1.3;
+}
+
+.stella-home p {
+  margin: 0;
+}
+
+.stella-home a {
+  color: inherit;
+}
+
+.stella-home .mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+.stella-home .rule {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 0;
+}
+
+.stella-home #prog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--ac);
+  z-index: 99;
+  transition: width 0.1s linear;
+}
+
+.stella-home .rv {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stella-home .rv.in {
+  opacity: 1;
+  transform: none;
+}
+
+.stella-home .top {
+  border-bottom: 1px solid transparent;
+  background: var(--grad-brand);
+}
+
+.stella-home .top-in {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 40px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+}
+
+.stella-home .live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.stella-home .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ac);
+  position: relative;
+  flex: none;
+}
+
+.stella-home .dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--ac);
+  opacity: 0.5;
+  animation: stella-ping 2.4s infinite;
+}
+
+@keyframes stella-ping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+.stella-home .tel {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.stella-home .langs {
+  display: flex;
+  gap: 2px;
+  margin-inline-start: auto;
+  flex-wrap: wrap;
+}
+
+.stella-home .lang {
+  font-family: var(--ui);
+  font-size: 12.5px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.stella-home .lang:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.stella-home .lang[aria-pressed="true"] {
+  color: var(--ac);
+  background: #fff;
+  box-shadow: none;
+}
+
+.stella-home .nav {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.stella-home .nav.stuck {
+  border-bottom-color: var(--line);
+  box-shadow: var(--sh-sm);
+}
+
+.stella-home .nav-in {
+  display: flex;
+  align-items: center;
+  height: 66px;
+  gap: 28px;
+  position: relative;
+}
+
+.stella-home .logo {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stella-home .logo i {
+  font-style: normal;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+.stella-home .mark {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.stella-home .nav-links {
+  display: flex;
+  gap: 26px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14.5px;
+}
+
+.stella-home .nav-links a {
+  text-decoration: none;
+  color: var(--ink-2);
+  letter-spacing: -0.012em;
+  position: relative;
+  padding: 4px 0;
+}
+
+.stella-home .nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 0;
+  background: var(--ink);
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stella-home .nav-links a:hover {
+  color: var(--ink);
+}
+
+.stella-home .nav-links a:hover::after {
+  width: 100%;
+}
+
+.stella-home .nav-r {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-inline-start: auto;
+}
+
+.stella-home .nav-r .btn:not(.ghost) {
+  background: var(--grad-btn);
+  border-color: transparent;
+  color: #fff;
+}
+
+.stella-home .nav-r .btn:not(.ghost):hover {
+  filter: brightness(1.06);
+  box-shadow: 0 8px 20px -8px rgba(0, 31, 111, 0.45);
+}
+
+.stella-home .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: -0.014em;
+  padding: 11px 20px;
+  border-radius: 7px;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  transition:
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.18s ease,
+    opacity 0.15s;
+}
+
+.stella-home .btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 8px 20px -8px rgba(185, 28, 28, 0.4);
+}
+
+.stella-home .btn.ghost {
+  background: #fff;
+  color: var(--ink);
+  border-color: var(--line-2);
+  box-shadow: var(--sh-sm);
+}
+
+.stella-home .btn.ghost:hover {
+  border-color: var(--ink-4);
+}
+
+.stella-home .btn.ac {
+  background: var(--grad-btn);
+  border-color: transparent;
+  color: #fff;
+}
+
+.stella-home .btn.ac:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 10px 24px -8px rgba(0, 31, 111, 0.4);
+}
+
+.stella-home .btn.sm {
+  padding: 8px 15px;
+  font-size: 13.5px;
+  border-radius: 6px;
+}
+
+.stella-home .btn svg {
+  transition: transform 0.2s ease;
+}
+
+.stella-home .btn:hover svg {
+  transform: translateX(3px);
+}
+
+.stella-home .hero {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 20%, rgba(0, 31, 111, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 50% at 88% 75%, rgba(220, 38, 38, 0.12) 0%, transparent 50%),
+    linear-gradient(180deg, #fffafa 0%, #ffffff 55%, #f8fafc 100%);
+}
+
+.stella-home .hero-next {
+  min-height: clamp(360px, 48vh, 460px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 0 64px;
+}
+
+.stella-home .hero-next-in {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.stella-home .hero-eyebrow {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #001f6f;
+  -webkit-text-fill-color: #001f6f;
+  background: none;
+}
+
+.stella-home .hero-next-title {
+  margin: 14px auto 0;
+  max-width: none;
+  font-size: clamp(2.75rem, 7vw, 4.75rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: #b91c1c;
+  -webkit-text-fill-color: #b91c1c;
+  background: none;
+}
+
+.stella-home .hero-search-pill {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 920px;
+  margin: 28px auto 0;
+  padding: 7px 7px 7px 4px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+  text-align: start;
+}
+
+.stella-home .hero-search-pill:focus-within {
+  border-color: #fca5a5;
+  box-shadow: 0 10px 36px rgba(185, 28, 28, 0.1);
+}
+
+.stella-home .hero-search-field {
+  flex: 1.15;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 22px;
+}
+
+.stella-home .hero-search-field--loc {
+  flex: 0.95;
+}
+
+.stella-home .hero-search-field svg {
+  flex: none;
+  color: #9ca3af;
+}
+
+.stella-home .hero-search-field input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-family: var(--ui);
+  font-size: 16px;
+  color: #111827;
+  padding: 16px 0;
+  letter-spacing: -0.01em;
+}
+
+.stella-home .hero-search-field input::placeholder {
+  color: #9ca3af;
+}
+
+.stella-home .hero-search-divider {
+  width: 1px;
+  height: 28px;
+  background: #e5e7eb;
+  flex: none;
+}
+
+.stella-home .hero-search-btn {
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  background: var(--grad-btn);
+  color: #fff;
+  font-family: var(--ui);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 15px 32px;
+  margin-right: 2px;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: filter 0.18s, transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 8px 22px -10px rgba(0, 31, 111, 0.45);
+}
+
+.stella-home .hero-search-btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 10px 26px -10px rgba(185, 28, 28, 0.5);
+}
+
+.stella-home .hero-search-btn:active {
+  transform: scale(0.98);
+}
+
+/* floating hero decorations */
+.stella-home .hero-floats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.stella-home .hero-float {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ececec;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.stella-home .hero-float--company {
+  left: 6%;
+  top: 34%;
+  --hero-rot: -10deg;
+  transform: rotate(-10deg);
+  border-radius: 16px;
+  padding: 16px 20px 14px;
+  text-align: start;
+  min-width: 130px;
+  animation: hero-float-drift 6s ease-in-out infinite;
+}
+
+.stella-home .hero-float--company strong {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #111827;
+  line-height: 1;
+}
+
+.stella-home .hero-float--company span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.stella-home .hero-float--icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+}
+
+.stella-home .hero-float--icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.stella-home .hero-float--slack {
+  left: 4%;
+  bottom: 22%;
+  --hero-rot: 8deg;
+  transform: rotate(8deg);
+  background: #fff;
+  animation: hero-float-drift 5.5s ease-in-out infinite 0.4s;
+}
+
+.stella-home .hero-float--plant {
+  left: 16%;
+  bottom: 12%;
+  --hero-rot: -6deg;
+  transform: rotate(-6deg);
+  background: #fff;
+  animation: hero-float-drift 6.2s ease-in-out infinite 0.8s;
+}
+
+.stella-home .hero-float--mail {
+  right: 4%;
+  top: 8%;
+  --hero-rot: 4deg;
+  transform: rotate(4deg);
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 260px;
+  text-align: start;
+  animation: hero-float-drift 5.6s ease-in-out infinite 0.3s;
+}
+
+.stella-home .hero-float-mail-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  display: grid;
+  place-items: center;
+  flex: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.stella-home .hero-float-mail-icon .g {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4285f4 0%, #ea4335 45%, #fbbc05 70%, #34a853 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stella-home .hero-float-mail-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.stella-home .hero-float-mail-copy {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+.stella-home .hero-float--notion {
+  right: 8%;
+  bottom: 28%;
+  --hero-rot: -14deg;
+  transform: rotate(-14deg);
+  background: #fff;
+  border-color: #e5e7eb;
+  font-size: 26px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.04em;
+  animation: hero-float-drift 6.8s ease-in-out infinite 1s;
+}
+
+@keyframes hero-float-drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--hero-rot, 0deg));
+  }
+  50% {
+    transform: translateY(-8px) rotate(var(--hero-rot, 0deg));
+  }
+}
+
+.stella-home .hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stella-home .hero-bg .dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(185, 28, 28, 0.08) 1px, transparent 0);
+  background-size: 26px 26px;
+  opacity: 0.45;
+}
+
+.stella-home #net {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.stella-home .hero-veil {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+}
+
+.stella-home .hero .shell {
+  position: relative;
+  z-index: 3;
+}
+
+.stella-home .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--line-2);
+  background: #fff;
+  border-radius: 30px;
+  padding: 5px 6px 5px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  text-decoration: none;
+  box-shadow: var(--sh-sm);
+  transition:
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.18s;
+}
+
+.stella-home .pill:hover {
+  transform: translateY(-1.5px);
+  box-shadow: var(--sh);
+}
+
+.stella-home .pill b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.stella-home .pill .tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  background: var(--ac-soft);
+  color: var(--ac);
+  padding: 4px 9px;
+  border-radius: 20px;
+}
+
+.stella-home .hero h1 {
+  margin: 26px auto 0;
+  max-width: 15ch;
+}
+
+.stella-home .hero h1 .w {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: stella-word-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes stella-word-in {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.stella-home .hero h1 i {
+  font-style: normal;
+  color: var(--ink-3);
+}
+
+.stella-home .hero-lede {
+  font-size: 18.5px;
+  color: var(--ink-2);
+  margin: 24px auto 0;
+  max-width: 56ch;
+  letter-spacing: -0.015em;
+  opacity: 0;
+  animation: stella-word-in 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stella-home .rot {
+  display: inline-block;
+  position: relative;
+  color: var(--ac);
+  font-weight: 500;
+  min-width: 6ch;
+  text-align: start;
+}
+
+.stella-home .rot span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.4s,
+    transform 0.4s;
+}
+
+.stella-home .rot span.on {
+  opacity: 1;
+  transform: none;
+  position: relative;
+}
+
+.stella-home .searchwrap {
+  opacity: 0;
+  animation: stella-word-in 0.8s 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stella-home .searchbar {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  margin: 36px auto 0;
+  max-width: 760px;
+  overflow: hidden;
+  text-align: start;
+  box-shadow: var(--sh-lg);
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+
+.stella-home .searchbar:focus-within {
+  border-color: var(--ac-line);
+  box-shadow:
+    var(--sh-lg),
+    0 0 0 4px var(--ac-soft);
+}
+
+.stella-home .sfield {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 17px;
+  min-width: 0;
+}
+
+.stella-home .sfield + .sfield {
+  border-inline-start: 1px solid var(--line);
+  flex: 0.82;
+}
+
+.stella-home .sfield svg {
+  flex: none;
+  color: var(--ink-4);
+}
+
+.stella-home .sfield input {
+  border: 0;
+  outline: 0;
+  width: 100%;
+  font-family: var(--ui);
+  font-size: 14.5px;
+  color: var(--ink);
+  padding: 17px 0;
+  background: transparent;
+  letter-spacing: -0.01em;
+}
+
+.stella-home .sfield input::placeholder {
+  color: var(--ink-4);
+}
+
+.stella-home .searchbar button {
+  border: 0;
+  background: var(--grad-btn);
+  color: #fff;
+  font-family: var(--ui);
+  font-weight: 500;
+  font-size: 14.5px;
+  padding: 0 26px;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: -0.014em;
+  transition: filter 0.18s;
+}
+
+.stella-home .searchbar button:hover {
+  filter: brightness(1.06);
+}
+
+.stella-home .qrow {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.stella-home .qchip {
+  font-size: 12.5px;
+  padding: 6px 13px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-family: var(--ui);
+  transition: all 0.16s;
+}
+
+.stella-home .qchip:hover {
+  border-color: var(--ac-line);
+  color: var(--ac);
+  background: var(--ac-soft);
+}
+
+.stella-home .strip {
+  position: relative;
+  z-index: 3;
+  margin-top: 74px;
+  border-top: 1px solid var(--ac-line);
+  border-bottom: 1px solid var(--ac-line);
+  background: #fff;
+}
+
+.stella-home .strip-in {
+  display: grid;
+  grid-template-columns: 1fr 190px 1fr;
+  align-items: center;
+}
+
+.stella-home .mcard {
+  padding: 24px 0;
+  text-align: start;
+}
+
+.stella-home .mcard.b {
+  text-align: end;
+}
+
+.stella-home .mtop {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.stella-home .mcard.b .mtop {
+  justify-content: flex-end;
+}
+
+.stella-home .av {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-2);
+  flex: none;
+}
+
+.stella-home .mcard .nm {
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.stella-home .mcard .sb {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  line-height: 1.3;
+}
+
+.stella-home .tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 11px;
+}
+
+.stella-home .mcard.b .tags {
+  justify-content: flex-end;
+}
+
+.stella-home .tags i {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+}
+
+.stella-home .tags i.ok {
+  background: var(--ac-soft);
+  border-color: transparent;
+  color: var(--ac);
+}
+
+.stella-home .tags i.wt {
+  background: var(--wait-soft);
+  border-color: transparent;
+  color: var(--wait);
+}
+
+.stella-home .mmid {
+  text-align: center;
+  border-inline: 1px solid var(--line);
+  padding: 24px 10px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--ac-soft);
+  position: relative;
+}
+
+.stella-home .mmid b {
+  display: block;
+  font-family: var(--mono);
+  font-size: 27px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--ac);
+}
+
+.stella-home .mmid span {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 5px;
+}
+
+.stella-home .mmid::before,
+.stella-home .mmid::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 26px;
+  height: 1px;
+  background: var(--ac-line);
+}
+
+.stella-home .mmid::before {
+  left: -26px;
+}
+
+.stella-home .mmid::after {
+  right: -26px;
+}
+
+.stella-home .marq {
+  overflow: hidden;
+  padding: 26px 0;
+  border-bottom: 1px solid transparent;
+  background: linear-gradient(90deg, #001f6f 0%, #7f1d1d 50%, #dc2626 100%);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.stella-home .marq-t {
+  display: flex;
+  width: max-content;
+  animation: stella-slide 38s linear infinite;
+}
+
+.stella-home .marq:hover .marq-t {
+  animation-play-state: paused;
+}
+
+@keyframes stella-slide {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.stella-home .marq-t span {
+  padding: 0 34px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  letter-spacing: -0.015em;
+}
+
+.stella-home section {
+  padding: 104px 0;
+}
+
+.stella-home #difference {
+  background: #fff;
+}
+
+.stella-home #paths {
+  background: #dc2626;
+  color: #fff;
+}
+
+.stella-home #paths .mono {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.stella-home #paths .head h2 {
+  color: #fff;
+}
+
+.stella-home #paths .door {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.stella-home #paths .door::before {
+  background: #fff;
+}
+
+.stella-home #paths .door:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 10px 28px -14px rgba(0, 0, 0, 0.35);
+}
+
+.stella-home #paths .door[aria-selected="true"] {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 10px 28px -14px rgba(0, 0, 0, 0.35);
+}
+
+.stella-home #paths .door-sub {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.stella-home #paths .steps li {
+  border-top-color: rgba(255, 255, 255, 0.22);
+}
+
+.stella-home #paths .steps li::before {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.stella-home #paths .steps li:hover::before {
+  color: #fff;
+}
+
+.stella-home #paths .steps b {
+  color: #fff;
+}
+
+.stella-home #paths .steps span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.stella-home #paths .human {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.35);
+  color: #fff;
+}
+
+.stella-home #paths .human-h {
+  background: rgba(255, 255, 255, 0.08);
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.stella-home #paths .dot {
+  background: #fff;
+}
+
+.stella-home #paths .dot::after {
+  border-color: #fff;
+}
+
+.stella-home #paths .av-lg {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.stella-home #paths .human-b .nm {
+  color: #fff;
+}
+
+.stella-home #paths .human-b .rl {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.stella-home #paths .human-f {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+.stella-home #paths .hrow span:first-child {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stella-home #paths .hrow span:last-child {
+  color: #fff;
+}
+
+.stella-home #paths .speaks i {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.stella-home #demand {
+  background: #fff;
+}
+
+.stella-home #support {
+  background: #001f6f;
+  color: #fff;
+}
+
+.stella-home #support .mono {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stella-home #support .head h2 {
+  color: #fff;
+}
+
+.stella-home #support .head .sub {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.stella-home #support .split {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 14px 36px -18px rgba(0, 0, 0, 0.45);
+  color: #fff;
+}
+
+.stella-home #support .half + .half {
+  border-inline-start-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.stella-home #support .half h3 {
+  color: #fff;
+}
+
+.stella-home #support .half p.d {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.stella-home #support .tk li {
+  border-top-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.stella-home #support .tk li::before {
+  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.stella-home #support .stats {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.stella-home #support .stat {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.stella-home #support .stat b {
+  color: #fff;
+  font-weight: 600;
+}
+
+.stella-home #support .stat span {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.stella-home #levels {
+  background: var(--bg-1);
+}
+
+.stella-home .sec-quote {
+  background: var(--grad-cta);
+  color: #fff;
+}
+
+.stella-home .sec-quote .quote p {
+  color: #fff;
+}
+
+.stella-home .sec-quote .quote .who {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.stella-home .sec-quote .stats {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.stella-home .sec-quote .stat {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.stella-home .sec-quote .stat b {
+  color: #fff;
+  font-weight: 600;
+}
+
+.stella-home .sec-quote .stat span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.stella-home #newcomers {
+  background: var(--bg-2);
+}
+
+.stella-home .head {
+  max-width: 60ch;
+}
+
+.stella-home .head h2 {
+  margin-top: 16px;
+}
+
+.stella-home .head .sub {
+  margin-top: 18px;
+  font-size: 18px;
+  color: var(--ink-2);
+  letter-spacing: -0.015em;
+  max-width: 62ch;
+}
+
+.stella-home .doors {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 44px;
+}
+
+.stella-home .door {
+  appearance: none;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  text-align: start;
+  padding: 22px;
+  cursor: pointer;
+  color: var(--ink);
+  font-family: var(--ui);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stella-home .door::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--ac);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stella-home .door:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh);
+  border-color: var(--line-2);
+}
+
+.stella-home .door[aria-selected="true"] {
+  border-color: var(--line-2);
+  box-shadow: var(--sh);
+}
+
+.stella-home .door[aria-selected="true"]::before {
+  transform: scaleX(1);
+}
+
+.stella-home .door-t {
+  display: block;
+  font-size: 1.24rem;
+  font-weight: 500;
+  letter-spacing: -0.034em;
+  margin-top: 0;
+  line-height: 1.15;
+}
+
+.stella-home .door-sub {
+  display: block;
+  font-size: 13.5px;
+  margin-top: 7px;
+  color: var(--ink-3);
+  letter-spacing: -0.01em;
+}
+
+.stella-home .path {
+  animation: stella-fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes stella-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.stella-home .path-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 56px;
+  align-items: start;
+  margin-top: 52px;
+}
+
+.stella-home .steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: stella-step;
+}
+
+.stella-home .steps li {
+  counter-increment: stella-step;
+  position: relative;
+  padding: 18px 0 18px 54px;
+  border-top: 1px solid var(--line);
+  transition: padding-inline-start 0.25s;
+}
+
+.stella-home .steps li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.stella-home .steps li:first-child::before {
+  top: 2px;
+}
+
+.stella-home .steps li::before {
+  content: counter(stella-step, decimal-leading-zero);
+  position: absolute;
+  inset-inline-start: 0;
+  top: 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-4);
+  letter-spacing: 0.08em;
+  transition: color 0.25s;
+}
+
+.stella-home .steps li:hover::before {
+  color: var(--ac);
+}
+
+.stella-home .steps b {
+  display: block;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: -0.024em;
+}
+
+.stella-home .steps span {
+  color: var(--ink-2);
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+}
+
+.stella-home .human {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--sh);
+}
+
+.stella-home .human-h {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--bg-1);
+}
+
+.stella-home .human-b {
+  padding: 20px 18px;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+}
+
+.stella-home .av-lg {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ac-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ac);
+  flex: none;
+}
+
+.stella-home .human-b .nm {
+  font-weight: 500;
+  font-size: 15.5px;
+  letter-spacing: -0.024em;
+}
+
+.stella-home .human-b .rl {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.stella-home .human-f {
+  border-top: 1px solid var(--line);
+  padding: 15px 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.stella-home .hrow {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 13.5px;
+}
+
+.stella-home .hrow span:first-child {
+  color: var(--ink-3);
+}
+
+.stella-home .hrow span:last-child {
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: end;
+}
+
+.stella-home .speaks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 0 18px 18px;
+}
+
+.stella-home .speaks i {
+  font-style: normal;
+  font-size: 11.5px;
+  padding: 4px 9px;
+  border-radius: 5px;
+  background: var(--bg-2);
+  color: var(--ink-2);
+}
+
+.stella-home .bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-top: 48px;
+}
+
+.stella-home .bx {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 26px;
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.25s,
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stella-home .bx:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh);
+  border-color: var(--line-2);
+}
+
+.stella-home .bx h3 {
+  margin-top: 14px;
+  font-size: 1.18rem;
+  letter-spacing: -0.032em;
+}
+
+.stella-home .bx p {
+  margin-top: 9px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.stella-home .b-lg {
+  grid-column: span 4;
+}
+
+.stella-home .b-sm {
+  grid-column: span 2;
+}
+
+.stella-home .b-md {
+  grid-column: span 3;
+}
+
+.stella-home .bx .glow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: var(--ac-soft);
+  filter: blur(46px);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.stella-home .g-tr {
+  top: -90px;
+  right: -70px;
+}
+
+.stella-home .bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 66px;
+  margin-top: 20px;
+}
+
+.stella-home .bars i {
+  flex: 1;
+  background: var(--bg-2);
+  border-radius: 3px;
+  transition:
+    height 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.3s;
+}
+
+.stella-home .bars i.hi {
+  background: var(--ac);
+}
+
+.stella-home .badgestack {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 18px;
+}
+
+.stella-home .bstack {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--ink-2);
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+
+.stella-home .bstack .tick {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--ac-soft);
+  color: var(--ac);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  flex: none;
+}
+
+.stella-home .langgrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.stella-home .langgrid i {
+  font-style: normal;
+  font-size: 12.5px;
+  padding: 5px 11px;
+  border-radius: 20px;
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+}
+
+.stella-home .board-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 26px;
+  flex-wrap: wrap;
+}
+
+.stella-home .filters {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.stella-home .filt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  padding: 7px 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+  transition: all 0.16s;
+}
+
+.stella-home .filt:hover {
+  color: var(--ink);
+  border-color: var(--line-2);
+}
+
+.stella-home .filt[aria-pressed="true"] {
+  background: var(--grad-btn);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 500;
+}
+
+.stella-home .board {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 34px;
+  font-size: 15px;
+}
+
+.stella-home .board thead th {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  text-align: start;
+  padding: 0 16px 13px 0;
+  font-weight: 400;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.stella-home .board th.num,
+.stella-home .board td.num {
+  text-align: end;
+  padding-inline-end: 0;
+}
+
+.stella-home .board tbody tr {
+  border-bottom: 1px solid var(--line);
+  transition: background 0.14s;
+}
+
+.stella-home .board tbody tr:hover {
+  background: var(--bg-1);
+}
+
+.stella-home .board td {
+  padding: 15px 16px 15px 0;
+  vertical-align: middle;
+}
+
+.stella-home .board .role {
+  font-weight: 500;
+  letter-spacing: -0.024em;
+}
+
+.stella-home .board .dim {
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
+.stella-home .board .cnt {
+  font-family: var(--mono);
+  font-size: 15px;
+}
+
+.stella-home .spark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+  vertical-align: middle;
+  margin-inline-end: 10px;
+}
+
+.stella-home .spark i {
+  width: 3px;
+  background: var(--line-2);
+  border-radius: 1px;
+}
+
+.stella-home .spark.up i {
+  background: var(--ac-line);
+}
+
+.stella-home .spark.up i:last-child {
+  background: var(--ac);
+}
+
+.stella-home .trend {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.stella-home .trend.up,
+.stella-home .trend.hot {
+  color: var(--ac);
+}
+
+.stella-home .trend.hot {
+  font-weight: 500;
+}
+
+.stella-home .board-note {
+  margin-top: 18px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.stella-home .tick-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 34px;
+  border: 1px solid var(--ac-line);
+  border-radius: 10px;
+  background: var(--ac-soft);
+  padding: 0 16px;
+  height: 52px;
+  overflow: hidden;
+}
+
+.stella-home .tick-lab {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ac);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+}
+
+.stella-home .tick-view {
+  position: relative;
+  height: 52px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.stella-home .tick-view ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stella-home .tick-view li {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: var(--ink-2);
+  gap: 9px;
+}
+
+.stella-home .tick-view b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.stella-home .tick-view em {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-4);
+  margin-inline-start: auto;
+}
+
+.stella-home .split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 50px;
+  border: 1px solid var(--ac-line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--sh);
+}
+
+.stella-home .half {
+  padding: 34px;
+}
+
+.stella-home .half + .half {
+  border-inline-start: 1px solid var(--line);
+  background: #fff;
+}
+
+.stella-home .half h3 {
+  margin-top: 14px;
+  font-size: 1.4rem;
+  letter-spacing: -0.036em;
+}
+
+.stella-home .half p.d {
+  color: var(--ink-2);
+  margin-top: 11px;
+  font-size: 15px;
+}
+
+.stella-home .tk {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+.stella-home .tk li {
+  padding: 12px 0 12px 24px;
+  border-top: 1px solid var(--line);
+  position: relative;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.stella-home .tk li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 19px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ac-line);
+}
+
+.stella-home .stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin-top: 50px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.stella-home .stat {
+  background: #fff;
+  padding: 28px 22px;
+}
+
+.stella-home .stat b {
+  display: block;
+  font-family: var(--mono);
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.stella-home .stat span {
+  font-size: 13.5px;
+  color: var(--ink-3);
+  margin-top: 6px;
+  display: block;
+}
+
+.stella-home .rungs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  margin-top: 50px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.stella-home .rung {
+  background: #fff;
+  padding: 26px 20px 30px;
+  transition: background 0.25s;
+  cursor: default;
+  position: relative;
+}
+
+.stella-home .rung:hover {
+  background: var(--bg-1);
+}
+
+.stella-home .rung.gate {
+  background: var(--grad-btn);
+}
+
+.stella-home .rung .n {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-4);
+  letter-spacing: 0.12em;
+}
+
+.stella-home .rung.gate .n {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.stella-home .rung h3 {
+  margin-top: 14px;
+}
+
+.stella-home .rung p {
+  margin-top: 9px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+
+.stella-home .rung.gate p {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.stella-home .rung.gate h3 {
+  color: #fff;
+}
+
+.stella-home .ladder {
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+  margin-top: 26px;
+  overflow: hidden;
+}
+
+.stella-home .ladder i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--ac);
+  transition: width 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stella-home .ladder i.fill {
+  width: 100%;
+}
+
+.stella-home .quote {
+  border-inline-start: 2px solid var(--ac);
+  padding-inline-start: 34px;
+  max-width: 34ch;
+}
+
+.stella-home .quote p {
+  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+  line-height: 1.28;
+  letter-spacing: -0.032em;
+}
+
+.stella-home .quote .who {
+  margin-top: 22px;
+  font-size: 14px;
+  color: var(--ink-3);
+  letter-spacing: -0.01em;
+}
+
+.stella-home .qgrid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.stella-home .new-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.stella-home .cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stella-home .mini {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.25s,
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stella-home .mini:hover {
+  border-color: var(--line-2);
+  box-shadow: var(--sh);
+  transform: translateY(-3px);
+}
+
+.stella-home .mini h3 {
+  margin-top: 12px;
+  font-size: 0.99rem;
+}
+
+.stella-home .mini p {
+  margin-top: 8px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+
+.stella-home .mini .arw {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ac);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stella-home .cta {
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: var(--grad-cta);
+  padding: 82px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+}
+
+.stella-home .cta .glow {
+  display: block;
+  position: absolute;
+  inset: -40% -20% auto auto;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.stella-home .cta::before {
+  content: "";
+  position: absolute;
+  left: -12%;
+  bottom: -35%;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 31, 111, 0.45) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.stella-home .cta > * {
+  position: relative;
+}
+
+.stella-home .cta h2 {
+  max-width: 19ch;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.stella-home .cta p {
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 48ch;
+  margin: 18px auto 0;
+}
+
+.stella-home .cta .row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.stella-home .cta .btn.ac {
+  background: #fff;
+  border-color: #fff;
+  color: #001f6f;
+}
+
+.stella-home .cta .btn.ac:hover {
+  background: #fef2f2;
+  border-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.stella-home .cta .btn.ghost {
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+}
+
+.stella-home .cta .btn.ghost:hover {
+  border-color: #fff;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.stella-home .cta .callout {
+  margin-top: 26px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.stella-home footer {
+  border-top: 1px solid transparent;
+  padding: 46px 0 60px;
+  color: rgba(255, 255, 255, 0.65);
+  background: linear-gradient(180deg, #001f6f 0%, #7f1d1d 55%, #b91c1c 100%);
+}
+
+.stella-home .foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  align-items: center;
+}
+
+.stella-home .foot .logo {
+  color: #fff;
+}
+
+.stella-home .foot .logo i {
+  color: #fff;
+}
+
+.stella-home .foot nav {
+  display: flex;
+  gap: 22px;
+  margin-inline-start: auto;
+  font-size: 13.5px;
+}
+
+.stella-home .foot a {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.stella-home .foot a:hover {
+  color: #fff;
+}
+
+.stella-home .fine {
+  margin-top: 28px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  max-width: 82ch;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.stella-home :focus-visible {
+  outline: 2px solid var(--ac);
+  outline-offset: 2px;
+  border-radius: 5px;
+}
+
+@media (max-width: 1000px) {
+  .stella-home .nav-links {
+    display: none;
+  }
+
+  .stella-home .strip-in {
+    grid-template-columns: 1fr;
+  }
+
+  .stella-home .mcard,
+  .stella-home .mcard.b {
+    text-align: start;
+    padding: 22px 0;
+  }
+
+  .stella-home .mcard.b .mtop,
+  .stella-home .mcard.b .tags {
+    justify-content: flex-start;
+  }
+
+  .stella-home .mmid {
+    border-inline: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 18px 0;
+    flex-direction: row;
+    gap: 10px;
+    align-items: baseline;
+    justify-content: flex-start;
+    background: transparent;
+  }
+
+  .stella-home .mmid::before,
+  .stella-home .mmid::after {
+    display: none;
+  }
+
+  .stella-home .path-grid,
+  .stella-home .new-grid,
+  .stella-home .split,
+  .stella-home .qgrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .stella-home .half + .half {
+    border-inline-start: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .stella-home .doors {
+    grid-template-columns: 1fr;
+  }
+
+  .stella-home .bento {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stella-home .b-lg,
+  .stella-home .b-md,
+  .stella-home .b-sm {
+    grid-column: span 2;
+  }
+
+  .stella-home .rungs,
+  .stella-home .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stella-home section {
+    padding: 70px 0;
+  }
+
+  .stella-home .searchbar {
+    flex-wrap: wrap;
+  }
+
+  .stella-home .hero-floats {
+    display: none;
+  }
+
+  .stella-home .hero-next {
+    min-height: auto;
+    padding: 44px 0 52px;
+  }
+
+  .stella-home .hero-next-in {
+    max-width: 100%;
+  }
+
+  .stella-home .hero-search-pill {
+    flex-wrap: wrap;
+    border-radius: 20px;
+    padding: 10px;
+  }
+
+  .stella-home .hero-search-field,
+  .stella-home .hero-search-field--loc {
+    flex: 1 1 100%;
+  }
+
+  .stella-home .hero-search-divider {
+    display: none;
+  }
+
+  .stella-home .hero-search-btn {
+    flex: 1 1 100%;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .stella-home .sfield + .sfield {
+    border-inline-start: 0;
+    border-top: 1px solid var(--line);
+    flex: 1 1 100%;
+  }
+
+  .stella-home .searchbar button {
+    flex: 1 1 100%;
+    padding: 16px 26px;
+  }
+
+  .stella-home .hero {
+    padding-top: 56px;
+  }
+
+  .stella-home .hero-next-title {
+    font-size: clamp(2.1rem, 9vw, 2.8rem);
+  }
+
+  .stella-home .board .dim {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .stella-home .shell {
+    padding: 0 20px;
+  }
+
+  .stella-home .cards,
+  .stella-home .bento {
+    grid-template-columns: 1fr;
+  }
+
+  .stella-home .rungs,
+  .stella-home .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stella-home .cta {
+    padding: 52px 22px;
+  }
+
+  .stella-home .quote {
+    padding-inline-start: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stella-home * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .stella-home .rv {
+    opacity: 1;
+    transform: none;
+  }
+
+  .stella-home .hero-float {
+    transform: rotate(var(--hero-rot, 0deg)) !important;
+  }
+
+  .stella-home .hero-next-title,
+  .stella-home .hero-search-pill {
+    opacity: 1;
+  }
+}

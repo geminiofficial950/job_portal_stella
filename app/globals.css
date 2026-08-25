@@ -238,7 +238,7 @@ body {
   border-radius: 12px;
   border: 1px solid #e6eaf2;
   background: #fff;
-  box-shadow: 0 12px 40px -12px rgba(185, 28, 28, 0.22);
+  box-shadow: 0 12px 40px -12px rgba(15, 39, 68, 0.22);
   opacity: 0;
   visibility: hidden;
   transform: translateY(6px);
@@ -263,12 +263,12 @@ body {
   padding: 12px;
   border-radius: 9px;
   text-decoration: none;
-  color: #b91c1c;
+  color: #0f2744;
   transition: background 0.15s ease;
 }
 
 .signin-item:hover {
-  background: #fef2f2;
+  background: #eef2f7;
 }
 
 .signin-icon {
@@ -278,13 +278,13 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  background: #fef2f2;
-  color: #b91c1c;
+  background: #eef2f7;
+  color: #1e3a5f;
   flex-shrink: 0;
 }
 
 .signin-icon.recruiter {
-  background: #dc2626;
+  background: #1e3a5f;
   color: #fff;
 }
 
@@ -325,7 +325,7 @@ body {
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  background: #dc2626;
+  background: #1e3a5f;
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -354,7 +354,7 @@ body {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #b91c1c;
+  color: #0f2744;
   letter-spacing: -0.02em;
 }
 

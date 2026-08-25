@@ -153,7 +153,7 @@ export default function RecruitersPage() {
         className="relative overflow-hidden border-b border-slate-200 px-4 py-10 sm:px-6 lg:px-8"
         style={{ background: "#f0f4f8" }}
       >
-        <div className="relative z-10 mx-auto max-w-5xl">
+        <div className="relative z-10 mx-auto max-w-5xl text-center">
           <div className="mb-6">
             <h1 className="font-manrope text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               Top Employers &amp; Recruiters
@@ -165,7 +165,7 @@ export default function RecruitersPage() {
           </div>
 
           <div
-            className="flex max-w-2xl items-center gap-3 rounded-2xl bg-white px-4 py-3"
+            className="mx-auto flex max-w-2xl items-center gap-3 rounded-2xl bg-white px-4 py-3 text-left"
             style={{
               border: "1px solid #e2e8f0",
               boxShadow: "0 4px 20px rgba(0,0,0,0.07)",

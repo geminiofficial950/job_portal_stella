@@ -15,15 +15,52 @@ export async function GET() {
 
   try {
     await connectDB();
+    const { Application } = await import("@/models/Application");
+
     const jobs = await Job.find({ recruiterId: result.auth.sub })
       .sort({ createdAt: -1 })
       .lean();
 
+    const company = await Company.findOne({ ownerId: result.auth.sub })
+      .select("name logoUrl location industry")
+      .lean();
+
+    const jobIds = jobs.map((j) => j._id);
+    const appCounts = await Application.aggregate<{
+      _id: (typeof jobIds)[number];
+      count: number;
+    }>([
+      { $match: { jobId: { $in: jobIds } } },
+      { $group: { _id: "$jobId", count: { $sum: 1 } } },
+    ]);
+    const countMap = new Map(
+      appCounts.map((row) => [String(row._id), row.count]),
+    );
+
     return NextResponse.json({
       success: true,
-      jobs: jobs.map((job) =>
-        serializeJob(job as unknown as Parameters<typeof serializeJob>[0])
-      ),
+      company: company
+        ? {
+            id: String(company._id),
+            name: company.name,
+            logoUrl: company.logoUrl || "",
+            location: company.location || "",
+            industry: company.industry || "",
+          }
+        : null,
+      jobs: jobs.map((job) => ({
+        ...serializeJob(job as unknown as Parameters<typeof serializeJob>[0]),
+        appliedCount: countMap.get(String(job._id)) ?? 0,
+        company: company
+          ? {
+              id: String(company._id),
+              name: company.name,
+              logoUrl: company.logoUrl || "",
+              location: company.location || "",
+              industry: company.industry || "",
+            }
+          : null,
+      })),
     });
   } catch (error) {
     console.error("Jobs GET error:", error);

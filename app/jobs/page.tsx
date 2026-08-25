@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import {
   Search,
   MapPin,
@@ -404,14 +402,17 @@ export default function JobSearchPage() {
     });
   }, [searchQuery, selectedCategory, selectedLevel, selectedTypes, selectedModels]);
 
+  // On detail view, filters only updated state — leave detail and show filtered list
+  useEffect(() => {
+    setSelectedJobId((prev) => (prev !== null ? null : prev));
+  }, [searchQuery, selectedCategory, selectedLevel, selectedTypes, selectedModels]);
+
   const activeJobDetail = useMemo(() => {
     return allJobsData.find((job) => job.id === selectedJobId) || null;
   }, [selectedJobId]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-inter text-slate-800 flex flex-col" style={{ fontFamily: 'var(--font-inter)' }}>
-      <Navbar />
-
       {/* Top Banner / Hero Search Header */}
       <section
         className="relative py-10 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-slate-200"
@@ -1011,7 +1012,17 @@ export default function JobSearchPage() {
                     {filteredJobs.map((job) => {
                       const isBookmarked = savedJobs.includes(job.id);
                       return (
-                        <div key={job.id}
+                        <div
+                          key={job.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setSelectedJobId(job.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              setSelectedJobId(job.id);
+                            }
+                          }}
                           className="bg-white border border-slate-100 rounded-3xl p-4 flex flex-col gap-3 cursor-pointer"
                           style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)', transition: 'transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s ease' }}
                           onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = 'translateY(-4px)'; el.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)'; }}
@@ -1023,10 +1034,16 @@ export default function JobSearchPage() {
                               <div className="w-11 h-11 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-xs shrink-0">
                                 {job.logo}
                               </div>
-                              <button type="button" onClick={() => toggleBookmark(job.id)}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleBookmark(job.id);
+                                }}
                                 className="w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer"
                                 style={{ background: isBookmarked ? '#dc2626' : '#fff', color: isBookmarked ? '#fff' : '#94a3b8', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
-                                aria-label="Bookmark Job">
+                                aria-label="Bookmark Job"
+                              >
                                 <Bookmark className="w-4 h-4 fill-current" />
                               </button>
                             </div>
@@ -1048,9 +1065,15 @@ export default function JobSearchPage() {
                                 <MapPin className="w-3 h-3" />{job.location}
                               </p>
                             </div>
-                            <button type="button" onClick={() => setSelectedJobId(job.id)}
-                              className="px-4 py-1.5 rounded-xl text-xs font-bold border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all duration-200 cursor-pointer">
-                              Details
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedJobId(job.id);
+                              }}
+                              className="px-4 py-1.5 rounded-xl text-xs font-bold border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all duration-200 cursor-pointer"
+                            >
+                              Apply
                             </button>
                           </div>
                         </div>
@@ -1084,8 +1107,6 @@ export default function JobSearchPage() {
 
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

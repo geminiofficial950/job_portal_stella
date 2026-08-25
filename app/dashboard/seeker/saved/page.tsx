@@ -1,24 +1,16 @@
-import { Bookmark, BookmarkX } from "lucide-react";
+import { BookmarkX, Search } from "lucide-react";
 import Link from "next/link";
-import { Search } from "lucide-react";
 
 export default function SeekerSavedPage() {
   return (
     <main className="px-5 py-8 sm:px-8 lg:px-10">
-      <div className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] border-l-4 border-l-[#dc2626] bg-white shadow-sm p-6 sm:p-8 mb-8">
-        <div className="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
-        <div className="relative">
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#64748b]">
-            <Bookmark className="h-3 w-3" />
-            Saved Jobs
-          </p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#0f172a]">
-            Saved Jobs
-          </h1>
-          <p className="mt-2 text-[#64748b] text-sm">
-            Keep interesting roles here while you decide.
-          </p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight text-[#0f172a]">
+          Saved Jobs
+        </h1>
+        <p className="mt-1 text-sm text-[#64748b]">
+          Keep interesting roles here while you decide.
+        </p>
       </div>
 
       <div className="rounded-2xl border-2 border-dashed border-[#fbcfe8] bg-gradient-to-br from-[#fdf2f8] to-[#fce7f3] px-6 py-16 text-center">

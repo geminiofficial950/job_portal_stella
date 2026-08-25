@@ -1,9 +1,10 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Loader2, MapPin, Search, Sparkles } from "lucide-react";
+import { Loader2, MapPin, Search, Sparkles, Check } from "lucide-react";
 
 type SeekerJob = {
   id: string;
@@ -18,6 +19,8 @@ type SeekerJob = {
   salaryCurrency: string;
   salaryPeriod: string;
   skills: string[];
+  applied: boolean;
+  applicationStatus: string | null;
   company: {
     name: string;
     logoUrl: string;
@@ -28,8 +31,10 @@ type SeekerJob = {
 
 function SeekerJobsListInner() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const matchedMode = searchParams.get("matched") === "1";
   const [loading, setLoading] = useState(true);
+  const [applyingId, setApplyingId] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [location, setLocation] = useState("");
   const [jobs, setJobs] = useState<SeekerJob[]>([]);
@@ -63,11 +68,45 @@ function SeekerJobsListInner() {
     return () => clearTimeout(t);
   }, [load]);
 
+  async function applyToJob(jobId: string) {
+    setApplyingId(jobId);
+    try {
+      const res = await fetch("/api/seeker/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        toast.error(data.message || "Could not apply");
+        if (
+          typeof data.message === "string" &&
+          data.message.toLowerCase().includes("profile")
+        ) {
+          setTimeout(() => router.push("/dashboard/seeker/profile"), 1200);
+        }
+        return;
+      }
+      toast.success("Applied successfully");
+      setJobs((prev) =>
+        prev.map((j) =>
+          j.id === jobId
+            ? { ...j, applied: true, applicationStatus: "pending" }
+            : j
+        )
+      );
+    } catch {
+      toast.error("Could not apply");
+    } finally {
+      setApplyingId(null);
+    }
+  }
+
   return (
     <div>
       {matchedMode ? (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#fecaca] bg-[#f1f5f9] px-4 py-3 text-sm text-[#991b1b]">
-          <Sparkles className="h-4 w-4 shrink-0 text-[#dc2626]" />
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#c5d0e0] bg-[#f1f5f9] px-4 py-3 text-sm text-[#1e3a5f]">
+          <Sparkles className="h-4 w-4 shrink-0" />
           Showing jobs that match your profile skills.
         </div>
       ) : null}
@@ -82,7 +121,7 @@ function SeekerJobsListInner() {
               setQ(e.target.value);
             }}
             placeholder="Title, skill, category..."
-            className="w-full rounded-lg border border-[#cdd3e0] bg-white py-2.5 pr-3 pl-9 text-sm outline-none focus:border-[#dc2626]"
+            className="w-full rounded-lg border border-[#cdd3e0] bg-white py-2.5 pr-3 pl-9 text-sm outline-none focus:border-[#1e3a5f]"
           />
         </div>
         <div className="relative">
@@ -94,7 +133,7 @@ function SeekerJobsListInner() {
               setLocation(e.target.value);
             }}
             placeholder="Location"
-            className="w-full rounded-lg border border-[#cdd3e0] bg-white py-2.5 pr-3 pl-9 text-sm outline-none focus:border-[#dc2626]"
+            className="w-full rounded-lg border border-[#cdd3e0] bg-white py-2.5 pr-3 pl-9 text-sm outline-none focus:border-[#1e3a5f]"
           />
         </div>
         <button
@@ -103,7 +142,7 @@ function SeekerJobsListInner() {
             setLoading(true);
             void load();
           }}
-          className="rounded-lg bg-[#b91c1c] px-4 py-2.5 text-sm font-semibold text-white"
+          className="rounded-lg bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white"
         >
           Search
         </button>
@@ -171,15 +210,24 @@ function SeekerJobsListInner() {
                     ) : null}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    toast.info("Applications coming next — profile ready pehle.")
-                  }
-                  className="shrink-0 rounded-lg bg-[#dc2626] px-3.5 py-2 text-sm font-semibold text-white"
-                >
-                  Apply soon
-                </button>
+                {job.applied ? (
+                  <Link
+                    href="/dashboard/seeker/applications"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#c5d0e0] bg-[#f8fafc] px-3.5 py-2 text-sm font-semibold text-[#1e3a5f]"
+                  >
+                    <Check className="h-4 w-4" />
+                    Applied
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={applyingId === job.id}
+                    onClick={() => void applyToJob(job.id)}
+                    className="shrink-0 rounded-lg bg-[#1e3a5f] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#0f2744] disabled:opacity-60"
+                  >
+                    {applyingId === job.id ? "Applying…" : "Apply"}
+                  </button>
+                )}
               </div>
             </li>
           ))}

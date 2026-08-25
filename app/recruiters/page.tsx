@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import {
   Search,
   MapPin,
@@ -256,8 +254,6 @@ export default function RecruitersPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-inter text-slate-800 flex flex-col">
-      <Navbar />
-
       {/* Top Banner / Hero Header */}
       <section
         className="relative py-10 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-slate-200"
@@ -432,8 +428,6 @@ export default function RecruitersPage() {
         )}
 
       </main>
-
-      <Footer />
     </div>
   );
 }

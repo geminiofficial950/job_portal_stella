@@ -4,6 +4,7 @@ import { requireApiAuth } from "@/lib/requireApiAuth";
 import { Job, serializeJob } from "@/models/Job";
 import { Company } from "@/models/Company";
 import { User } from "@/models/User";
+import { Application } from "@/models/Application";
 
 function normalizeSkill(s: string) {
   return s.trim().toLowerCase();
@@ -50,18 +51,32 @@ export async function GET(request: Request) {
     }
 
     const companyIds = [...new Set(jobs.map((j) => String(j.companyId)))];
-    const companies = await Company.find({ _id: { $in: companyIds } })
-      .select("name logoUrl location industry status")
-      .lean();
+    const [companies, myApps] = await Promise.all([
+      Company.find({ _id: { $in: companyIds } })
+        .select("name logoUrl location industry status")
+        .lean(),
+      Application.find({
+        seekerId: result.auth.sub,
+        jobId: { $in: jobs.map((j) => j._id) },
+      })
+        .select("jobId status")
+        .lean(),
+    ]);
     const companyMap = new Map(companies.map((c) => [String(c._id), c]));
+    const appliedMap = new Map(
+      myApps.map((a) => [String(a.jobId), a.status])
+    );
 
     return NextResponse.json({
       success: true,
       matchedOnly,
       jobs: jobs.map((job) => {
         const company = companyMap.get(String(job.companyId));
+        const appliedStatus = appliedMap.get(String(job._id)) || null;
         return {
           ...serializeJob(job as unknown as Parameters<typeof serializeJob>[0]),
+          applied: Boolean(appliedStatus),
+          applicationStatus: appliedStatus,
           company: company
             ? {
                 name: company.name,

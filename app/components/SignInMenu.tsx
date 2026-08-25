@@ -34,7 +34,7 @@ export default function SignInMenu({
   const triggerClass =
     variant === "ghost"
       ? "btn ghost sm"
-      : "inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#dc2626] border border-[#dc2626] hover:bg-[#b91c1c] hover:text-white hover:border-[#b91c1c] transition-colors";
+      : "inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-[#1e3a5f] border border-[#c5d0e0] bg-white hover:bg-[#eef2f7] hover:border-[#1e3a5f] transition-colors";
 
   async function handleLogout() {
     await logout();

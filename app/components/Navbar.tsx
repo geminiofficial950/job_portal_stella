@@ -57,45 +57,50 @@ export default function Navbar() {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-[68px]">
+        <div className="relative flex items-center justify-between h-16 sm:h-[68px]">
 
-          {/* Left: Logo + Nav Links */}
-          <div className="flex items-center gap-8 lg:gap-10">
-            {/* Logo */}
-            <Link href="/" className="flex items-center select-none group shrink-0">
-              <img
-                src="/logo.webp"
-                alt="Stella Incline logo"
-                className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.04]"
-              />
-            </Link>
+          {/* Left: Logo */}
+          <Link href="/" className="relative z-10 flex items-center select-none group shrink-0">
+            <img
+              src="/logo.webp"
+              alt="Stella Incline logo"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.04]"
+            />
+          </Link>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-1 h-[68px]">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className={`relative flex items-center h-full px-3.5 text-sm font-medium transition-colors duration-150 ${
-                      isActive
-                        ? "text-[#b91c1c]"
-                        : "text-slate-500 hover:text-[#dc2626]"
-                    }`}
-                  >
-                    {link.name}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-3 right-3 h-[2.5px] bg-[#dc2626] rounded-t-full" />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
+          {/* Center: Desktop Nav */}
+          <nav className="hidden md:flex absolute left-1/2 top-0 h-full -translate-x-1/2 items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`relative flex items-center h-full px-3.5 text-sm font-medium transition-colors duration-150 ${
+                    isActive
+                      ? "text-[#1e3a5f]"
+                      : "text-slate-500 hover:text-[#1e3a5f]"
+                  }`}
+                >
+                  {link.name}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-3 right-3 h-[2.5px] bg-[#1e3a5f] rounded-t-full" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
 
-          {/* Right: Post a Job + Log In + Hamburger */}
-          <div className="flex items-center gap-2.5">
+          {/* Right: Post a Job (recruiters only) + Log In + Hamburger */}
+          <div className="relative z-10 flex items-center gap-2.5">
+            {user?.role === "recruiter" && (
+              <Link
+                href="/dashboard/recruiter/jobs/new"
+                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1e3a5f] hover:bg-[#0f2744] transition-colors"
+              >
+                Post a job
+              </Link>
+            )}
 
             <SignInMenu variant="solid" />
 
@@ -142,14 +147,14 @@ export default function Navbar() {
                 <Link
                   href={dashboardHref}
                   onClick={() => setIsMobileOpen(false)}
-                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#fef2f2]"
+                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#eef2f7]"
                 >
                   Dashboard
                 </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#fef2f2] text-left"
+                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#eef2f7] text-left"
                 >
                   Logout
                 </button>
@@ -159,14 +164,14 @@ export default function Navbar() {
                 <Link
                   href="/login?role=user"
                   onClick={() => setIsMobileOpen(false)}
-                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#fef2f2]"
+                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#eef2f7]"
                 >
                   Sign in as job seeker
                 </Link>
                 <Link
                   href="/login?role=recruiter"
                   onClick={() => setIsMobileOpen(false)}
-                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#fef2f2]"
+                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#eef2f7]"
                 >
                   Sign in as recruiter
                 </Link>

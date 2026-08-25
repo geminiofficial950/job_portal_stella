@@ -3,18 +3,18 @@ import { requireAuth } from "@/lib/requireAuth";
 import { connectDB } from "@/lib/db";
 import { Job } from "@/models/Job";
 import { Company } from "@/models/Company";
+import DashboardStatCards from "@/app/components/DashboardStatCards";
 import {
   Briefcase,
   FileText,
   PauseCircle,
-  PlusCircle,
   Building2,
   ArrowRight,
   CheckCircle2,
   Clock3,
   AlertCircle,
-  LayoutDashboard,
   BarChart2,
+  List,
 } from "lucide-react";
 
 function formatDate(value?: Date | string | null) {
@@ -39,7 +39,6 @@ function statusStyles(status: string) {
 
 export default async function RecruiterOverviewPage() {
   const auth = await requireAuth(["recruiter"]);
-  const firstName = auth.name.split(" ")[0] || "there";
 
   await connectDB();
 
@@ -61,33 +60,24 @@ export default async function RecruiterOverviewPage() {
       value: openCount,
       icon: Briefcase,
       href: "/dashboard/recruiter/jobs",
-      gradient: "from-[#dc2626] to-[#b91c1c]",
-      bg: "from-white to-[#f1f5f9]",
-      iconBg: "bg-[#64748b]",
-      textColor: "text-[#1e293b]",
-      pill: "🟢 Live",
+      actionIcon: CheckCircle2,
+      action: "Live",
     },
     {
       label: "Total Jobs",
       value: totalJobs,
       icon: FileText,
       href: "/dashboard/recruiter/jobs",
-      gradient: "from-[#dc2626] to-[#b91c1c]",
-      bg: "from-white to-[#f1f5f9]",
-      iconBg: "bg-[#64748b]",
-      textColor: "text-[#1e293b]",
-      pill: "📋 All",
+      actionIcon: List,
+      action: "All",
     },
     {
       label: "Paused / Draft",
       value: pausedCount + draftCount,
       icon: PauseCircle,
       href: "/dashboard/recruiter/jobs",
-      gradient: "from-[#dc2626] to-[#b91c1c]",
-      bg: "from-white to-[#f1f5f9]",
-      iconBg: "bg-[#64748b]",
-      textColor: "text-[#1e293b]",
-      pill: "⏸ Inactive",
+      actionIcon: Clock3,
+      action: "Inactive",
     },
   ];
 
@@ -95,72 +85,8 @@ export default async function RecruiterOverviewPage() {
 
   return (
     <main className="px-5 py-8 sm:px-8 lg:px-10">
-
-      {/* ── Hero header ── */}
-      <div className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] border-l-4 border-l-[#dc2626] bg-white shadow-sm p-6 sm:p-8 mb-8">
-        {/* Decorative blobs */}
-        <div className="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[#f1f5f9] blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full bg-[#e2e8f0]/60 blur-2xl" />
-
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#64748b]">
-              <LayoutDashboard className="h-3 w-3" />
-              Overview
-            </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#0f172a]">
-              Welcome back, {firstName}! 👋
-            </h1>
-            <p className="mt-2 max-w-xl text-[#64748b] text-sm">
-              Live snapshot of your hiring workspace — jobs, company status, and
-              next steps.
-            </p>
-          </div>
-          <Link
-            href={
-              companyReady
-                ? "/dashboard/recruiter/jobs/new"
-                : "/dashboard/recruiter/company"
-            }
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#1e293b] shadow-lg hover:bg-[#f1f5f9] transition-all duration-200 hover:scale-105"
-          >
-            <PlusCircle className="h-4 w-4" />
-            {companyReady ? "Post a Job" : "Complete Company Profile"}
-          </Link>
-        </div>
-      </div>
-
       {/* ── Stats cards ── */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Link
-              key={stat.label}
-              href={stat.href}
-              className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${stat.bg} p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg`}
-            >
-              {/* Decorative circle */}
-              <div className={`pointer-events-none absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-br ${stat.gradient} opacity-20`} />
-
-              <div className="relative flex items-center justify-between">
-                <p className={`text-sm font-semibold ${stat.textColor} opacity-80`}>
-                  {stat.label}
-                </p>
-                <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.iconBg} text-white shadow-md`}>
-                  <Icon className="h-5 w-5" />
-                </span>
-              </div>
-              <p className={`mt-3 text-4xl font-black tracking-tight ${stat.textColor}`}>
-                {stat.value}
-              </p>
-              <span className={`mt-2 inline-block rounded-full bg-white/60 px-2.5 py-0.5 text-[11px] font-semibold ${stat.textColor} backdrop-blur-sm`}>
-                {stat.pill}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      <DashboardStatCards stats={stats} columns={3} />
 
       {/* ── Company + Account ── */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">

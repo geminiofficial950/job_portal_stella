@@ -60,6 +60,93 @@ const inputClass =
 const EMPLOYMENT = ["full-time", "part-time", "casual", "contract"];
 const WORK_MODES = ["onsite", "hybrid", "remote"];
 
+const SALARY_OPTIONS = [
+  "AUD 40k–50k / year",
+  "AUD 50k–60k / year",
+  "AUD 60k–70k / year",
+  "AUD 70k–80k / year",
+  "AUD 80k–95k / year",
+  "AUD 95k–110k / year",
+  "AUD 110k–130k / year",
+  "AUD 130k–150k / year",
+  "AUD 150k–180k / year",
+  "AUD 180k–220k / year",
+  "AUD 220k+ / year",
+  "Negotiable",
+] as const;
+
+function isValidHttpUrl(value: string) {
+  try {
+    const u = new URL(value);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function isValidLinkedInUrl(value: string) {
+  if (!isValidHttpUrl(value)) return false;
+  try {
+    const host = new URL(value).hostname.replace(/^www\./, "").toLowerCase();
+    return host === "linkedin.com" || host.endsWith(".linkedin.com");
+  } catch {
+    return false;
+  }
+}
+
+function isValidSalaryExpectation(value: string) {
+  return (SALARY_OPTIONS as readonly string[]).includes(value.trim());
+}
+
+function validateProfile(p: ProfileState): string | null {
+  if (!p.headline.trim() || p.headline.trim().length < 5) {
+    return "Headline is required (min 5 characters)";
+  }
+  if (!p.location.trim() || p.location.trim().length < 2) {
+    return "Location is required";
+  }
+  if (!p.experienceLevel) {
+    return "Please select experience level";
+  }
+  if (!p.about.trim() || p.about.trim().length < 30) {
+    return "About is required (min 30 characters)";
+  }
+  if (!p.education.trim() || p.education.trim().length < 3) {
+    return "Education is required";
+  }
+  if (!p.skills.length) {
+    return "Add at least one skill";
+  }
+  if (!p.salaryExpectation.trim()) {
+    return "Salary expectation is required";
+  }
+  if (!isValidSalaryExpectation(p.salaryExpectation)) {
+    return "Please select a salary expectation from the list";
+  }
+  if (!p.resumeUrl.trim()) {
+    return "Resume URL is required";
+  }
+  if (!isValidHttpUrl(p.resumeUrl.trim())) {
+    return "Resume URL must be a valid http/https link";
+  }
+  if (!p.linkedin.trim()) {
+    return "LinkedIn URL is required";
+  }
+  if (!isValidLinkedInUrl(p.linkedin.trim())) {
+    return "Enter a valid LinkedIn profile URL (linkedin.com/in/...)";
+  }
+  if (p.portfolio.trim() && !isValidHttpUrl(p.portfolio.trim())) {
+    return "Portfolio must be a valid http/https link";
+  }
+  if (!p.preferredEmploymentTypes.length) {
+    return "Select at least one employment type";
+  }
+  if (!p.preferredWorkModes.length) {
+    return "Select at least one work mode";
+  }
+  return null;
+}
+
 function toggleInList(list: string[], value: string) {
   return list.includes(value)
     ? list.filter((v) => v !== value)
@@ -83,6 +170,7 @@ export default function SeekerProfileForm() {
   const [mode, setMode] = useState<Mode>("choose");
   const [fromResume, setFromResume] = useState(false);
   const [skillInput, setSkillInput] = useState("");
+  const [userName, setUserName] = useState("");
   const [profile, setProfile] = useState<ProfileState>(emptyProfile());
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -97,6 +185,7 @@ export default function SeekerProfileForm() {
         }
         const next = data.profile as ProfileState;
         setProfile(next);
+        setUserName(String(data.account?.name || "").trim());
         if (hasMeaningfulProfile(next)) {
           setMode("preview");
         }
@@ -155,6 +244,11 @@ export default function SeekerProfileForm() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    const error = validateProfile(profile);
+    if (error) {
+      toast.error(error);
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/seeker/profile", {
@@ -179,9 +273,14 @@ export default function SeekerProfileForm() {
 
   /* ── Profile Preview Card ── */
   if (mode === "preview") {
-    const initials = profile.headline
-      ? profile.headline.slice(0, 2).toUpperCase()
-      : "ME";
+    const nameParts = userName.trim().split(/\s+/).filter(Boolean);
+    const initials = nameParts.length
+      ? nameParts.length === 1
+        ? nameParts[0].slice(0, 2).toUpperCase()
+        : `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+      : profile.headline
+        ? profile.headline.slice(0, 2).toUpperCase()
+        : "ME";
     const expColors: Record<string, string> = {
       entry: "bg-[#d1fae5] text-[#065f46]",
       mid: "bg-[#dbeafe] text-[#1e40af]",
@@ -192,40 +291,46 @@ export default function SeekerProfileForm() {
     return (
       <div className="space-y-4">
         {/* Header card */}
-        <div className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] border-l-4 border-l-[#dc2626] bg-white shadow-sm p-6 sm:p-8 mb-8">
-          <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-xl font-black text-white backdrop-blur-sm shadow-lg">
+        <div className="rounded-2xl border border-[#e6eaf2] bg-white p-5 sm:p-6 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#1e3a5f] text-lg font-bold text-white">
                 {initials}
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white leading-tight">
-                  {profile.headline || "Your Headline"}
+              <div className="min-w-0">
+                <h2 className="text-xl font-bold tracking-tight text-[#0f172a] truncate">
+                  {userName || "Your name"}
                 </h2>
-                <div className="mt-1.5 flex flex-wrap items-center gap-3 text-white/70 text-sm">
-                  {profile.location && (
+                {profile.headline ? (
+                  <p className="mt-0.5 text-sm font-medium text-[#475569] truncate">
+                    {profile.headline}
+                  </p>
+                ) : null}
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[#64748b]">
+                  {profile.location ? (
                     <span className="inline-flex items-center gap-1">
                       <MapPin className="h-3.5 w-3.5" /> {profile.location}
                     </span>
-                  )}
-                  {profile.experienceLevel && (
-                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold capitalize ${expColor}`}>
+                  ) : null}
+                  {profile.experienceLevel ? (
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold capitalize ${expColor}`}
+                    >
                       {profile.experienceLevel}
                     </span>
-                  )}
-                  {profile.openToWork && (
+                  ) : null}
+                  {profile.openToWork ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#d1fae5] px-2.5 py-0.5 text-[11px] font-bold text-[#065f46]">
                       <CheckCircle2 className="h-3 w-3" /> Open to Work
                     </span>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setMode("manual")}
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-[#1e293b] shadow-md hover:bg-[#f5f3ff] transition-all hover:scale-105 shrink-0"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-4 py-2.5 text-sm font-semibold text-[#1e293b] hover:bg-[#f8fafc] transition-colors"
             >
               <Pencil className="h-3.5 w-3.5" /> Edit Profile
             </button>
@@ -253,7 +358,7 @@ export default function SeekerProfileForm() {
                   {profile.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="rounded-full bg-gradient-to-r from-[#cffafe] to-[#a5f3fc] border border-[#67e8f9] px-3 py-1 text-xs font-semibold text-[#164e63]"
+                      className="rounded-full bg-[#f1f5f9] border border-[#e2e8f0] px-3 py-1 text-xs font-semibold text-[#334155]"
                     >
                       {skill}
                     </span>
@@ -520,7 +625,9 @@ export default function SeekerProfileForm() {
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="block sm:col-span-2">
-            <span className="mb-1.5 block text-sm font-medium">Headline</span>
+            <span className="mb-1.5 block text-sm font-medium">
+              Headline <span className="text-[#dc2626]">*</span>
+            </span>
             <input
               className={inputClass}
               value={profile.headline}
@@ -528,10 +635,15 @@ export default function SeekerProfileForm() {
                 setProfile((p) => ({ ...p, headline: e.target.value }))
               }
               placeholder="e.g. Frontend developer · React & TypeScript"
+              required
+              minLength={5}
+              maxLength={120}
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium">Location</span>
+            <span className="mb-1.5 block text-sm font-medium">
+              Location <span className="text-[#dc2626]">*</span>
+            </span>
             <input
               className={inputClass}
               value={profile.location}
@@ -539,11 +651,14 @@ export default function SeekerProfileForm() {
                 setProfile((p) => ({ ...p, location: e.target.value }))
               }
               placeholder="City, country"
+              required
+              minLength={2}
+              maxLength={120}
             />
           </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium">
-              Experience level
+              Experience level <span className="text-[#dc2626]">*</span>
             </span>
             <select
               className={inputClass}
@@ -555,6 +670,7 @@ export default function SeekerProfileForm() {
                     .value as ProfileState["experienceLevel"],
                 }))
               }
+              required
             >
               <option value="">Select level</option>
               <option value="entry">Entry</option>
@@ -563,7 +679,9 @@ export default function SeekerProfileForm() {
             </select>
           </label>
           <label className="block sm:col-span-2">
-            <span className="mb-1.5 block text-sm font-medium">About</span>
+            <span className="mb-1.5 block text-sm font-medium">
+              About <span className="text-[#dc2626]">*</span>
+            </span>
             <textarea
               className={`${inputClass} min-h-[120px] resize-y`}
               value={profile.about}
@@ -571,10 +689,15 @@ export default function SeekerProfileForm() {
                 setProfile((p) => ({ ...p, about: e.target.value }))
               }
               placeholder="Short summary of your background and goals"
+              required
+              minLength={30}
+              maxLength={2000}
             />
           </label>
           <label className="block sm:col-span-2">
-            <span className="mb-1.5 block text-sm font-medium">Education</span>
+            <span className="mb-1.5 block text-sm font-medium">
+              Education <span className="text-[#dc2626]">*</span>
+            </span>
             <input
               className={inputClass}
               value={profile.education}
@@ -582,64 +705,97 @@ export default function SeekerProfileForm() {
                 setProfile((p) => ({ ...p, education: e.target.value }))
               }
               placeholder="Degree · School · Year"
+              required
+              minLength={3}
+              maxLength={200}
             />
           </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium">
-              Salary expectation
+              Salary expectation <span className="text-[#dc2626]">*</span>
             </span>
-            <input
+            <select
               className={inputClass}
-              value={profile.salaryExpectation}
+              value={
+                (SALARY_OPTIONS as readonly string[]).includes(
+                  profile.salaryExpectation
+                )
+                  ? profile.salaryExpectation
+                  : ""
+              }
               onChange={(e) =>
                 setProfile((p) => ({
                   ...p,
                   salaryExpectation: e.target.value,
                 }))
               }
-              placeholder="e.g. AUD 80k–95k / year"
-            />
+              required
+            >
+              <option value="">Select salary range</option>
+              {SALARY_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium">Resume URL</span>
+            <span className="mb-1.5 block text-sm font-medium">
+              Resume URL <span className="text-[#dc2626]">*</span>
+            </span>
             <input
               className={inputClass}
+              type="url"
               value={profile.resumeUrl}
               onChange={(e) =>
                 setProfile((p) => ({ ...p, resumeUrl: e.target.value }))
               }
-              placeholder="https://..."
+              placeholder="https://drive.google.com/..."
+              required
+              maxLength={500}
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium">LinkedIn</span>
+            <span className="mb-1.5 block text-sm font-medium">
+              LinkedIn <span className="text-[#dc2626]">*</span>
+            </span>
             <input
               className={inputClass}
+              type="url"
               value={profile.linkedin}
               onChange={(e) =>
                 setProfile((p) => ({ ...p, linkedin: e.target.value }))
               }
-              placeholder="https://linkedin.com/in/..."
+              placeholder="https://www.linkedin.com/in/your-name"
+              required
+              maxLength={200}
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium">Portfolio</span>
+            <span className="mb-1.5 block text-sm font-medium">
+              Portfolio{" "}
+              <span className="font-normal text-[#94a3b8]">(optional)</span>
+            </span>
             <input
               className={inputClass}
+              type="url"
               value={profile.portfolio}
               onChange={(e) =>
                 setProfile((p) => ({ ...p, portfolio: e.target.value }))
               }
-              placeholder="https://..."
+              placeholder="https://your-site.com"
+              maxLength={200}
             />
           </label>
         </div>
       </section>
 
       <section className="rounded-2xl border border-[#e6eaf2] bg-white p-5 sm:p-6">
-        <h2 className="font-semibold">Skills</h2>
+        <h2 className="font-semibold">
+          Skills <span className="text-[#dc2626]">*</span>
+        </h2>
         <p className="mt-1 text-sm text-[#6b7a9e]">
-          Press Enter or comma to add a skill.
+          Press Enter or comma to add a skill. At least one is required.
         </p>
         <div className="mt-4 flex gap-2">
           <input
@@ -692,7 +848,9 @@ export default function SeekerProfileForm() {
         <h2 className="font-semibold">Job preferences</h2>
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
           <div>
-            <p className="mb-2 text-sm font-medium">Employment type</p>
+            <p className="mb-2 text-sm font-medium">
+              Employment type <span className="text-[#dc2626]">*</span>
+            </p>
             <div className="flex flex-wrap gap-2">
               {EMPLOYMENT.map((type) => {
                 const active = profile.preferredEmploymentTypes.includes(type);
@@ -722,7 +880,9 @@ export default function SeekerProfileForm() {
             </div>
           </div>
           <div>
-            <p className="mb-2 text-sm font-medium">Work mode</p>
+            <p className="mb-2 text-sm font-medium">
+              Work mode <span className="text-[#dc2626]">*</span>
+            </p>
             <div className="flex flex-wrap gap-2">
               {WORK_MODES.map((modeOption) => {
                 const active =

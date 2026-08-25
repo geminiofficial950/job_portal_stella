@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { DM_Mono, Inter } from "next/font/google";
 import Providers from "./components/Providers";
+import ConditionalNavbar from "./components/ConditionalNavbar";
+import ConditionalFooter from "./components/ConditionalFooter";
 import "./globals.css";
 
 /* Wellfound-style stack: Graphik → Inter, Aeonik Fono → DM Mono */
@@ -35,7 +37,11 @@ export default function RootLayout({
       className={`${inter.variable} ${dmMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Providers>{children}</Providers>
+        <Providers>
+          <ConditionalNavbar />
+          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+          <ConditionalFooter />
+        </Providers>
       </body>
     </html>
   );

@@ -3,6 +3,8 @@ import { requireAuth } from "@/lib/requireAuth";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
 import { Job } from "@/models/Job";
+import { Application } from "@/models/Application";
+import DashboardStatCards from "@/app/components/DashboardStatCards";
 import {
   Search,
   FileText,
@@ -14,9 +16,9 @@ import {
   CheckCircle2,
   Circle,
   MousePointerClick,
-  LayoutDashboard,
   ListChecks,
   Target,
+  Heart,
 } from "lucide-react";
 
 function profileCompletion(profile: {
@@ -44,12 +46,12 @@ function profileCompletion(profile: {
 
 export default async function SeekerOverviewPage() {
   const auth = await requireAuth(["user"]);
-  const firstName = auth.name.split(" ")[0] || "there";
 
   await connectDB();
-  const [user, openJobs] = await Promise.all([
+  const [user, openJobs, applicationCount] = await Promise.all([
     User.findById(auth.sub).select("seekerProfile phone").lean(),
     Job.countDocuments({ status: "open" }),
+    Application.countDocuments({ seekerId: auth.sub }),
   ]);
 
   const { checks, doneCount, percent } = profileCompletion(
@@ -62,40 +64,32 @@ export default async function SeekerOverviewPage() {
       value: openJobs,
       icon: Briefcase,
       href: "/dashboard/seeker/jobs",
-      bg: "from-white to-[#f1f5f9]",
-      iconBg: "bg-[#64748b]",
-      textColor: "text-[#1e293b]",
-      pill: "🔍 Browse",
+      actionIcon: Search,
+      action: "Browse",
     },
     {
       label: "Applications",
-      value: 0,
+      value: applicationCount,
       icon: FileText,
       href: "/dashboard/seeker/applications",
-      bg: "from-white to-[#f1f5f9]",
-      iconBg: "bg-[#64748b]",
-      textColor: "text-[#1e293b]",
-      pill: "📋 Track",
+      actionIcon: FileText,
+      action: "Track",
     },
     {
       label: "Saved Jobs",
       value: 0,
       icon: Bookmark,
       href: "/dashboard/seeker/saved",
-      bg: "from-white to-[#f1f5f9]",
-      iconBg: "bg-[#64748b]",
-      textColor: "text-[#1e293b]",
-      pill: "❤️ Saved",
+      actionIcon: Heart,
+      action: "Saved",
     },
     {
       label: "Interviews",
       value: 0,
       icon: CalendarCheck,
       href: "/dashboard/seeker/interviews",
-      bg: "from-white to-[#f1f5f9]",
-      iconBg: "bg-[#64748b]",
-      textColor: "text-[#1e293b]",
-      pill: "📅 Upcoming",
+      actionIcon: CalendarCheck,
+      action: "Upcoming",
     },
   ];
 
@@ -130,64 +124,8 @@ export default async function SeekerOverviewPage() {
 
   return (
     <main className="px-5 py-8 sm:px-8 lg:px-10">
-
-      {/* ── Hero banner ── */}
-      <div className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] border-l-4 border-l-[#dc2626] bg-white shadow-sm p-6 sm:p-8 mb-8">
-        <div className="pointer-events-none absolute -top-12 -right-12 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-1/3 h-36 w-36 rounded-full bg-[#a5f3fc]/20 blur-2xl" />
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#64748b]">
-              <LayoutDashboard className="h-3 w-3" />
-              Career Overview
-            </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#0f172a]">
-              Welcome back, {firstName}! 🎯
-            </h1>
-            <p className="mt-2 max-w-xl text-[#64748b] text-sm">
-              Your career hub — find roles, manage applications, and keep your
-              profile ready for employers.
-            </p>
-          </div>
-          <Link
-            href="/dashboard/seeker/jobs"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#dc2626] px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#b91c1c] transition-all duration-200 hover:scale-105"
-          >
-            <Search className="h-4 w-4" />
-            Find Jobs
-          </Link>
-        </div>
-      </div>
-
       {/* ── Stats grid ── */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Link
-              key={stat.label}
-              href={stat.href}
-              className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${stat.bg} p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg`}
-            >
-              <div className="pointer-events-none absolute -bottom-4 -right-4 h-20 w-20 rounded-full bg-white/30 blur-xl" />
-              <div className="relative flex items-center justify-between">
-                <p className={`text-sm font-semibold ${stat.textColor} opacity-80`}>
-                  {stat.label}
-                </p>
-                <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.iconBg} text-white shadow-md`}>
-                  <Icon className="h-5 w-5" />
-                </span>
-              </div>
-              <p className={`mt-3 text-4xl font-black tracking-tight ${stat.textColor}`}>
-                {stat.value}
-              </p>
-              <span className={`mt-2 inline-block rounded-full bg-white/60 px-2.5 py-0.5 text-[11px] font-semibold ${stat.textColor} backdrop-blur-sm`}>
-                {stat.pill}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      <DashboardStatCards stats={stats} />
 
       {/* ── Profile readiness + Quick actions ── */}
       <div className="mt-6 grid gap-4 lg:grid-cols-5">

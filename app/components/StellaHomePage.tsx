@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import SignInMenu from "./SignInMenu";
 import "../stella-jobs.css";
 
 /* ── data ── */
@@ -337,17 +336,6 @@ const PATH_CONTENT: Record<
 
 /* ── helpers ── */
 
-function LogoMark() {
-  return (
-    <svg className="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 2l2.4 7.1L21.6 9l-5.9 4.4 2.3 7.2-6-4.4-6 4.4 2.3-7.2L2.4 9l7.2.1z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
 function ArrowIcon() {
   return (
     <svg
@@ -468,7 +456,6 @@ function CountStat({
 /* ── main page ── */
 
 export default function StellaHomePage() {
-  const [navStuck, setNavStuck] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activePath, setActivePath] = useState<PathTab>("seek");
   const [region, setRegion] = useState<Region>("all");
@@ -480,9 +467,9 @@ export default function StellaHomePage() {
   const [tickerOffset, setTickerOffset] = useState(0);
   const [tickerTransition, setTickerTransition] = useState(true);
 
-  const navRef = useRef<HTMLElement>(null);
   const barsRef = useRef<HTMLDivElement>(null);
   const ladderRef = useRef<HTMLDivElement>(null);
+  const tickViewRef = useRef<HTMLDivElement>(null);
 
   const t = I18N[lang];
 
@@ -494,12 +481,11 @@ export default function StellaHomePage() {
       ? "Showing all regions · figures illustrative"
       : `Showing ${region.toUpperCase()} · figures illustrative`;
 
-  /* scroll progress + sticky nav */
+  /* scroll progress */
   useEffect(() => {
     const onScroll = () => {
       const h = document.documentElement.scrollHeight - window.innerHeight;
       setProgress(h > 0 ? (window.scrollY / h) * 100 : 0);
-      setNavStuck(window.scrollY > 8);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -547,11 +533,16 @@ export default function StellaHomePage() {
     ).matches;
     if (reduced) return;
 
+    const rowHeight = () => {
+      const h = tickViewRef.current?.getBoundingClientRect().height;
+      return h && h > 0 ? Math.round(h) : 52;
+    };
+
     let idx = 0;
     const id = setInterval(() => {
       idx++;
       setTickerTransition(true);
-      setTickerOffset(idx * 52);
+      setTickerOffset(idx * rowHeight());
 
       if (idx >= TICKER_ITEMS.length) {
         setTimeout(() => {
@@ -562,7 +553,16 @@ export default function StellaHomePage() {
       }
     }, 3000);
 
-    return () => clearInterval(id);
+    const onResize = () => {
+      setTickerTransition(false);
+      setTickerOffset(idx * rowHeight());
+    };
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   /* language dir */
@@ -589,28 +589,6 @@ export default function StellaHomePage() {
   return (
     <div className="stella-home">
       <div id="prog" style={{ width: `${progress}%` }} />
-
-      {/* nav */}
-      <header ref={navRef} className={`nav${navStuck ? " stuck" : ""}`}>
-        <div className="shell nav-in">
-          <a className="logo" href="#top">
-            <LogoMark />
-            Stella<i>Jobs</i>
-          </a>
-          <nav className="nav-links">
-            <a href="#difference">Platform</a>
-            <a href="#demand">Demand</a>
-            <a href="#levels">Levels</a>
-            <a href="#newcomers">Newcomers</a>
-          </nav>
-          <div className="nav-r">
-            <SignInMenu variant="ghost" />
-            <a className="btn sm" href="/login?role=recruiter">
-              Post a job
-            </a>
-          </div>
-        </div>
-      </header>
 
       <main id="top">
         {/* hero */}
@@ -1068,7 +1046,7 @@ export default function StellaHomePage() {
                   <span className="pulse-green-dot" />
                   Live Activity
                 </span>
-                <div className="tick-view">
+                <div className="tick-view" ref={tickViewRef}>
                   <ul
                     style={{
                       transform: `translateY(-${tickerOffset}px)`,
@@ -1080,7 +1058,9 @@ export default function StellaHomePage() {
                     {[...TICKER_ITEMS, TICKER_ITEMS[0]].map(
                       ([who, what, when], i) => (
                         <li key={i}>
-                          <b>{who}</b> {what} <em>{when}</em>
+                          <b className="tick-who">{who}</b>
+                          <span className="tick-what">{what}</span>
+                          <em className="tick-when">{when}</em>
                         </li>
                       ),
                     )}
@@ -1358,31 +1338,6 @@ export default function StellaHomePage() {
         </section>
       </main>
 
-      {/* footer */}
-      <footer>
-        <div className="shell">
-          <div className="foot">
-            <a className="logo" href="#top">
-              <LogoMark />
-              Stella<i>Jobs</i>
-            </a>
-            <nav>
-              <a href="#difference">Platform</a>
-              <a href="#demand">Demand</a>
-              <a href="#newcomers">Newcomers</a>
-              <a href="#">Privacy</a>
-              <a href="#">Contact</a>
-            </nav>
-          </div>
-          <p className="fine">
-            Stella Jobs verifies credentials and work rights supplied by
-            candidates. Assessments measure job-relevant capability against a
-            published rubric and are never used to rank candidates on attributes
-            protected under Australian anti-discrimination law. Interpreter
-            services are provided at no cost to candidates.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

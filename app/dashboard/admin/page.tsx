@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
 import { Company } from "@/models/Company";
 import { Job } from "@/models/Job";
+import DashboardStatCards from "@/app/components/DashboardStatCards";
 import {
   Users,
   Building2,
@@ -12,6 +13,7 @@ import {
   Clock3,
   CheckCircle2,
   ArrowRight,
+  Eye,
 } from "lucide-react";
 
 function formatDate(value?: Date | string | null) {
@@ -32,16 +34,12 @@ export default async function AdminOverviewPage() {
     totalUsers,
     jobSeekers,
     recruiters,
-    admins,
     pendingCompanies,
     approvedCompanies,
     rejectedCompanies,
     totalCompanies,
     openJobs,
     totalJobs,
-    draftJobs,
-    pausedJobs,
-    closedJobs,
     recentUsers,
     recentJobs,
     pendingList,
@@ -49,16 +47,12 @@ export default async function AdminOverviewPage() {
     User.countDocuments({}),
     User.countDocuments({ role: "user" }),
     User.countDocuments({ role: "recruiter" }),
-    User.countDocuments({ role: "admin" }),
     Company.countDocuments({ status: "pending" }),
     Company.countDocuments({ status: "approved" }),
     Company.countDocuments({ status: "rejected" }),
     Company.countDocuments({}),
     Job.countDocuments({ status: "open" }),
     Job.countDocuments({}),
-    Job.countDocuments({ status: "draft" }),
-    Job.countDocuments({ status: "paused" }),
-    Job.countDocuments({ status: "closed" }),
     User.find({}).sort({ createdAt: -1 }).limit(5).lean(),
     Job.find({}).sort({ createdAt: -1 }).limit(5).lean(),
     Company.find({ status: "pending" }).sort({ updatedAt: -1 }).limit(5).lean(),
@@ -68,30 +62,34 @@ export default async function AdminOverviewPage() {
     {
       label: "Total users",
       value: totalUsers,
-      sub: `${jobSeekers} seekers · ${recruiters} recruiters · ${admins} admins`,
       href: "/dashboard/admin/users",
       icon: Users,
+      actionIcon: Eye,
+      action: `${jobSeekers} seekers · ${recruiters} recruiters`,
     },
     {
       label: "Recruiters",
       value: recruiters,
-      sub: `${approvedCompanies} approved companies`,
       href: "/dashboard/admin/recruiters",
       icon: UserCog,
+      actionIcon: CheckCircle2,
+      action: `${approvedCompanies} approved companies`,
     },
     {
       label: "Companies pending",
       value: pendingCompanies,
-      sub: `${approvedCompanies} approved · ${rejectedCompanies} rejected`,
       href: "/dashboard/admin/companies",
       icon: Building2,
+      actionIcon: Clock3,
+      action: `${approvedCompanies} approved · ${rejectedCompanies} rejected`,
     },
     {
       label: "Open jobs",
       value: openJobs,
-      sub: `${totalJobs} total · ${draftJobs} draft · ${pausedJobs} paused · ${closedJobs} closed`,
       href: "/dashboard/admin/jobs",
       icon: Briefcase,
+      actionIcon: Briefcase,
+      action: `${totalJobs} total jobs`,
     },
   ];
 
@@ -110,28 +108,8 @@ export default async function AdminOverviewPage() {
         </p>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {cards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Link
-              key={card.label}
-              href={card.href}
-              className="rounded-2xl border border-[#e6eaf2] bg-white p-5 transition hover:border-[#dc2626]"
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-[#6b7a9e]">{card.label}</p>
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569]">
-                  <Icon className="h-4 w-4" />
-                </span>
-              </div>
-              <p className="mt-3 text-3xl font-medium tracking-[-0.04em]">
-                {card.value}
-              </p>
-              <p className="mt-1 text-xs text-[#6b7a9e]">{card.sub}</p>
-            </Link>
-          );
-        })}
+      <div className="mt-8">
+        <DashboardStatCards stats={cards} />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">

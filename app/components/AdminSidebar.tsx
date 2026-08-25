@@ -57,7 +57,7 @@ export default function AdminSidebar() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="lg:hidden fixed bottom-5 left-5 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#b91c1c] text-white shadow-lg"
+        className="lg:hidden fixed bottom-5 left-5 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#0f172a] text-white shadow-lg"
         aria-label="Open menu"
       >
         <Menu className="h-5 w-5" />
@@ -66,7 +66,7 @@ export default function AdminSidebar() {
       {open ? (
         <button
           type="button"
-          className="lg:hidden fixed inset-0 z-40 bg-[#b91c1c]/35"
+          className="lg:hidden fixed inset-0 z-40 bg-black/30"
           aria-label="Close menu overlay"
           onClick={() => setOpen(false)}
         />
@@ -78,11 +78,11 @@ export default function AdminSidebar() {
         }`}
       >
         <div className="flex items-center justify-between border-b border-[#eef1f7] px-5 py-4 lg:hidden">
-          <p className="text-sm font-semibold text-[#b91c1c]">Admin menu</p>
+          <p className="text-sm font-semibold text-[#1e293b]">Admin menu</p>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-lg p-1.5 text-[#6b7a9e] hover:bg-[#fef2f2]"
+            className="rounded-lg p-1.5 text-[#6b7a9e] hover:bg-[#f1f5f9]"
             aria-label="Close menu"
           >
             <X className="h-5 w-5" />
@@ -94,7 +94,7 @@ export default function AdminSidebar() {
             <Shield className="h-3.5 w-3.5" />
             Platform control
           </p>
-          <p className="mt-1 text-sm font-semibold text-[#b91c1c]">
+          <p className="mt-1 text-sm font-semibold text-[#1e293b]">
             Admin panel
           </p>
         </div>
@@ -111,15 +111,15 @@ export default function AdminSidebar() {
                     onClick={() => setOpen(false)}
                     className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors ${
                       active
-                        ? "bg-[#fef2f2] text-[#b91c1c]"
-                        : "text-[#4a5878] hover:bg-[#fef2f2] hover:text-[#b91c1c]"
+                        ? "bg-[#f1f5f9] text-[#0f172a] border-l-2 border-[#dc2626]"
+                        : "text-[#4a5878] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
                     }`}
                   >
                     <span
                       className={`flex h-8 w-8 items-center justify-center rounded-lg ${
                         active
-                          ? "bg-[#b91c1c] text-white"
-                          : "bg-[#fef2f2] text-[#6b7a9e]"
+                          ? "bg-[#dc2626] text-white"
+                          : "bg-[#f1f5f9] text-[#6b7a9e]"
                       }`}
                     >
                       <Icon className="h-4 w-4" />

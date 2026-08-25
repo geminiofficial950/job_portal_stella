@@ -234,7 +234,7 @@ export default function CompanyProfileForm() {
         {company ? (
           <StatusBadge status={company.status} />
         ) : (
-          <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#fef2f2] to-[#fef2f2] px-3 py-1 text-xs font-semibold text-[#6b7a9e] border border-[#e6eaf2]">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-semibold text-[#6b7a9e] border border-[#e6eaf2]">
             <Building2 className="h-3.5 w-3.5" />
             No profile yet
           </span>
@@ -338,7 +338,7 @@ export default function CompanyProfileForm() {
 
         <div className="block">
           <FieldLabel required>Company logo</FieldLabel>
-          <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[#e0e7ff] bg-gradient-to-br from-[#fef2f2] to-[#f5f3ff] p-4">
+          <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[#e6eaf2] bg-[#f8fafc] p-4">
             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl border border-[#e6eaf2] bg-white">
               {form.logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -364,7 +364,7 @@ export default function CompanyProfileForm() {
                 JPG, PNG, WEBP or GIF · max 2MB · uploads to Cloudinary
               </p>
               {uploading ? (
-                <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-[#b91c1c]">
+                <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-[#1e293b]">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   Uploading…
                 </p>

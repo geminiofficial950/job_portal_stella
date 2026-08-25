@@ -94,7 +94,7 @@ export default function RecruiterJobsList() {
 
   if (loading) {
     return (
-      <div className="mt-8 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-[#fffafa] to-[#fef2f2] p-6 text-[#6b7a9e]">
+      <div className="mt-8 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-white to-[#f8fafc] p-6 text-[#6b7a9e]">
         <Loader2 className="h-5 w-5 animate-spin text-[#dc2626]" />
         <span className="font-medium">Loading jobs…</span>
       </div>
@@ -132,7 +132,7 @@ export default function RecruiterJobsList() {
             className="flex flex-col gap-3 rounded-2xl border border-[#e6eaf2] bg-white p-5 shadow-sm hover:shadow-md transition-shadow sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-[#b91c1c] text-[15px]">{job.title}</p>
+              <p className="font-bold text-[#1e293b] text-[15px]">{job.title}</p>
               <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6b7a9e]">
                 <span className="inline-flex items-center gap-1">
                   <MapPin className="h-3 w-3" />

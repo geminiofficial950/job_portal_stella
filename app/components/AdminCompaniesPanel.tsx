@@ -44,17 +44,17 @@ function CompanyCard({
               className="h-14 w-14 shrink-0 rounded-xl border border-[#e6eaf2] object-cover"
             />
           ) : (
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#fef2f2] text-lg font-semibold text-[#b91c1c]">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#f1f5f9] text-lg font-semibold text-[#1e293b]">
               {c.name.slice(0, 1).toUpperCase()}
             </div>
           )}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="font-semibold text-[#b91c1c]">{c.name}</p>
+              <p className="font-semibold text-[#1e293b]">{c.name}</p>
               <span
                 className={`rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
                   c.status === "approved"
-                    ? "bg-[#fef2f2] text-[#b91c1c]"
+                    ? "bg-[#f1f5f9] text-[#0f172a]"
                     : c.status === "pending"
                       ? "bg-[#fff8e8] text-[#9a6700]"
                       : "bg-[#fff1f1] text-[#b42318]"
@@ -78,7 +78,7 @@ function CompanyCard({
                 href={c.website}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-1 inline-block text-sm text-[#b91c1c] underline decoration-[#dc2626]"
+                className="mt-1 inline-block text-sm text-[#dc2626] underline decoration-[#dc2626]"
               >
                 {c.website}
               </a>

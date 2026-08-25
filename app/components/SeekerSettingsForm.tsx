@@ -21,7 +21,7 @@ function Toggle({
   return (
     <label className="flex items-start justify-between gap-4 rounded-xl border border-[#eef1f7] px-4 py-3">
       <span>
-        <span className="block text-sm font-medium text-[#b91c1c]">{label}</span>
+        <span className="block text-sm font-medium text-[#1e293b]">{label}</span>
         {hint ? (
           <span className="mt-0.5 block text-xs text-[#6b7a9e]">{hint}</span>
         ) : null}

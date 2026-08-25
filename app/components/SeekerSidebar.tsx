@@ -23,71 +23,71 @@ const menuItems = [
     href: "/dashboard/seeker",
     icon: LayoutDashboard,
     exact: true,
-    iconBg: "bg-[#dc2626]",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    iconBg: "bg-[#64748b]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Find Jobs",
     href: "/dashboard/seeker/jobs",
     icon: Search,
-    iconBg: "bg-[#dc2626]",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    iconBg: "bg-[#64748b]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Applications",
     href: "/dashboard/seeker/applications",
     icon: FileText,
-    iconBg: "bg-[#dc2626]",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    iconBg: "bg-[#64748b]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Saved Jobs",
     href: "/dashboard/seeker/saved",
     icon: Bookmark,
-    iconBg: "bg-[#dc2626]",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    iconBg: "bg-[#64748b]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Interviews",
     href: "/dashboard/seeker/interviews",
     icon: CalendarCheck,
-    iconBg: "bg-[#dc2626]",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    iconBg: "bg-[#64748b]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Profile",
     href: "/dashboard/seeker/profile",
     icon: UserRound,
-    iconBg: "bg-[#dc2626]",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    iconBg: "bg-[#64748b]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Settings",
     href: "/dashboard/seeker/settings",
     icon: Settings,
-    iconBg: "bg-[#dc2626]",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    iconBg: "bg-[#64748b]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
 ];
 
@@ -112,7 +112,7 @@ export default function SeekerSidebar() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="lg:hidden fixed bottom-5 left-5 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#dc2626] to-[#b91c1c] text-white shadow-xl hover:scale-110 transition-transform"
+        className="lg:hidden fixed bottom-5 left-5 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#64748b] text-white shadow-xl hover:scale-110 transition-transform"
         aria-label="Open menu"
       >
         <Menu className="h-5 w-5" />
@@ -135,11 +135,11 @@ export default function SeekerSidebar() {
       >
         {/* Mobile close */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0f0f5] lg:hidden">
-          <p className="text-sm font-bold text-[#b91c1c]">Career Menu</p>
+          <p className="text-sm font-bold text-[#1e293b]">Career Menu</p>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-lg p-1.5 text-[#6b7a9e] hover:bg-[#fef2f2]"
+            className="rounded-lg p-1.5 text-[#6b7a9e] hover:bg-[#f1f5f9]"
             aria-label="Close menu"
           >
             <X className="h-5 w-5" />
@@ -148,14 +148,14 @@ export default function SeekerSidebar() {
 
         {/* Desktop header */}
         <div className="hidden lg:flex items-center gap-3 px-5 py-5 border-b border-[#f0f0f5]">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#dc2626] shadow-md shrink-0">
-            <Briefcase className="h-4 w-4 text-white" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none shrink-0">
+            <Briefcase className="h-4 w-4" />
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#9aa3b8]">
               Career Workspace
             </p>
-            <p className="text-[13px] font-bold text-[#b91c1c] leading-tight">
+            <p className="text-[13px] font-bold text-[#1e293b] leading-tight">
               Job Seeker Panel
             </p>
           </div>
@@ -180,11 +180,11 @@ export default function SeekerSidebar() {
                         className={`group flex items-center gap-3 rounded-xl border-l-2 px-3 py-2.5 text-[13.5px] font-semibold transition-all duration-150 ${
                           active
                             ? `${item.activeBg} ${item.activeText} border-l-[3px] ${item.activeBorder}`
-                            : `border-transparent text-[#5a6a8a] ${item.hoverBg} hover:text-[#b91c1c]`
+                            : `border-transparent text-[#5a6a8a] ${item.hoverBg} hover:text-[#0f172a]`
                         }`}
                       >
                         <span
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white shadow-sm ${item.iconBg} ${
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm ${active ? "bg-[#dc2626] text-white" : "bg-[#e2e8f0] text-[#475569]"} ${
                             active
                               ? "shadow-md scale-105"
                               : "opacity-80 group-hover:opacity-100 group-hover:scale-105"

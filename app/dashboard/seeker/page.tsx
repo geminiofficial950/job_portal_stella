@@ -62,9 +62,9 @@ export default async function SeekerOverviewPage() {
       value: openJobs,
       icon: Briefcase,
       href: "/dashboard/seeker/jobs",
-      bg: "from-[#fef2f2] to-[#fee2e2]",
-      iconBg: "bg-[#dc2626]",
-      textColor: "text-[#b91c1c]",
+      bg: "from-white to-[#f1f5f9]",
+      iconBg: "bg-[#64748b]",
+      textColor: "text-[#1e293b]",
       pill: "🔍 Browse",
     },
     {
@@ -72,9 +72,9 @@ export default async function SeekerOverviewPage() {
       value: 0,
       icon: FileText,
       href: "/dashboard/seeker/applications",
-      bg: "from-[#fef2f2] to-[#fee2e2]",
-      iconBg: "bg-[#dc2626]",
-      textColor: "text-[#b91c1c]",
+      bg: "from-white to-[#f1f5f9]",
+      iconBg: "bg-[#64748b]",
+      textColor: "text-[#1e293b]",
       pill: "📋 Track",
     },
     {
@@ -82,9 +82,9 @@ export default async function SeekerOverviewPage() {
       value: 0,
       icon: Bookmark,
       href: "/dashboard/seeker/saved",
-      bg: "from-[#fef2f2] to-[#fee2e2]",
-      iconBg: "bg-[#dc2626]",
-      textColor: "text-[#b91c1c]",
+      bg: "from-white to-[#f1f5f9]",
+      iconBg: "bg-[#64748b]",
+      textColor: "text-[#1e293b]",
       pill: "❤️ Saved",
     },
     {
@@ -92,9 +92,9 @@ export default async function SeekerOverviewPage() {
       value: 0,
       icon: CalendarCheck,
       href: "/dashboard/seeker/interviews",
-      bg: "from-[#fef2f2] to-[#fee2e2]",
-      iconBg: "bg-[#dc2626]",
-      textColor: "text-[#b91c1c]",
+      bg: "from-white to-[#f1f5f9]",
+      iconBg: "bg-[#64748b]",
+      textColor: "text-[#1e293b]",
       pill: "📅 Upcoming",
     },
   ];
@@ -105,7 +105,7 @@ export default async function SeekerOverviewPage() {
       copy: "Search live roles from approved employers.",
       href: "/dashboard/seeker/jobs",
       icon: Search,
-      iconBg: "bg-[#dc2626]",
+      iconBg: "bg-[#64748b]",
       hoverBorder: "hover:border-[#dc2626]/40",
     },
     {
@@ -113,7 +113,7 @@ export default async function SeekerOverviewPage() {
       copy: "Add skills, experience, and a resume link.",
       href: "/dashboard/seeker/profile",
       icon: UserRound,
-      iconBg: "bg-[#dc2626]",
+      iconBg: "bg-[#64748b]",
       hoverBorder: "hover:border-[#dc2626]/40",
     },
     {
@@ -121,37 +121,37 @@ export default async function SeekerOverviewPage() {
       copy: "Follow every role you apply to.",
       href: "/dashboard/seeker/applications",
       icon: FileText,
-      iconBg: "bg-[#dc2626]",
+      iconBg: "bg-[#64748b]",
       hoverBorder: "hover:border-[#dc2626]/40",
     },
   ];
 
-  const profileColor = { bar: "from-[#dc2626] to-[#b91c1c]", text: "text-[#b91c1c]" };
+  const profileColor = { bar: "from-[#dc2626] to-[#b91c1c]", text: "text-[#334155]" };
 
   return (
     <main className="px-5 py-8 sm:px-8 lg:px-10">
 
       {/* ── Hero banner ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c] p-6 sm:p-8 mb-8">
+      <div className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] border-l-4 border-l-[#dc2626] bg-white shadow-sm p-6 sm:p-8 mb-8">
         <div className="pointer-events-none absolute -top-12 -right-12 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-1/3 h-36 w-36 rounded-full bg-[#a5f3fc]/20 blur-2xl" />
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/80 backdrop-blur-sm">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#64748b]">
               <LayoutDashboard className="h-3 w-3" />
               Career Overview
             </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-white">
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#0f172a]">
               Welcome back, {firstName}! 🎯
             </h1>
-            <p className="mt-2 max-w-xl text-white/70 text-sm">
+            <p className="mt-2 max-w-xl text-[#64748b] text-sm">
               Your career hub — find roles, manage applications, and keep your
               profile ready for employers.
             </p>
           </div>
           <Link
             href="/dashboard/seeker/jobs"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#b91c1c] shadow-lg hover:bg-[#f5f3ff] transition-all duration-200 hover:scale-105"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#dc2626] px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#b91c1c] transition-all duration-200 hover:scale-105"
           >
             <Search className="h-4 w-4" />
             Find Jobs
@@ -196,11 +196,11 @@ export default async function SeekerOverviewPage() {
         <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm lg:col-span-3">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c] shadow-md">
-                <Target className="h-4 w-4 text-white" />
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none">
+                <Target className="h-4 w-4" />
               </span>
               <div>
-                <h2 className="font-bold text-[#b91c1c] tracking-tight">Profile Readiness</h2>
+                <h2 className="font-bold text-[#1e293b] tracking-tight">Profile Readiness</h2>
                 <p className={`text-xs font-semibold ${profileColor.text}`}>
                   {doneCount} of {checks.length} sections · {percent}%
                 </p>
@@ -208,7 +208,7 @@ export default async function SeekerOverviewPage() {
             </div>
             <Link
               href="/dashboard/seeker/profile"
-              className="inline-flex items-center gap-1 rounded-lg bg-[#fef2f2] px-3 py-1.5 text-xs font-semibold text-[#b91c1c] hover:bg-[#fef2f2] transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg bg-[#f1f5f9] px-3 py-1.5 text-xs font-semibold text-[#1e293b] hover:bg-[#f1f5f9] transition-colors"
             >
               Edit <ArrowRight className="h-3 w-3" />
             </Link>
@@ -229,7 +229,7 @@ export default async function SeekerOverviewPage() {
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   item.done
                     ? "bg-[#f0fdf4] text-[#065f46]"
-                    : "bg-[#fffafa] text-[#6b7a9e]"
+                    : "bg-[#f8fafc] text-[#6b7a9e]"
                 }`}
               >
                 {item.done ? (
@@ -246,10 +246,10 @@ export default async function SeekerOverviewPage() {
         {/* Quick actions */}
         <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm lg:col-span-2">
           <div className="flex items-center gap-2 mb-5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c] shadow-md">
-              <MousePointerClick className="h-4 w-4 text-white" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none">
+              <MousePointerClick className="h-4 w-4" />
             </span>
-            <h2 className="font-bold text-[#b91c1c] tracking-tight">Quick Actions</h2>
+            <h2 className="font-bold text-[#1e293b] tracking-tight">Quick Actions</h2>
           </div>
           <ul className="space-y-3">
             {shortcuts.map((item) => {
@@ -264,7 +264,7 @@ export default async function SeekerOverviewPage() {
                       <Icon className="h-4 w-4" />
                     </span>
                     <span className="flex-1 min-w-0">
-                      <span className="block text-sm font-bold text-[#b91c1c]">
+                      <span className="block text-sm font-bold text-[#1e293b]">
                         {item.title}
                       </span>
                       <span className="mt-0.5 block text-xs text-[#6b7a9e] truncate">
@@ -283,10 +283,10 @@ export default async function SeekerOverviewPage() {
       {/* ── Getting started steps ── */}
       <section className="mt-6 rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="flex items-center gap-2 mb-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#dc2626] shadow-md">
-            <ListChecks className="h-4 w-4 text-white" />
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none">
+            <ListChecks className="h-4 w-4" />
           </span>
-          <h2 className="font-bold text-[#b91c1c] tracking-tight">Getting Started</h2>
+          <h2 className="font-bold text-[#1e293b] tracking-tight">Getting Started</h2>
         </div>
         <ol className="grid gap-4 sm:grid-cols-3">
           {[
@@ -294,25 +294,25 @@ export default async function SeekerOverviewPage() {
               step: "01",
               title: "Build Your Profile",
               copy: "Fill skills, education, and links so recruiters know you.",
-              color: "from-[#dc2626] to-[#b91c1c]",
-              bg: "bg-[#fef2f2]",
-              text: "text-[#b91c1c]",
+              color: "from-[#475569] to-[#64748b]",
+              bg: "bg-[#f1f5f9]",
+              text: "text-[#334155]",
             },
             {
               step: "02",
               title: "Explore Open Jobs",
               copy: "Search by title, skill, or location and save roles you like.",
-              color: "from-[#dc2626] to-[#dc2626]",
-              bg: "bg-[#fef2f2]",
-              text: "text-[#b91c1c]",
+              color: "from-[#475569] to-[#64748b]",
+              bg: "bg-[#f1f5f9]",
+              text: "text-[#334155]",
             },
             {
               step: "03",
               title: "Apply & Track",
               copy: "Applications and interviews will show up here as you apply.",
-              color: "from-[#dc2626] to-[#b91c1c]",
-              bg: "bg-[#fef2f2]",
-              text: "text-[#b91c1c]",
+              color: "from-[#475569] to-[#64748b]",
+              bg: "bg-[#f1f5f9]",
+              text: "text-[#334155]",
             },
           ].map((s) => (
             <li key={s.step} className={`rounded-xl ${s.bg} p-5 border border-white`}>

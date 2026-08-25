@@ -121,7 +121,7 @@ export default async function AdminOverviewPage() {
             >
               <div className="flex items-center justify-between">
                 <p className="text-sm text-[#6b7a9e]">{card.label}</p>
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#fef2f2] text-[#b91c1c]">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569]">
                   <Icon className="h-4 w-4" />
                 </span>
               </div>
@@ -140,7 +140,7 @@ export default async function AdminOverviewPage() {
             <h2 className="font-semibold">Pending companies</h2>
             <Link
               href="/dashboard/admin/companies"
-              className="inline-flex items-center gap-1 text-sm text-[#b91c1c]"
+              className="inline-flex items-center gap-1 text-sm font-medium text-[#dc2626]"
             >
               Review <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -151,7 +151,7 @@ export default async function AdminOverviewPage() {
             <ul className="mt-4 space-y-3">
               {pendingList.map((c) => (
                 <li key={String(c._id)} className="text-sm">
-                  <p className="font-medium text-[#b91c1c]">{c.name}</p>
+                  <p className="font-medium text-[#1e293b]">{c.name}</p>
                   <p className="text-[#6b7a9e]">
                     {c.industry || "—"} · {c.location || "—"}
                   </p>
@@ -166,7 +166,7 @@ export default async function AdminOverviewPage() {
             <h2 className="font-semibold">Latest users</h2>
             <Link
               href="/dashboard/admin/users"
-              className="inline-flex items-center gap-1 text-sm text-[#b91c1c]"
+              className="inline-flex items-center gap-1 text-sm font-medium text-[#dc2626]"
             >
               All <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -174,7 +174,7 @@ export default async function AdminOverviewPage() {
           <ul className="mt-4 space-y-3">
             {recentUsers.map((u) => (
               <li key={String(u._id)} className="text-sm">
-                <p className="font-medium text-[#b91c1c]">{u.name}</p>
+                <p className="font-medium text-[#1e293b]">{u.name}</p>
                 <p className="text-[#6b7a9e]">
                   {u.role} · {formatDate(u.createdAt as Date)}
                 </p>
@@ -188,7 +188,7 @@ export default async function AdminOverviewPage() {
             <h2 className="font-semibold">Latest jobs</h2>
             <Link
               href="/dashboard/admin/jobs"
-              className="inline-flex items-center gap-1 text-sm text-[#b91c1c]"
+              className="inline-flex items-center gap-1 text-sm font-medium text-[#dc2626]"
             >
               All <ArrowRight className="h-3.5 w-3.5" />
             </Link>
@@ -199,7 +199,7 @@ export default async function AdminOverviewPage() {
             <ul className="mt-4 space-y-3">
               {recentJobs.map((j) => (
                 <li key={String(j._id)} className="text-sm">
-                  <p className="font-medium text-[#b91c1c]">{j.title}</p>
+                  <p className="font-medium text-[#1e293b]">{j.title}</p>
                   <p className="text-[#6b7a9e]">
                     {j.status} · {j.location}
                   </p>
@@ -213,7 +213,7 @@ export default async function AdminOverviewPage() {
       <section className="mt-6 rounded-2xl border border-[#e6eaf2] bg-white p-5">
         <h2 className="font-semibold">Platform snapshot</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
-          <div className="rounded-xl bg-[#fffafa] p-4">
+          <div className="rounded-xl bg-[#f8fafc] p-4">
             <p className="text-[#6b7a9e]">Companies total</p>
             <p className="mt-1 text-xl font-semibold">{totalCompanies}</p>
           </div>
@@ -223,13 +223,13 @@ export default async function AdminOverviewPage() {
             </p>
             <p className="mt-1 text-xl font-semibold">{pendingCompanies}</p>
           </div>
-          <div className="rounded-xl bg-[#fef2f2] p-4">
-            <p className="inline-flex items-center gap-1 text-[#b91c1c]">
+          <div className="rounded-xl bg-[#f1f5f9] p-4">
+            <p className="inline-flex items-center gap-1 text-[#475569]">
               <CheckCircle2 className="h-3.5 w-3.5" /> Approved
             </p>
             <p className="mt-1 text-xl font-semibold">{approvedCompanies}</p>
           </div>
-          <div className="rounded-xl bg-[#fffafa] p-4">
+          <div className="rounded-xl bg-[#f8fafc] p-4">
             <p className="text-[#6b7a9e]">Jobs total</p>
             <p className="mt-1 text-xl font-semibold">{totalJobs}</p>
           </div>

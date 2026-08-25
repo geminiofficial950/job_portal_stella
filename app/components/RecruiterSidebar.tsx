@@ -23,90 +23,90 @@ const menuItems = [
     href: "/dashboard/recruiter",
     icon: LayoutDashboard,
     exact: true,
-    iconBg: "bg-[#dc2626]",
+    iconBg: "bg-[#64748b]",
     iconColor: "text-white",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Post a Job",
     href: "/dashboard/recruiter/jobs/new",
     icon: PlusCircle,
-    iconBg: "bg-[#dc2626]",
+    iconBg: "bg-[#64748b]",
     iconColor: "text-white",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "My Jobs",
     href: "/dashboard/recruiter/jobs",
     icon: Briefcase,
     exact: true,
-    iconBg: "bg-[#dc2626]",
+    iconBg: "bg-[#64748b]",
     iconColor: "text-white",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Applications",
     href: "/dashboard/recruiter/applications",
     icon: FileText,
-    iconBg: "bg-[#dc2626]",
+    iconBg: "bg-[#64748b]",
     iconColor: "text-white",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Candidates",
     href: "/dashboard/recruiter/candidates",
     icon: Users,
-    iconBg: "bg-[#dc2626]",
+    iconBg: "bg-[#64748b]",
     iconColor: "text-white",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Interviews",
     href: "/dashboard/recruiter/interviews",
     icon: CalendarCheck,
-    iconBg: "bg-[#dc2626]",
+    iconBg: "bg-[#64748b]",
     iconColor: "text-white",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Company",
     href: "/dashboard/recruiter/company",
     icon: Building2,
-    iconBg: "bg-[#dc2626]",
+    iconBg: "bg-[#64748b]",
     iconColor: "text-white",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
   {
     label: "Settings",
     href: "/dashboard/recruiter/settings",
     icon: Settings,
-    iconBg: "bg-[#dc2626]",
+    iconBg: "bg-[#64748b]",
     iconColor: "text-white",
-    activeBg: "bg-[#fef2f2]",
-    activeText: "text-[#b91c1c]",
+    activeBg: "bg-[#f1f5f9]",
+    activeText: "text-[#0f172a]",
     activeBorder: "border-l-[#dc2626]",
-    hoverBg: "hover:bg-[#fef2f2]",
+    hoverBg: "hover:bg-[#f1f5f9]",
   },
 ];
 
@@ -125,7 +125,7 @@ export default function RecruiterSidebar() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="lg:hidden fixed bottom-5 left-5 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#dc2626] to-[#b91c1c] text-white shadow-xl hover:scale-110 transition-transform"
+        className="lg:hidden fixed bottom-5 left-5 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#64748b] text-white shadow-xl hover:scale-110 transition-transform"
         aria-label="Open menu"
       >
         <Menu className="h-5 w-5" />
@@ -148,11 +148,11 @@ export default function RecruiterSidebar() {
       >
         {/* Mobile close row */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0f0f5] lg:hidden">
-          <p className="text-sm font-bold text-[#b91c1c]">Recruiter Menu</p>
+          <p className="text-sm font-bold text-[#1e293b]">Recruiter Menu</p>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-lg p-1.5 text-[#6b7a9e] hover:bg-[#fef2f2]"
+            className="rounded-lg p-1.5 text-[#6b7a9e] hover:bg-[#f1f5f9]"
             aria-label="Close menu"
           >
             <X className="h-5 w-5" />
@@ -161,14 +161,14 @@ export default function RecruiterSidebar() {
 
         {/* Desktop header */}
         <div className="hidden lg:flex items-center gap-3 px-5 py-5 border-b border-[#f0f0f5]">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#b91c1c] to-[#dc2626] shadow-md shrink-0">
-            <Briefcase className="h-4 w-4 text-white" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none shrink-0">
+            <Briefcase className="h-4 w-4" />
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#9aa3b8]">
               Hiring Workspace
             </p>
-            <p className="text-[13px] font-bold text-[#b91c1c] leading-tight">
+            <p className="text-[13px] font-bold text-[#1e293b] leading-tight">
               Recruiter Panel
             </p>
           </div>
@@ -191,11 +191,11 @@ export default function RecruiterSidebar() {
                     className={`group flex items-center gap-3 rounded-xl border-l-2 px-3 py-2.5 text-[13.5px] font-semibold transition-all duration-150 ${
                       active
                         ? `${item.activeBg} ${item.activeText} border-l-[3px] ${item.activeBorder}`
-                        : `border-transparent text-[#5a6a8a] ${item.hoverBg} hover:text-[#b91c1c]`
+                        : `border-transparent text-[#5a6a8a] ${item.hoverBg} hover:text-[#0f172a]`
                     }`}
                   >
                     <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm ${item.iconBg} ${item.iconColor} ${
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm ${active ? "bg-[#dc2626] text-white" : "bg-[#e2e8f0] text-[#475569]"} ${
                         active ? "shadow-md scale-105" : "opacity-80 group-hover:opacity-100 group-hover:scale-105"
                       } transition-all duration-150`}
                     >
@@ -226,11 +226,11 @@ export default function RecruiterSidebar() {
                     className={`group flex items-center gap-3 rounded-xl border-l-2 px-3 py-2.5 text-[13.5px] font-semibold transition-all duration-150 ${
                       active
                         ? `${item.activeBg} ${item.activeText} border-l-[3px] ${item.activeBorder}`
-                        : `border-transparent text-[#5a6a8a] ${item.hoverBg} hover:text-[#b91c1c]`
+                        : `border-transparent text-[#5a6a8a] ${item.hoverBg} hover:text-[#0f172a]`
                     }`}
                   >
                     <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm ${item.iconBg} ${item.iconColor} ${
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm ${active ? "bg-[#dc2626] text-white" : "bg-[#e2e8f0] text-[#475569]"} ${
                         active ? "shadow-md scale-105" : "opacity-80 group-hover:opacity-100 group-hover:scale-105"
                       } transition-all duration-150`}
                     >
@@ -261,11 +261,11 @@ export default function RecruiterSidebar() {
                     className={`group flex items-center gap-3 rounded-xl border-l-2 px-3 py-2.5 text-[13.5px] font-semibold transition-all duration-150 ${
                       active
                         ? `${item.activeBg} ${item.activeText} border-l-[3px] ${item.activeBorder}`
-                        : `border-transparent text-[#5a6a8a] ${item.hoverBg} hover:text-[#b91c1c]`
+                        : `border-transparent text-[#5a6a8a] ${item.hoverBg} hover:text-[#0f172a]`
                     }`}
                   >
                     <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm ${item.iconBg} ${item.iconColor} ${
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm ${active ? "bg-[#dc2626] text-white" : "bg-[#e2e8f0] text-[#475569]"} ${
                         active ? "shadow-md scale-105" : "opacity-80 group-hover:opacity-100 group-hover:scale-105"
                       } transition-all duration-150`}
                     >
@@ -283,13 +283,13 @@ export default function RecruiterSidebar() {
         </nav>
 
         {/* Bottom status card */}
-        <div className="mx-3 mb-4 overflow-hidden rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c]">
+        <div className="mx-3 mb-4 overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#f8fafc]">
           <div className="p-4">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-[#dc2626] shadow-[0_0_6px_#dc2626]" />
-              <p className="text-xs font-bold text-white">Workspace Active</p>
+              <p className="text-xs font-bold text-[#1e293b]">Workspace Active</p>
             </div>
-            <p className="mt-1.5 text-[11px] leading-relaxed text-white/55">
+            <p className="mt-1.5 text-[11px] leading-relaxed text-[#64748b]">
               Post jobs, review applications & manage candidates.
             </p>
           </div>

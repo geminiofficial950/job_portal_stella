@@ -118,7 +118,7 @@ export default function AdminUsersPanel({
       ) : (
         <div className="mt-6 overflow-x-auto rounded-2xl border border-[#e6eaf2] bg-white">
           <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-[#eef1f7] bg-[#fffafa] text-xs uppercase tracking-[0.08em] text-[#6b7a9e]">
+            <thead className="border-b border-[#eef1f7] bg-[#f8fafc] text-xs uppercase tracking-[0.08em] text-[#6b7a9e]">
               <tr>
                 <th className="px-4 py-3 font-medium">User</th>
                 <th className="px-4 py-3 font-medium">Role</th>
@@ -132,7 +132,7 @@ export default function AdminUsersPanel({
               {users.map((u) => (
                 <tr key={u.id} className="border-b border-[#eef1f7] last:border-0">
                   <td className="px-4 py-3">
-                    <p className="font-medium text-[#b91c1c]">{u.name}</p>
+                    <p className="font-medium text-[#1e293b]">{u.name}</p>
                     <p className="text-xs text-[#6b7a9e]">{u.email}</p>
                     {u.phone ? (
                       <p className="text-xs text-[#6b7a9e]">{u.phone}</p>
@@ -156,7 +156,7 @@ export default function AdminUsersPanel({
                     <span
                       className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
                         u.isActive
-                          ? "bg-[#fef2f2] text-[#b91c1c]"
+                          ? "bg-[#f1f5f9] text-[#0f172a]"
                           : "bg-[#fff1f1] text-[#b42318]"
                       }`}
                     >

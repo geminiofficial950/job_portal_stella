@@ -3,6 +3,11 @@ import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
 import { Job, serializeJob } from "@/models/Job";
 import { Company } from "@/models/Company";
+import { User } from "@/models/User";
+
+function normalizeSkill(s: string) {
+  return s.trim().toLowerCase();
+}
 
 export async function GET(request: Request) {
   const result = await requireApiAuth(["user"]);
@@ -12,6 +17,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() || "";
     const location = searchParams.get("location")?.trim() || "";
+    const matchedOnly = searchParams.get("matched") === "1";
 
     await connectDB();
 
@@ -27,7 +33,22 @@ export async function GET(request: Request) {
       filter.location = { $regex: location, $options: "i" };
     }
 
-    const jobs = await Job.find(filter).sort({ createdAt: -1 }).limit(50).lean();
+    let jobs = await Job.find(filter).sort({ createdAt: -1 }).limit(50).lean();
+
+    if (matchedOnly) {
+      const user = await User.findById(result.auth.sub)
+        .select("seekerProfile.skills")
+        .lean();
+      const skills = new Set(
+        (user?.seekerProfile?.skills || [])
+          .map((s) => normalizeSkill(String(s)))
+          .filter(Boolean)
+      );
+      jobs = jobs.filter((job) =>
+        (job.skills || []).some((s) => skills.has(normalizeSkill(String(s))))
+      );
+    }
+
     const companyIds = [...new Set(jobs.map((j) => String(j.companyId)))];
     const companies = await Company.find({ _id: { $in: companyIds } })
       .select("name logoUrl location industry status")
@@ -36,6 +57,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
+      matchedOnly,
       jobs: jobs.map((job) => {
         const company = companyMap.get(String(job.companyId));
         return {

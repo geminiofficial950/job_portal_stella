@@ -31,7 +31,7 @@ function statusStyles(status: string) {
   if (status === "open")
     return "bg-gradient-to-r from-[#dc2626]/20 to-[#dc2626]/10 text-[#dc2626] border border-[#dc2626]/30";
   if (status === "draft")
-    return "bg-gradient-to-r from-[#b91c1c]/20 to-[#b91c1c]/10 text-[#7c3aed] border border-[#b91c1c]/30";
+    return "bg-gradient-to-r from-[#6366f1]/15 to-[#6366f1]/5 text-[#4338ca] border border-[#6366f1]/25";
   if (status === "paused")
     return "bg-gradient-to-r from-[#f59e0b]/20 to-[#f59e0b]/10 text-[#d97706] border border-[#f59e0b]/30";
   return "bg-gradient-to-r from-[#ef4444]/20 to-[#ef4444]/10 text-[#dc2626] border border-[#ef4444]/30";
@@ -62,9 +62,9 @@ export default async function RecruiterOverviewPage() {
       icon: Briefcase,
       href: "/dashboard/recruiter/jobs",
       gradient: "from-[#dc2626] to-[#b91c1c]",
-      bg: "from-[#fef2f2] to-[#fee2e2]",
-      iconBg: "bg-[#dc2626]",
-      textColor: "text-[#b91c1c]",
+      bg: "from-white to-[#f1f5f9]",
+      iconBg: "bg-[#64748b]",
+      textColor: "text-[#1e293b]",
       pill: "🟢 Live",
     },
     {
@@ -73,9 +73,9 @@ export default async function RecruiterOverviewPage() {
       icon: FileText,
       href: "/dashboard/recruiter/jobs",
       gradient: "from-[#dc2626] to-[#b91c1c]",
-      bg: "from-[#fef2f2] to-[#fee2e2]",
-      iconBg: "bg-[#dc2626]",
-      textColor: "text-[#b91c1c]",
+      bg: "from-white to-[#f1f5f9]",
+      iconBg: "bg-[#64748b]",
+      textColor: "text-[#1e293b]",
       pill: "📋 All",
     },
     {
@@ -84,9 +84,9 @@ export default async function RecruiterOverviewPage() {
       icon: PauseCircle,
       href: "/dashboard/recruiter/jobs",
       gradient: "from-[#dc2626] to-[#b91c1c]",
-      bg: "from-[#fef2f2] to-[#fee2e2]",
-      iconBg: "bg-[#dc2626]",
-      textColor: "text-[#b91c1c]",
+      bg: "from-white to-[#f1f5f9]",
+      iconBg: "bg-[#64748b]",
+      textColor: "text-[#1e293b]",
       pill: "⏸ Inactive",
     },
   ];
@@ -97,21 +97,21 @@ export default async function RecruiterOverviewPage() {
     <main className="px-5 py-8 sm:px-8 lg:px-10">
 
       {/* ── Hero header ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c] p-6 sm:p-8 mb-8">
+      <div className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] border-l-4 border-l-[#dc2626] bg-white shadow-sm p-6 sm:p-8 mb-8">
         {/* Decorative blobs */}
-        <div className="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[#dc2626]/25 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full bg-[#b91c1c]/30 blur-2xl" />
+        <div className="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-[#f1f5f9] blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full bg-[#e2e8f0]/60 blur-2xl" />
 
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/80 backdrop-blur-sm">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#64748b]">
               <LayoutDashboard className="h-3 w-3" />
               Overview
             </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-white">
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#0f172a]">
               Welcome back, {firstName}! 👋
             </h1>
-            <p className="mt-2 max-w-xl text-white/70 text-sm">
+            <p className="mt-2 max-w-xl text-[#64748b] text-sm">
               Live snapshot of your hiring workspace — jobs, company status, and
               next steps.
             </p>
@@ -122,7 +122,7 @@ export default async function RecruiterOverviewPage() {
                 ? "/dashboard/recruiter/jobs/new"
                 : "/dashboard/recruiter/company"
             }
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#b91c1c] shadow-lg hover:bg-[#fef2f2] transition-all duration-200 hover:scale-105"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#1e293b] shadow-lg hover:bg-[#f1f5f9] transition-all duration-200 hover:scale-105"
           >
             <PlusCircle className="h-4 w-4" />
             {companyReady ? "Post a Job" : "Complete Company Profile"}
@@ -169,22 +169,22 @@ export default async function RecruiterOverviewPage() {
         <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#dc2626] to-[#b91c1c] text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f1f5f9] text-[#475569]">
                 <Building2 className="h-4 w-4" />
               </span>
-              <h2 className="font-bold text-[#b91c1c] tracking-tight">Company</h2>
+              <h2 className="font-bold text-[#1e293b] tracking-tight">Company</h2>
             </div>
             <Link
               href="/dashboard/recruiter/company"
-              className="inline-flex items-center gap-1 rounded-lg bg-[#fef2f2] px-3 py-1.5 text-xs font-semibold text-[#b91c1c] hover:bg-[#fef2f2] transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg bg-[#f1f5f9] px-3 py-1.5 text-xs font-semibold text-[#1e293b] hover:bg-[#f1f5f9] transition-colors"
             >
               Manage <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
           {!company ? (
-            <div className="mt-4 rounded-xl bg-gradient-to-br from-[#fef2f2] to-[#fef2f2] p-4 border border-[#e6eaf2]">
-              <p className="font-semibold text-[#b91c1c]">No company profile yet</p>
+            <div className="mt-4 rounded-xl bg-[#f8fafc] p-4 border border-[#e6eaf2]">
+              <p className="font-semibold text-[#1e293b]">No company profile yet</p>
               <p className="mt-1 text-sm text-[#6b7a9e]">
                 Submit your company details for admin approval before posting
                 jobs.
@@ -193,7 +193,7 @@ export default async function RecruiterOverviewPage() {
           ) : (
             <div className="mt-4 space-y-3">
               <div className="flex items-start gap-3">
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-[#e6eaf2] bg-[#fffafa]">
+                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-[#e6eaf2] bg-[#f8fafc]">
                   {company.logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -206,7 +206,7 @@ export default async function RecruiterOverviewPage() {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="font-bold text-[#b91c1c]">{company.name}</p>
+                  <p className="font-bold text-[#1e293b]">{company.name}</p>
                   <p className="text-sm text-[#6b7a9e]">
                     {[company.industry, company.location]
                       .filter(Boolean)
@@ -240,23 +240,23 @@ export default async function RecruiterOverviewPage() {
         {/* Account card */}
         <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#dc2626] to-[#dc2626] text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f1f5f9] text-[#475569]">
               <BarChart2 className="h-4 w-4" />
             </span>
-            <h2 className="font-bold text-[#b91c1c] tracking-tight">Account</h2>
+            <h2 className="font-bold text-[#1e293b] tracking-tight">Account</h2>
           </div>
           <div className="space-y-0 text-sm">
-            <div className="flex justify-between gap-3 rounded-xl bg-gradient-to-r from-[#fffafa] to-[#fef2f2] px-4 py-3 mb-2">
+            <div className="flex justify-between gap-3 rounded-xl bg-gradient-to-r from-white to-[#f8fafc] px-4 py-3 mb-2">
               <span className="text-[#6b7a9e] font-medium">Name</span>
-              <span className="font-bold text-[#b91c1c]">{auth.name}</span>
+              <span className="font-bold text-[#1e293b]">{auth.name}</span>
             </div>
-            <div className="flex justify-between gap-3 rounded-xl bg-gradient-to-r from-[#fffafa] to-[#fef2f2] px-4 py-3 mb-2">
+            <div className="flex justify-between gap-3 rounded-xl bg-gradient-to-r from-white to-[#f8fafc] px-4 py-3 mb-2">
               <span className="text-[#6b7a9e] font-medium">Email</span>
-              <span className="font-bold text-[#b91c1c] truncate max-w-[60%]">{auth.email}</span>
+              <span className="font-bold text-[#1e293b] truncate max-w-[60%]">{auth.email}</span>
             </div>
             <div className="flex justify-between gap-3 rounded-xl bg-gradient-to-r from-[#ede9fe] to-[#ddd6fe] px-4 py-3">
               <span className="text-[#6b7a9e] font-medium">Role</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#dc2626] to-[#b91c1c] px-3 py-0.5 text-xs font-bold text-white capitalize">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f1f5f9] px-3 py-0.5 text-xs font-bold text-[#475569] capitalize">
                 ✨ {auth.role}
               </span>
             </div>
@@ -268,25 +268,25 @@ export default async function RecruiterOverviewPage() {
       <section className="mt-6 rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#dc2626] to-[#b91c1c] text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f1f5f9] text-[#475569]">
               <Briefcase className="h-4 w-4" />
             </span>
-            <h2 className="font-bold text-[#b91c1c] tracking-tight">Recent Jobs</h2>
+            <h2 className="font-bold text-[#1e293b] tracking-tight">Recent Jobs</h2>
           </div>
           <Link
             href="/dashboard/recruiter/jobs"
-            className="inline-flex items-center gap-1 rounded-lg bg-[#fef2f2] px-3 py-1.5 text-xs font-semibold text-[#b91c1c] hover:bg-[#fef2f2] transition-colors"
+            className="inline-flex items-center gap-1 rounded-lg bg-[#f1f5f9] px-3 py-1.5 text-xs font-semibold text-[#1e293b] hover:bg-[#f1f5f9] transition-colors"
           >
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
 
         {jobs.length === 0 ? (
-          <div className="rounded-xl border-2 border-dashed border-[#cdd3e0] px-4 py-12 text-center bg-gradient-to-br from-[#fffafa] to-[#fef2f2]">
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c]">
+          <div className="rounded-xl border-2 border-dashed border-[#cdd3e0] px-4 py-12 text-center bg-gradient-to-br from-white to-[#f8fafc]">
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f1f5f9] text-[#64748b]">
               <Briefcase className="h-7 w-7 text-white" />
             </div>
-            <p className="font-bold text-[#b91c1c]">No jobs yet</p>
+            <p className="font-bold text-[#1e293b]">No jobs yet</p>
             <p className="mt-1 text-sm text-[#6b7a9e]">
               {companyReady
                 ? "Post your first role to see it here."
@@ -298,10 +298,10 @@ export default async function RecruiterOverviewPage() {
             {jobs.map((job) => (
               <li
                 key={String(job._id)}
-                className="flex flex-col gap-2 rounded-xl bg-gradient-to-r from-[#fffafa] to-[#fef2f2] px-4 py-3 sm:flex-row sm:items-center sm:justify-between hover:from-[#fef2f2] hover:to-[#fef2f2] transition-all duration-200"
+                className="flex flex-col gap-2 rounded-xl bg-gradient-to-r from-white to-[#f8fafc] px-4 py-3 sm:flex-row sm:items-center sm:justify-between hover:from-[#f8fafc] hover:to-[#f1f5f9] transition-all duration-200"
               >
                 <div>
-                  <p className="font-bold text-[#b91c1c]">{job.title}</p>
+                  <p className="font-bold text-[#1e293b]">{job.title}</p>
                   <p className="text-xs text-[#6b7a9e] mt-0.5">
                     {job.location} · {job.employmentType} · posted{" "}
                     {formatDate(job.createdAt as Date | undefined)}

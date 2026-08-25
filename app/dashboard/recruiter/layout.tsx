@@ -10,7 +10,7 @@ export default async function RecruiterDashboardLayout({
   await requireAuth(["recruiter"]);
 
   return (
-    <div className="min-h-screen bg-[#fffafa] text-[#b91c1c] font-[family-name:var(--font-ui)]">
+    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] font-[family-name:var(--font-ui)]">
       <Navbar />
       <div className="flex min-h-[calc(100vh-68px)]">
         <RecruiterSidebar />

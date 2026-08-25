@@ -350,7 +350,14 @@ function LogoMark() {
 
 function ArrowIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
@@ -374,7 +381,7 @@ function Reveal({
           observer.disconnect();
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
+      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" },
     );
 
     observer.observe(el);
@@ -395,51 +402,6 @@ function Spark({ vals, up }: { vals: number[]; up: boolean }) {
         <i key={i} style={{ height: `${v * 2}px` }} />
       ))}
     </span>
-  );
-}
-
-function HumanCard({
-  header,
-  initials,
-  name,
-  role,
-  rows,
-  speaks,
-}: {
-  header: string;
-  initials: string;
-  name: string;
-  role: string;
-  rows: [string, string][];
-  speaks: string[];
-}) {
-  return (
-    <div className="human">
-      <div className="human-h">
-        <span className="dot" />
-        {header}
-      </div>
-      <div className="human-b">
-        <div className="av-lg">{initials}</div>
-        <div>
-          <p className="nm">{name}</p>
-          <p className="rl">{role}</p>
-        </div>
-      </div>
-      <div className="human-f">
-        {rows.map(([label, value]) => (
-          <div key={label} className="hrow">
-            <span>{label}</span>
-            <span>{value}</span>
-          </div>
-        ))}
-      </div>
-      <div className="speaks">
-        {speaks.map((lang) => (
-          <i key={lang}>{lang}</i>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -469,7 +431,9 @@ function CountStat({
         if (!entry.isIntersecting) return;
         observer.disconnect();
 
-        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const reduced = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
         if (reduced) {
           setDisplay(`${target.toLocaleString()}${suffix}`);
           return;
@@ -487,7 +451,7 @@ function CountStat({
 
         requestAnimationFrame(step);
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
 
     observer.observe(el);
@@ -553,7 +517,7 @@ export default function StellaHomePage() {
           observer.disconnect();
         }
       },
-      { threshold: 0.4 }
+      { threshold: 0.4 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -570,7 +534,7 @@ export default function StellaHomePage() {
           observer.disconnect();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -578,7 +542,9 @@ export default function StellaHomePage() {
 
   /* live ticker */
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (reduced) return;
 
     let idx = 0;
@@ -602,7 +568,10 @@ export default function StellaHomePage() {
   /* language dir */
   useEffect(() => {
     document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-    document.documentElement.setAttribute("lang", lang === "en" ? "en-AU" : lang);
+    document.documentElement.setAttribute(
+      "lang",
+      lang === "en" ? "en-AU" : lang,
+    );
   }, [lang]);
 
   const selectPath = useCallback((tab: PathTab) => setActivePath(tab), []);
@@ -620,32 +589,6 @@ export default function StellaHomePage() {
   return (
     <div className="stella-home">
       <div id="prog" style={{ width: `${progress}%` }} />
-
-      {/* top bar */}
-      <div className="top">
-        <div className="shell top-in">
-          <span className="live">
-            <span className="dot" />
-            {t.hours}
-          </span>
-          <a className="tel" href="tel:1300000000">
-            1300 000 000
-          </a>
-          <div className="langs" role="group" aria-label="Choose language">
-            {(Object.keys(LANG_LABELS) as Lang[]).map((code) => (
-              <button
-                key={code}
-                type="button"
-                className="lang"
-                aria-pressed={lang === code}
-                onClick={() => setLang(code)}
-              >
-                {LANG_LABELS[code]}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
 
       {/* nav */}
       <header ref={navRef} className={`nav${navStuck ? " stuck" : ""}`}>
@@ -680,20 +623,49 @@ export default function StellaHomePage() {
 
             <div className="hero-float hero-float--icon hero-float--slack">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#36C5F0" d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52z" />
-                <path fill="#36C5F0" d="M6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z" />
-                <path fill="#2EB67D" d="M8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834z" />
-                <path fill="#2EB67D" d="M8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312z" />
-                <path fill="#ECB22E" d="M18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834z" />
-                <path fill="#ECB22E" d="M17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312z" />
-                <path fill="#E01E5A" d="M15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52z" />
-                <path fill="#E01E5A" d="M15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.528 2.528 0 0 1 2.52-2.52h6.313A2.528 2.528 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" />
+                <path
+                  fill="#36C5F0"
+                  d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52z"
+                />
+                <path
+                  fill="#36C5F0"
+                  d="M6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z"
+                />
+                <path
+                  fill="#2EB67D"
+                  d="M8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834z"
+                />
+                <path
+                  fill="#2EB67D"
+                  d="M8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312z"
+                />
+                <path
+                  fill="#ECB22E"
+                  d="M18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834z"
+                />
+                <path
+                  fill="#ECB22E"
+                  d="M17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312z"
+                />
+                <path
+                  fill="#E01E5A"
+                  d="M15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52z"
+                />
+                <path
+                  fill="#E01E5A"
+                  d="M15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.528 2.528 0 0 1 2.52-2.52h6.313A2.528 2.528 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"
+                />
               </svg>
             </div>
 
             <div className="hero-float hero-float--icon hero-float--plant">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 22V12" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" />
+                <path
+                  d="M12 22V12"
+                  stroke="#16a34a"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
                 <path d="M12 12C12 6 18 4 20 4c0 4-2 8-8 8z" fill="#22c55e" />
                 <path d="M12 14C12 8 6 6 4 6c0 4 2 8 8 8z" fill="#4ade80" />
                 <rect x="9" y="20" width="6" height="2" rx="1" fill="#92400e" />
@@ -706,7 +678,9 @@ export default function StellaHomePage() {
               </div>
               <div>
                 <p className="hero-float-mail-title">New message</p>
-                <p className="hero-float-mail-copy">You have 5 interviews ready</p>
+                <p className="hero-float-mail-copy">
+                  You have 5 interviews ready
+                </p>
               </div>
             </div>
 
@@ -716,12 +690,22 @@ export default function StellaHomePage() {
           </div>
 
           <div className="shell hero-next-in">
-            <p className="hero-eyebrow">OVER 130K REMOTE &amp; LOCAL STARTUP JOBS</p>
+            <p className="hero-eyebrow">
+              OVER 130K REMOTE &amp; LOCAL STARTUP JOBS
+            </p>
             <h1 className="hero-next-title">Find what&apos;s next:</h1>
 
             <div className="hero-search-pill" role="search">
               <div className="hero-search-field">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
+                >
                   <circle cx="11" cy="11" r="7" />
                   <path d="M20 20l-3.5-3.5" strokeLinecap="round" />
                 </svg>
@@ -738,8 +722,20 @@ export default function StellaHomePage() {
               </div>
               <div className="hero-search-divider" />
               <div className="hero-search-field hero-search-field--loc">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z" strokeLinecap="round" strokeLinejoin="round" />
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                   <circle cx="12" cy="10" r="2.5" />
                 </svg>
                 <input
@@ -753,7 +749,11 @@ export default function StellaHomePage() {
                   }}
                 />
               </div>
-              <button type="button" className="hero-search-btn" onClick={goToJobs}>
+              <button
+                type="button"
+                className="hero-search-btn"
+                onClick={goToJobs}
+              >
                 Search
               </button>
             </div>
@@ -764,96 +764,118 @@ export default function StellaHomePage() {
         <div className="marq" aria-label="Employers hiring on Stella">
           <div className="marq-t">
             {[...EMPLOYERS, ...EMPLOYERS].map((name, i) => (
-              <span key={`${name}-${i}`}>{name}</span>
+              <span key={`${name}-${i}`}>
+                <i aria-hidden="true" />
+                {name}
+              </span>
             ))}
           </div>
         </div>
 
-        {/* difference / bento */}
+        {/* difference */}
         <section id="difference">
           <div className="shell">
-            <Reveal className="head">
-              <p className="mono">The platform</p>
-              <h2>Five things a job board cannot do.</h2>
-              <p className="sub">
-                Matching is the easy part. Everything around it is where hiring actually breaks.
+            <Reveal className="diff-intro">
+              <h2>Four things a job board cannot do.</h2>
+              <p>
+                Matching is the easy part. Everything around it is where hiring
+                actually breaks.
               </p>
             </Reveal>
 
-            <div className="bento">
-              <Reveal className="bx b-lg">
-                <div className="glow g-tr" />
-                <p className="mono">Matching</p>
+            <Reveal className="diff-panel">
+              <article className="diff-cell diff-match">
+                <div className="diff-cell-top">
+                  <span className="diff-lab">Matching Engine</span>
+                  <span className="diff-chip">98% Match Score</span>
+                </div>
                 <h3>Ranked with the reasoning shown.</h3>
                 <p>
-                  Every score comes with its evidence: which credential matched, which shift
-                  pattern fits, and exactly what is missing. No black box, no unexplained
-                  rejection.
+                  Every score comes with its evidence: which credential matched,
+                  which shift pattern fits, and exactly what is missing. No black
+                  box, no unexplained rejection.
                 </p>
-                <div className="bars" ref={barsRef}>
-                  {BAR_VALS.map((v, i) => (
-                    <i
-                      key={i}
-                      className={v > 82 ? "hi" : ""}
-                      style={{
-                        height: barsAnimated ? `${v}%` : "6px",
-                        transitionDelay: barsAnimated ? `${i * 55}ms` : undefined,
-                      }}
-                    />
-                  ))}
-                </div>
-              </Reveal>
-
-              <Reveal className="bx b-sm">
-                <p className="mono">Verification</p>
-                <h3>We check, so you don&apos;t.</h3>
-                <div className="badgestack">
+                <div className="diff-bars">
                   {[
-                    "Identity matched",
-                    "Work rights via VEVO",
-                    "Qualification at source",
-                    "Clearance current today",
-                  ].map((label) => (
-                    <div key={label} className="bstack">
-                      <span className="tick">✓</span>
-                      {label}
+                    { label: "Shift Pattern & Availability", val: "96%" },
+                    { label: "Verified Credentials & Clearances", val: "94%" },
+                    { label: "Role Capability & Skills Test", val: "88%" },
+                  ].map((bar) => (
+                    <div key={bar.label} className="diff-bar">
+                      <div className="diff-bar-top">
+                        <span>{bar.label}</span>
+                        <b>{bar.val}</b>
+                      </div>
+                      <div className="diff-bar-track">
+                        <i style={{ width: bar.val }} />
+                      </div>
                     </div>
                   ))}
                 </div>
-              </Reveal>
+              </article>
 
-              <Reveal className="bx b-sm">
-                <p className="mono">Language</p>
+              <article className="diff-cell diff-verify">
+                <div className="diff-cell-top">
+                  <span className="diff-lab">Instant Verification</span>
+                </div>
+                <h3>We check, so you don&apos;t.</h3>
+                <ul className="diff-checks">
+                  {[
+                    { label: "Identity matched", sub: "Passport & Driver License" },
+                    { label: "Work rights via VEVO", sub: "Direct DHA Database Link" },
+                    { label: "Qualification at source", sub: "University & TAFE Verified" },
+                    { label: "Clearance current today", sub: "NDIS & Police Check Valid" },
+                  ].map((item) => (
+                    <li key={item.label}>
+                      <strong>{item.label}</strong>
+                      <span>{item.sub}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+
+              <article className="diff-cell diff-lang">
+                <div className="diff-cell-top">
+                  <span className="diff-lab">Multilingual Support</span>
+                </div>
                 <h3>Twelve languages on the phones.</h3>
                 <p>Interpreters at no cost to candidates.</p>
-                <div className="langgrid">
-                  {["English", "हिन्दी", "中文", "ਪੰਜਾਬੀ", "Tiếng Việt", "العربية", "नेपाली", "+5"].map(
-                    (l) => (
-                      <i key={l}>{l}</i>
-                    )
-                  )}
-                </div>
-              </Reveal>
+                <ul className="diff-langs">
+                  {[
+                    "English",
+                    "हिन्दी",
+                    "中文",
+                    "ਪੰਜਾਬੀ",
+                    "Tiếng Việt",
+                    "العربية",
+                    "नेपाली",
+                    "+5 More",
+                  ].map((name) => (
+                    <li key={name}>{name}</li>
+                  ))}
+                </ul>
+              </article>
 
-              <Reveal className="bx b-md">
-                <p className="mono">Human screening</p>
+              <article className="diff-cell diff-screen">
+                <div className="diff-cell-top">
+                  <span className="diff-lab">Level 5 Pre-Screened</span>
+                  <span className="diff-chip">Phone Verified</span>
+                </div>
                 <h3>A phone interview before the shortlist.</h3>
                 <p>
-                  Once a candidate reaches Level 5, a consultant calls, works through a script
-                  built from the gaps in that profile, and writes a note that travels with them.
-                  Employers read the note, not just the number.
+                  Once a candidate reaches Level 5, a consultant calls, works through
+                  a script built from the gaps in that profile, and writes a note that
+                  travels with them. Employers read the note, not just the number.
                 </p>
-              </Reveal>
-
-              <Reveal className="bx b-sm">
-                <p className="mono">Offshore</p>
-                <h3>Labelled, never hidden.</h3>
-                <p>
-                  Where a role can genuinely be done remotely, offshore candidates meet the same
-                  profile standard with timezone and engagement type stated up front.
-                </p>
-              </Reveal>
-            </div>
+                <blockquote className="diff-note">
+                  <cite>Consultant Notes (Anjali K.)</cite>
+                  <p>
+                    &ldquo;5+ years aged care experience. Full 24/7 availability.
+                    Excellent communication skills and verified NDIS clearance.&rdquo;
+                  </p>
+                </blockquote>
+              </article>
+            </Reveal>
           </div>
         </section>
 
@@ -862,32 +884,44 @@ export default function StellaHomePage() {
         {/* paths */}
         <section id="paths">
           <div className="shell">
-            <Reveal className="head">
-              <p className="mono">{t.pathlab}</p>
+            <Reveal className="paths-head">
               <h2>{t.pathh2}</h2>
-            </Reveal>
-
-            <Reveal className="doors" role="tablist" aria-label="Choose your path">
-              {(
-                [
-                  { id: "seek" as PathTab, t: t.d1t, s: t.d1s },
-                  { id: "hire" as PathTab, t: t.d2t, s: t.d2s },
-                  { id: "new" as PathTab, t: t.d3t, s: t.d3s },
-                ] as const
-              ).map((door) => (
-                <button
-                  key={door.id}
-                  type="button"
-                  className="door"
-                  role="tab"
-                  aria-selected={activePath === door.id}
-                  aria-controls={`p-${door.id}`}
-                  onClick={() => selectPath(door.id)}
-                >
-                  <span className="door-t">{door.t}</span>
-                  <span className="door-sub">{door.s}</span>
-                </button>
-              ))}
+              <div
+                className="paths-switch"
+                role="tablist"
+                aria-label="Choose your path"
+              >
+                {(
+                  [
+                    { id: "seek" as PathTab, t: t.d1t, s: t.d1s },
+                    { id: "hire" as PathTab, t: t.d2t, s: t.d2s },
+                    { id: "new" as PathTab, t: t.d3t, s: t.d3s },
+                  ] as const
+                ).map((door) => (
+                  <button
+                    key={door.id}
+                    type="button"
+                    className="paths-switch-btn"
+                    role="tab"
+                    aria-selected={activePath === door.id}
+                    aria-controls={`p-${door.id}`}
+                    onClick={() => selectPath(door.id)}
+                  >
+                    {door.t}
+                  </button>
+                ))}
+              </div>
+              <p className="paths-lead">
+                {
+                  (
+                    {
+                      seek: t.d1s,
+                      hire: t.d2s,
+                      new: t.d3s,
+                    } as const
+                  )[activePath]
+                }
+              </p>
             </Reveal>
 
             <div
@@ -896,16 +930,42 @@ export default function StellaHomePage() {
               role="tabpanel"
               aria-labelledby={`tab-${activePath}`}
             >
-              <div className="path-grid">
-                <ol className="steps">
-                  {pathContent.steps.map((step) => (
-                    <li key={step.title}>
-                      <b>{step.title}</b>
-                      <span>{step.desc}</span>
-                    </li>
+              <ol
+                className="paths-rail"
+                style={{
+                  ["--paths-count" as string]: pathContent.steps.length,
+                }}
+              >
+                {pathContent.steps.map((step, i) => (
+                  <li key={step.title}>
+                    <span className="paths-rail-n">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <b>{step.title}</b>
+                    <span>{step.desc}</span>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="paths-contact">
+                <div className="paths-contact-who">
+                  <span>{pathContent.human.header}</span>
+                  <strong>{pathContent.human.name}</strong>
+                  <em>{pathContent.human.role}</em>
+                </div>
+                <div className="paths-contact-meta">
+                  {pathContent.human.rows.map(([label, value]) => (
+                    <p key={label}>
+                      <span>{label}</span>
+                      <b>{value}</b>
+                    </p>
                   ))}
-                </ol>
-                <HumanCard {...pathContent.human} />
+                </div>
+                <div className="paths-contact-langs">
+                  {pathContent.human.speaks.map((lang) => (
+                    <span key={lang}>{lang}</span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -918,69 +978,95 @@ export default function StellaHomePage() {
           <div className="shell">
             <Reveal className="board-top">
               <div className="head">
-                <p className="mono">Live demand</p>
                 <h2>What Australia is actually hiring for.</h2>
                 <p className="sub">
-                  Open roles on Stella right now, ranked by unfilled positions. Updated hourly.
+                  Open roles on Stella right now, ranked by unfilled positions.
+                  Updated hourly.
                 </p>
               </div>
-              <div className="filters" role="group" aria-label="Filter by region">
-                {(["all", "vic", "nsw", "qld", "remote"] as Region[]).map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    className="filt"
-                    aria-pressed={region === r}
-                    onClick={() => setRegion(r)}
-                  >
-                    {r === "all" ? "ALL" : r.toUpperCase()}
-                  </button>
-                ))}
+              <div
+                className="filters"
+                role="group"
+                aria-label="Filter by region"
+              >
+                {(["all", "vic", "nsw", "qld", "remote"] as Region[]).map(
+                  (r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      className="filt"
+                      aria-pressed={region === r}
+                      onClick={() => setRegion(r)}
+                    >
+                      {r === "all" ? "ALL" : r.toUpperCase()}
+                    </button>
+                  ),
+                )}
               </div>
             </Reveal>
 
             <Reveal>
-              <table className="board">
-                <thead>
-                  <tr>
-                    <th style={{ width: "32%" }}>Role</th>
-                    <th>Location</th>
-                    <th>Pay guide</th>
-                    <th className="num">Open</th>
-                    <th className="num" style={{ width: 150 }}>
-                      30-day trend
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRows.length === 0 ? (
+              <div className="board-card-wrapper">
+                <table className="board">
+                  <thead>
                     <tr>
-                      <td colSpan={5} style={{ padding: "26px 0", color: "#79818C" }}>
-                        No open roles in this region right now. Try another.
-                      </td>
+                      <th style={{ width: "32%" }}>Role</th>
+                      <th>Location</th>
+                      <th>Pay guide</th>
+                      <th className="num">Open Positions</th>
+                      <th className="num" style={{ width: 170 }}>
+                        30-day trend
+                      </th>
                     </tr>
-                  ) : (
-                    filteredRows.map((row) => (
-                      <tr key={row.role}>
-                        <td className="role">{row.role}</td>
-                        <td className="dim">{row.where}</td>
-                        <td className="dim">{row.pay}</td>
-                        <td className="num cnt">{row.open}</td>
-                        <td className="num">
-                          <Spark vals={row.s} up={row.t !== ""} />
-                          <span className={`trend ${row.t}`}>{row.tl}</span>
+                  </thead>
+                  <tbody>
+                    {filteredRows.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          style={{
+                            padding: "32px 0",
+                            textAlign: "center",
+                            color: "#64748b",
+                          }}
+                        >
+                          No open roles in this region right now. Try another
+                          region filter.
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      filteredRows.map((row) => (
+                        <tr key={row.role}>
+                          <td className="role">
+                            <span className="role-title">{row.role}</span>
+                          </td>
+                          <td className="dim">
+                            <span className="loc-text">{row.where}</span>
+                          </td>
+                          <td className="dim">
+                            <span className="pay-pill">{row.pay}</span>
+                          </td>
+                          <td className="num cnt">
+                            <span className="open-count-tag">{row.open}</span>
+                          </td>
+                          <td className="num trend-cell">
+                            <Spark vals={row.s} up={row.t !== ""} />
+                            <span className={`trend-pill ${row.t}`}>
+                              {row.tl}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
               <p className="board-note">{boardNote}</p>
 
               <div className="tick-wrap">
                 <span className="tick-lab">
-                  <span className="dot" />
-                  Live
+                  <span className="pulse-green-dot" />
+                  Live Activity
                 </span>
                 <div className="tick-view">
                   <ul
@@ -991,11 +1077,13 @@ export default function StellaHomePage() {
                         : "none",
                     }}
                   >
-                    {[...TICKER_ITEMS, TICKER_ITEMS[0]].map(([who, what, when], i) => (
-                      <li key={i}>
-                        <b>{who}</b> {what} <em>{when}</em>
-                      </li>
-                    ))}
+                    {[...TICKER_ITEMS, TICKER_ITEMS[0]].map(
+                      ([who, what, when], i) => (
+                        <li key={i}>
+                          <b>{who}</b> {what} <em>{when}</em>
+                        </li>
+                      ),
+                    )}
                   </ul>
                 </div>
               </div>
@@ -1008,63 +1096,82 @@ export default function StellaHomePage() {
         {/* support */}
         <section id="support">
           <div className="shell">
-            <Reveal className="head">
-              <p className="mono">Human support</p>
+            <Reveal className="support-intro">
               <h2>The matching is automated. The judgement is not.</h2>
-              <p className="sub">
-                Two support desks, staffed by people with names, direct lines, and enough context
-                to be useful on the first call.
+              <p>
+                Two support desks, staffed by people with names, direct lines,
+                and enough context to be useful on the first call.
               </p>
             </Reveal>
 
-            <Reveal className="split">
-              <div className="half">
-                <p className="mono">For job seekers</p>
-                <h3>A phone line a person picks up.</h3>
-                <p className="d">
-                  Not a chatbot, not a ticket number. If your application stalls, you ring and
-                  find out why.
-                </p>
-                <ul className="tk">
-                  <li>Free help writing your profile and choosing assessments</li>
-                  <li>Structured phone interview once you reach Level 5</li>
-                  <li>Honest feedback when you are not ready for a role yet</li>
-                  <li>Interpreter arranged at no cost for any call</li>
-                </ul>
-              </div>
-              <div className="half">
-                <p className="mono">For employers</p>
-                <h3>We do the verifying, you do the hiring.</h3>
-                <p className="d">
-                  Identity, work rights, qualifications, and clearances are checked at the source
-                  before a shortlist reaches you.
-                </p>
-                <ul className="tk">
-                  <li>Every credential verified with the issuing body, not just uploaded</li>
-                  <li>Work rights confirmed against VEVO, expiry dates tracked for you</li>
-                  <li>Clearances checked as current on the day you see the profile</li>
-                  <li>Direct mobile to your manager, no call queue, no ticket triage</li>
-                </ul>
-              </div>
-            </Reveal>
-
-            <Reveal className="stats">
-              <div className="stat">
+            <Reveal className="support-metrics">
+              <div className="support-metric">
                 <CountStat target={90} suffix="s" />
                 <span>Median answer time, seeker line</span>
               </div>
-              <div className="stat">
+              <div className="support-metric">
                 <CountStat target={1} />
                 <span>Account manager per employer</span>
               </div>
-              <div className="stat">
+              <div className="support-metric">
                 <CountStat target={12} />
                 <span>Languages across both desks</span>
               </div>
-              <div className="stat">
+              <div className="support-metric">
                 <CountStat target={6} suffix="h" />
                 <span>Posting to screened shortlist</span>
               </div>
+            </Reveal>
+
+            <Reveal className="support-desks">
+              <article className="support-desk">
+                <p className="support-desk-label">For job seekers</p>
+                <div className="support-desk-body">
+                  <h3>A phone line a person picks up.</h3>
+                  <p>
+                    Not a chatbot, not a ticket number. If your application
+                    stalls, you ring and find out why.
+                  </p>
+                  <ul>
+                    <li>
+                      Free help writing your profile and choosing assessments
+                    </li>
+                    <li>Structured phone interview once you reach Level 5</li>
+                    <li>
+                      Honest feedback when you are not ready for a role yet
+                    </li>
+                    <li>Interpreter arranged at no cost for any call</li>
+                  </ul>
+                </div>
+              </article>
+              <article className="support-desk">
+                <p className="support-desk-label">For employers</p>
+                <div className="support-desk-body">
+                  <h3>We do the verifying, you do the hiring.</h3>
+                  <p>
+                    Identity, work rights, qualifications, and clearances are
+                    checked at the source before a shortlist reaches you.
+                  </p>
+                  <ul>
+                    <li>
+                      Every credential verified with the issuing body, not just
+                      uploaded
+                    </li>
+                    <li>
+                      Work rights confirmed against VEVO, expiry dates tracked
+                      for you
+                    </li>
+                    <li>
+                      Clearances checked as current on the day you see the
+                      profile
+                    </li>
+                    <li>
+                      Direct mobile to your manager, no call queue, no ticket
+                      triage
+                    </li>
+                  </ul>
+                </div>
+              </article>
             </Reveal>
           </div>
         </section>
@@ -1074,33 +1181,60 @@ export default function StellaHomePage() {
         {/* levels */}
         <section id="levels">
           <div className="shell">
-            <Reveal className="head">
-              <p className="mono">The level system</p>
+            <Reveal className="levels-intro">
+              <p className="levels-kicker">The level system</p>
               <h2>A level you earn, not a badge you buy.</h2>
-              <p className="sub">
+              <p>
                 Every profile starts at one. Each level adds evidence that somebody actually
                 checked. Employers filter on it, so it has to mean something.
               </p>
             </Reveal>
-            <Reveal>
-              <div className="ladder" ref={ladderRef}>
-                <i className={ladderFill ? "fill" : ""} />
+
+            <Reveal className="levels-board">
+              <div className="levels-steps">
+                {[
+                  {
+                    n: "L1",
+                    title: "Profile started",
+                    desc: "History, availability, location.",
+                  },
+                  {
+                    n: "L2",
+                    title: "Identity and work rights",
+                    desc: "ID matched, visa status confirmed.",
+                  },
+                  {
+                    n: "L3",
+                    title: "Credentials verified",
+                    desc: "Checked at the source, overseas study included.",
+                  },
+                  {
+                    n: "L4",
+                    title: "Skills tested",
+                    desc: "Job-relevant assessments and referees.",
+                  },
+                ].map((rung) => (
+                  <div key={rung.n} className="levels-step">
+                    <span className="levels-n">{rung.n}</span>
+                    <h3>{rung.title}</h3>
+                    <p>{rung.desc}</p>
+                  </div>
+                ))}
               </div>
-            </Reveal>
-            <Reveal className="rungs">
-              {[
-                { n: "L1", title: "Profile started", desc: "History, availability, location." },
-                { n: "L2", title: "Identity and work rights", desc: "ID matched, visa status confirmed." },
-                { n: "L3", title: "Credentials verified", desc: "Checked at the source, overseas study included." },
-                { n: "L4", title: "Skills tested", desc: "Job-relevant assessments and referees." },
-                { n: "L5", title: "Human screened", desc: "Phone interview, written note, shortlist ready.", gate: true },
-              ].map((rung) => (
-                <div key={rung.n} className={`rung${rung.gate ? " gate" : ""}`}>
-                  <span className="n">{rung.n}</span>
-                  <h3>{rung.title}</h3>
-                  <p>{rung.desc}</p>
+
+              <div
+                className={`levels-gate${ladderFill ? " on" : ""}`}
+                ref={ladderRef}
+              >
+                <div className="levels-gate-in">
+                  <span className="levels-n">L5</span>
+                  <div>
+                    <h3>Human screened</h3>
+                    <p>Phone interview, written note, shortlist ready.</p>
+                  </div>
                 </div>
-              ))}
+                <span className="levels-gate-mark">Gate</span>
+              </div>
             </Reveal>
           </div>
         </section>
@@ -1112,14 +1246,19 @@ export default function StellaHomePage() {
           <div className="shell qgrid">
             <Reveal className="quote">
               <p>
-                We stopped chasing certificates. The shortlist arrives already checked, and
-                there is a person I can ring about every name on it.
+                We stopped chasing certificates. The shortlist arrives already
+                checked, and there is a person I can ring about every name on
+                it.
               </p>
               <p className="who">
-                Operations manager, 240-bed residential aged care provider, Melbourne
+                Operations manager, 240-bed residential aged care provider,
+                Melbourne
               </p>
             </Reveal>
-            <Reveal className="stats" style={{ marginTop: 0, gridTemplateColumns: "1fr 1fr" }}>
+            <Reveal
+              className="stats"
+              style={{ marginTop: 0, gridTemplateColumns: "1fr 1fr" }}
+            >
               <div className="stat">
                 <CountStat target={412} />
                 <span>Open personal care roles, VIC</span>
@@ -1144,52 +1283,51 @@ export default function StellaHomePage() {
 
         {/* newcomers */}
         <section id="newcomers">
-          <div className="shell new-grid">
-            <Reveal>
-              <p className="mono">New to Australia</p>
-              <h2 style={{ marginTop: 16 }}>
-                Nobody should have to guess how this country works.
-              </h2>
-              <p className="sub">
-                If you arrived recently, the hardest part is not the job. It is knowing which of
-                your qualifications count, what an employer is allowed to ask, and which check to
-                get first. That information is free here, whether you ever apply for a role or not.
-              </p>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 30 }}>
-                <a className="btn ac" href="#cta">
-                  Book a free consult <ArrowIcon />
-                </a>
-                <a className="btn ghost" href="#demand">
-                  See what is in demand
-                </a>
-              </div>
-            </Reveal>
-            <Reveal className="cards">
-              {[
-                {
-                  title: "Does my degree count?",
-                  desc: "How overseas qualifications are assessed against the Australian framework.",
-                },
-                {
-                  title: "Work rights by visa",
-                  desc: "Hour limits, conditions, and what changes when your visa does.",
-                },
-                {
-                  title: "Checks and clearances",
-                  desc: "Police check, NDIS screening, working with children. Which one, and when.",
-                },
-                {
-                  title: "Your first Australian job",
-                  desc: "Pay rates, award basics, and the questions employers cannot legally ask.",
-                },
-              ].map((card) => (
-                <div key={card.title} className="mini">
-                  <p className="mono">Guide</p>
-                  <h3>{card.title}</h3>
-                  <p>{card.desc}</p>
-                  <p className="arw">Read →</p>
+          <div className="shell">
+            <Reveal className="new-panel">
+              <div className="new-main">
+                <p className="new-kicker">New to Australia</p>
+                <h2>Nobody should have to guess how this country works.</h2>
+                <p>
+                  If you arrived recently, the hardest part is not the job. It is knowing which
+                  of your qualifications count, what an employer is allowed to ask, and which check
+                  to get first. That information is free here, whether you ever apply for a role
+                  or not.
+                </p>
+                <div className="new-actions">
+                  <a className="btn ac sm" href="#cta">
+                    Book a free consult <ArrowIcon />
+                  </a>
+                  <a className="btn ghost sm" href="#demand">
+                    See what is in demand
+                  </a>
                 </div>
-              ))}
+              </div>
+              <div className="new-grid">
+                {[
+                  {
+                    title: "Does my degree count?",
+                    desc: "How overseas qualifications are assessed against the Australian framework.",
+                  },
+                  {
+                    title: "Work rights by visa",
+                    desc: "Hour limits, conditions, and what changes when your visa does.",
+                  },
+                  {
+                    title: "Checks and clearances",
+                    desc: "Police check, NDIS screening, working with children. Which one, and when.",
+                  },
+                  {
+                    title: "Your first Australian job",
+                    desc: "Pay rates, award basics, and the questions employers cannot legally ask.",
+                  },
+                ].map((card) => (
+                  <a key={card.title} className="new-cell" href="#cta">
+                    <h3>{card.title}</h3>
+                    <p>{card.desc}</p>
+                  </a>
+                ))}
+              </div>
             </Reveal>
           </div>
         </section>
@@ -1201,8 +1339,8 @@ export default function StellaHomePage() {
               <div className="glow" aria-hidden="true" />
               <h2>Whichever side you are on, someone picks up.</h2>
               <p>
-                Post a role, build a profile, or just ring and ask. The first conversation costs
-                nothing.
+                Post a role, build a profile, or just ring and ask. The first
+                conversation costs nothing.
               </p>
               <div className="row">
                 <a className="btn ac" href="#">
@@ -1237,10 +1375,11 @@ export default function StellaHomePage() {
             </nav>
           </div>
           <p className="fine">
-            Stella Jobs verifies credentials and work rights supplied by candidates. Assessments
-            measure job-relevant capability against a published rubric and are never used to rank
-            candidates on attributes protected under Australian anti-discrimination law.
-            Interpreter services are provided at no cost to candidates.
+            Stella Jobs verifies credentials and work rights supplied by
+            candidates. Assessments measure job-relevant capability against a
+            published rubric and are never used to rank candidates on attributes
+            protected under Australian anti-discrimination law. Interpreter
+            services are provided at no cost to candidates.
           </p>
         </div>
       </footer>

@@ -187,12 +187,12 @@ export default function SeekerProfileForm() {
       mid: "bg-[#dbeafe] text-[#1e40af]",
       senior: "bg-[#ede9fe] text-[#4c1d95]",
     };
-    const expColor = expColors[profile.experienceLevel] ?? "bg-[#fef2f2] text-[#6b7a9e]";
+    const expColor = expColors[profile.experienceLevel] ?? "bg-[#f1f5f9] text-[#6b7a9e]";
 
     return (
       <div className="space-y-4">
         {/* Header card */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#b91c1c] via-[#7c3aed] to-[#dc2626] p-6 sm:p-8">
+        <div className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] border-l-4 border-l-[#dc2626] bg-white shadow-sm p-6 sm:p-8 mb-8">
           <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
           <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-4">
@@ -225,7 +225,7 @@ export default function SeekerProfileForm() {
             <button
               type="button"
               onClick={() => setMode("manual")}
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-[#b91c1c] shadow-md hover:bg-[#f5f3ff] transition-all hover:scale-105 shrink-0"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-[#1e293b] shadow-md hover:bg-[#f5f3ff] transition-all hover:scale-105 shrink-0"
             >
               <Pencil className="h-3.5 w-3.5" /> Edit Profile
             </button>
@@ -284,18 +284,18 @@ export default function SeekerProfileForm() {
                     </span>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-wider text-[#9aa3b8]">Salary</p>
-                      <p className="font-semibold text-[#b91c1c]">{profile.salaryExpectation}</p>
+                      <p className="font-semibold text-[#1e293b]">{profile.salaryExpectation}</p>
                     </div>
                   </li>
                 )}
                 {(profile.preferredEmploymentTypes.length > 0) && (
                   <li className="flex items-start gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#fef2f2]">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f1f5f9]">
                       <Briefcase className="h-3.5 w-3.5 text-[#dc2626]" />
                     </span>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-wider text-[#9aa3b8]">Work type</p>
-                      <p className="font-semibold text-[#b91c1c] capitalize">{profile.preferredEmploymentTypes.join(" · ")}</p>
+                      <p className="font-semibold text-[#1e293b] capitalize">{profile.preferredEmploymentTypes.join(" · ")}</p>
                     </div>
                   </li>
                 )}
@@ -306,7 +306,7 @@ export default function SeekerProfileForm() {
                     </span>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-wider text-[#9aa3b8]">Work mode</p>
-                      <p className="font-semibold text-[#b91c1c] capitalize">{profile.preferredWorkModes.join(" · ")}</p>
+                      <p className="font-semibold text-[#1e293b] capitalize">{profile.preferredWorkModes.join(" · ")}</p>
                     </div>
                   </li>
                 )}
@@ -368,10 +368,10 @@ export default function SeekerProfileForm() {
           onClick={() => setMode("resume")}
           className="group rounded-2xl border border-[#e6eaf2] bg-white p-6 text-left transition hover:border-[#dc2626] hover:shadow-md"
         >
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fef2f2] text-[#dc2626] group-hover:bg-[#dc2626] group-hover:text-white transition-colors">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#dc2626] group-hover:bg-[#dc2626] group-hover:text-white transition-colors">
             <FileUp className="h-5 w-5" />
           </span>
-          <p className="mt-4 text-lg font-semibold text-[#b91c1c]">
+          <p className="mt-4 text-lg font-semibold text-[#1e293b]">
             Fill with resume
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[#6b7a9e]">
@@ -385,10 +385,10 @@ export default function SeekerProfileForm() {
           onClick={() => setMode("manual")}
           className="group rounded-2xl border border-[#e6eaf2] bg-white p-6 text-left transition hover:border-[#dc2626] hover:shadow-md"
         >
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fef2f2] text-[#dc2626] group-hover:bg-[#dc2626] group-hover:text-white transition-colors">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#dc2626] group-hover:bg-[#dc2626] group-hover:text-white transition-colors">
             <PenLine className="h-5 w-5" />
           </span>
-          <p className="mt-4 text-lg font-semibold text-[#b91c1c]">
+          <p className="mt-4 text-lg font-semibold text-[#1e293b]">
             Fill manually
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[#6b7a9e]">
@@ -405,14 +405,14 @@ export default function SeekerProfileForm() {
         <button
           type="button"
           onClick={() => setMode("choose")}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6b7a9e] hover:text-[#b91c1c]"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6b7a9e] hover:text-[#0f172a]"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
         </button>
 
         <div className="mt-5 text-center">
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fef2f2] text-[#b91c1c]">
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f1f5f9] text-[#b91c1c]">
             <FileUp className="h-6 w-6" />
           </span>
           <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em]">
@@ -440,12 +440,12 @@ export default function SeekerProfileForm() {
             type="button"
             disabled={parsing}
             onClick={() => fileRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#cdd3e0] bg-[#fffafa] px-6 py-12 transition hover:border-[#dc2626] disabled:opacity-70"
+            className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#cdd3e0] bg-[#f8fafc] px-6 py-12 transition hover:border-[#dc2626] disabled:opacity-70"
           >
             {parsing ? (
               <>
                 <Loader2 className="h-8 w-8 animate-spin text-[#b91c1c]" />
-                <p className="mt-3 font-medium text-[#b91c1c]">
+                <p className="mt-3 font-medium text-[#1e293b]">
                   Reading your resume…
                 </p>
                 <p className="mt-1 text-sm text-[#6b7a9e]">
@@ -455,7 +455,7 @@ export default function SeekerProfileForm() {
             ) : (
               <>
                 <FileUp className="h-8 w-8 text-[#b91c1c]" />
-                <p className="mt-3 font-medium text-[#b91c1c]">
+                <p className="mt-3 font-medium text-[#1e293b]">
                   Choose resume file
                 </p>
                 <p className="mt-1 text-sm text-[#6b7a9e]">
@@ -475,7 +475,7 @@ export default function SeekerProfileForm() {
         <button
           type="button"
           onClick={() => setMode("choose")}
-          className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-[#6b7a9e] hover:text-[#b91c1c]"
+          className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-[#6b7a9e] hover:text-[#0f172a]"
         >
           <ArrowLeft className="h-4 w-4" />
           Change fill method
@@ -483,7 +483,7 @@ export default function SeekerProfileForm() {
         <button
           type="button"
           onClick={() => setMode("resume")}
-          className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-[#cdd3e0] bg-white px-3 py-2 text-sm font-medium text-[#b91c1c]"
+          className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-[#cdd3e0] bg-white px-3 py-2 text-sm font-medium text-[#1e293b]"
         >
           <FileUp className="h-4 w-4" />
           Fill from resume again
@@ -491,7 +491,7 @@ export default function SeekerProfileForm() {
       </div>
 
       {fromResume ? (
-        <div className="rounded-xl border border-[#d7f3f6] bg-[#fef2f2] px-4 py-3 text-sm text-[#b91c1c]">
+        <div className="rounded-xl border border-[#d7f3f6] bg-[#f1f5f9] px-4 py-3 text-sm text-[#dc2626]">
           Fields were filled from your resume. Review everything, tweak what you
           need, then save.
         </div>
@@ -667,7 +667,7 @@ export default function SeekerProfileForm() {
             {profile.skills.map((skill) => (
               <li
                 key={skill}
-                className="inline-flex items-center gap-1 rounded-full bg-[#fef2f2] px-3 py-1 text-sm text-[#b91c1c]"
+                className="inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-3 py-1 text-sm text-[#dc2626]"
               >
                 {skill}
                 <button

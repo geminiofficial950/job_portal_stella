@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { Loader2, MapPin, Search } from "lucide-react";
+import { Loader2, MapPin, Search, Sparkles } from "lucide-react";
 
 type SeekerJob = {
   id: string;
@@ -25,7 +26,9 @@ type SeekerJob = {
   } | null;
 };
 
-export default function SeekerJobsList() {
+function SeekerJobsListInner() {
+  const searchParams = useSearchParams();
+  const matchedMode = searchParams.get("matched") === "1";
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [location, setLocation] = useState("");
@@ -36,6 +39,7 @@ export default function SeekerJobsList() {
       const params = new URLSearchParams();
       if (q.trim()) params.set("q", q.trim());
       if (location.trim()) params.set("location", location.trim());
+      if (matchedMode) params.set("matched", "1");
       const res = await fetch(`/api/seeker/jobs?${params.toString()}`, {
         cache: "no-store",
       });
@@ -50,7 +54,7 @@ export default function SeekerJobsList() {
     } finally {
       setLoading(false);
     }
-  }, [q, location]);
+  }, [q, location, matchedMode]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -61,6 +65,13 @@ export default function SeekerJobsList() {
 
   return (
     <div>
+      {matchedMode ? (
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#fecaca] bg-[#f1f5f9] px-4 py-3 text-sm text-[#991b1b]">
+          <Sparkles className="h-4 w-4 shrink-0 text-[#dc2626]" />
+          Showing jobs that match your profile skills.
+        </div>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]">
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#6b7a9e]" />
@@ -105,9 +116,13 @@ export default function SeekerJobsList() {
         </div>
       ) : jobs.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-[#cdd3e0] bg-white px-6 py-16 text-center">
-          <p className="font-semibold text-[#b91c1c]">No open jobs yet</p>
+          <p className="font-semibold text-[#1e293b]">
+            {matchedMode ? "No skill matches right now" : "No open jobs yet"}
+          </p>
           <p className="mt-2 text-sm text-[#6b7a9e]">
-            Check back soon — approved employers post roles here.
+            {matchedMode
+              ? "Add more skills to your profile or browse all open roles."
+              : "Check back soon — approved employers post roles here."}
           </p>
         </div>
       ) : (
@@ -127,12 +142,12 @@ export default function SeekerJobsList() {
                       className="h-12 w-12 rounded-xl border border-[#e6eaf2] object-cover"
                     />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#fef2f2] text-sm font-semibold text-[#b91c1c]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#f1f5f9] text-sm font-semibold text-[#1e293b]">
                       {(job.company?.name || "J").slice(0, 1)}
                     </div>
                   )}
                   <div>
-                    <p className="font-semibold text-[#b91c1c]">{job.title}</p>
+                    <p className="font-semibold text-[#1e293b]">{job.title}</p>
                     <p className="mt-1 text-sm text-[#6b7a9e]">
                       {job.company?.name || "Company"} · {job.location} ·{" "}
                       {job.employmentType} · {job.workMode}
@@ -147,7 +162,7 @@ export default function SeekerJobsList() {
                         {job.skills.slice(0, 6).map((skill) => (
                           <span
                             key={skill}
-                            className="rounded-full bg-[#fef2f2] px-2.5 py-0.5 text-xs text-[#4a5878]"
+                            className="rounded-full bg-[#f1f5f9] px-2.5 py-0.5 text-xs text-[#4a5878]"
                           >
                             {skill}
                           </span>
@@ -171,5 +186,20 @@ export default function SeekerJobsList() {
         </ul>
       )}
     </div>
+  );
+}
+
+export default function SeekerJobsList() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mt-8 flex items-center gap-2 text-[#6b7a9e]">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Loading jobs…
+        </div>
+      }
+    >
+      <SeekerJobsListInner />
+    </Suspense>
   );
 }

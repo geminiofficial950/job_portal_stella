@@ -58,9 +58,9 @@ function Toggle({
   hint?: string;
 }) {
   return (
-    <label className="flex items-start justify-between gap-4 rounded-xl border border-[#eef1f7] px-4 py-3 hover:bg-[#fffafa] transition-colors cursor-pointer">
+    <label className="flex items-start justify-between gap-4 rounded-xl border border-[#eef1f7] px-4 py-3 hover:bg-[#f8fafc] transition-colors cursor-pointer">
       <span>
-        <span className="block text-sm font-semibold text-[#b91c1c]">
+        <span className="block text-sm font-semibold text-[#1e293b]">
           {label}
         </span>
         {hint ? (
@@ -226,10 +226,10 @@ export default function RecruiterSettingsForm() {
       {/* Profile */}
       <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="mb-5 flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#b91c1c] shadow-md">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none">
             <UserRound className="h-4 w-4 text-white" />
           </span>
-          <h2 className="font-bold text-[#b91c1c] tracking-tight">Profile</h2>
+          <h2 className="font-bold text-[#1e293b] tracking-tight">Profile</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block sm:col-span-2">
@@ -254,7 +254,7 @@ export default function RecruiterSettingsForm() {
             <input
               value={settings.profile.email}
               disabled
-              className={`${inputClass} bg-[#fffafa]`}
+              className={`${inputClass} bg-[#f8fafc]`}
             />
           </label>
           <label className="block">
@@ -282,7 +282,7 @@ export default function RecruiterSettingsForm() {
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#f59e0b] to-[#fb923c] shadow-md">
             <Bell className="h-4 w-4 text-white" />
           </span>
-          <h2 className="font-bold text-[#b91c1c] tracking-tight">Notifications</h2>
+          <h2 className="font-bold text-[#1e293b] tracking-tight">Notifications</h2>
         </div>
         <div className="space-y-2">
           <Toggle
@@ -347,10 +347,10 @@ export default function RecruiterSettingsForm() {
       {/* Hiring preferences */}
       <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="mb-5 flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#dc2626] shadow-md">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none">
             <Briefcase className="h-4 w-4 text-white" />
           </span>
-          <h2 className="font-bold text-[#b91c1c] tracking-tight">Hiring Preferences</h2>
+          <h2 className="font-bold text-[#1e293b] tracking-tight">Hiring Preferences</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
@@ -444,7 +444,7 @@ export default function RecruiterSettingsForm() {
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#ec4899] to-[#f472b6] shadow-md">
             <Users className="h-4 w-4 text-white" />
           </span>
-          <h2 className="font-bold text-[#b91c1c] tracking-tight">Team Access</h2>
+          <h2 className="font-bold text-[#1e293b] tracking-tight">Team Access</h2>
         </div>
         <p className="mb-4 text-sm text-[#6b7a9e]">
           Invite teammates to view or help manage your hiring workspace.
@@ -491,7 +491,7 @@ export default function RecruiterSettingsForm() {
                 className="flex items-center justify-between gap-3 py-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-[#b91c1c]">
+                  <p className="text-sm font-medium text-[#1e293b]">
                     {invite.email}
                   </p>
                   <p className="text-xs text-[#6b7a9e]">
@@ -515,7 +515,7 @@ export default function RecruiterSettingsForm() {
       {/* Password */}
       {!isGoogle ? (
         <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
-          <h2 className="mb-4 font-bold text-[#b91c1c] tracking-tight">🔒 Password</h2>
+          <h2 className="mb-4 font-bold text-[#1e293b] tracking-tight">🔒 Password</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="mb-1.5 block text-xs font-medium uppercase tracking-[0.12em] text-[#6b7a9e]">

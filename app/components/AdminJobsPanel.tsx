@@ -135,7 +135,7 @@ export default function AdminJobsPanel() {
             >
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <p className="font-semibold text-[#b91c1c]">{job.title}</p>
+                  <p className="font-semibold text-[#1e293b]">{job.title}</p>
                   <p className="mt-1 text-sm text-[#6b7a9e]">
                     {job.location} · {job.category} · {job.employmentType} ·{" "}
                     {job.salaryCurrency} {job.salaryMin}-{job.salaryMax}/

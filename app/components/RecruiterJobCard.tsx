@@ -104,7 +104,7 @@ export default function RecruiterJobCard({
             className="h-full w-full object-cover"
           />
         ) : (
-          <Building2 className="h-6 w-6 text-[#1e3a5f]" />
+          <Building2 className="h-6 w-6 text-[#5850ec]" />
         )}
       </div>
 
@@ -126,7 +126,7 @@ export default function RecruiterJobCard({
               onClick={() => setBookmarked((v) => !v)}
               className={`rounded-lg p-2 transition-colors ${
                 bookmarked
-                  ? "text-[#1e3a5f]"
+                  ? "text-[#5850ec]"
                   : "text-[#94a3b8] hover:bg-[#f8fafc] hover:text-[#64748b]"
               }`}
               aria-label="Bookmark"

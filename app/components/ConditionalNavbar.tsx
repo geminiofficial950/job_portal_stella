@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 
-const HIDDEN_PREFIXES = ["/login", "/register"];
+const HIDDEN_PREFIXES = ["/login", "/register", "/dashboard"];
 
 export default function ConditionalNavbar() {
   const pathname = usePathname();

@@ -6,6 +6,12 @@ import { Company } from "@/models/Company";
 import { Job } from "@/models/Job";
 import DashboardStatCards from "@/app/components/DashboardStatCards";
 import {
+  DashboardPageHeader,
+  DashboardDarkPanel,
+  DashboardSoftPanel,
+} from "@/app/components/DashboardUI";
+import { DASH } from "@/app/lib/dashboardTheme";
+import {
   Users,
   Building2,
   Briefcase,
@@ -94,122 +100,136 @@ export default async function AdminOverviewPage() {
   ];
 
   return (
-    <main className="px-5 py-8 sm:px-8 lg:px-10">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#6b7a9e]">
-          Overview
-        </p>
-        <h1 className="mt-2 text-3xl font-medium tracking-[-0.04em]">
-          Welcome, {auth.name.split(" ")[0]}
-        </h1>
-        <p className="mt-2 max-w-2xl text-[#6b7a9e]">
-          Full platform control — users, recruiters, companies, and jobs in one
-          place.
-        </p>
-      </div>
+    <main className="px-5 py-7 sm:px-8 lg:px-10">
+      <DashboardPageHeader
+        title={`Welcome, ${auth.name.split(" ")[0]}`}
+        subtitle="Full platform control — users, recruiters, companies, and jobs in one place."
+      />
 
-      <div className="mt-8">
-        <DashboardStatCards stats={cards} />
-      </div>
+      <DashboardStatCards stats={cards} />
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <section className="rounded-2xl border border-[#e6eaf2] bg-white p-5 lg:col-span-1">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Pending companies</h2>
+      <DashboardDarkPanel className="mt-6">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          {[
+            { label: "Pending", href: "/dashboard/admin/companies", active: true },
+            { label: "Users", href: "/dashboard/admin/users" },
+            { label: "Jobs", href: "/dashboard/admin/jobs" },
+          ].map((tab) => (
             <Link
-              href="/dashboard/admin/companies"
-              className="inline-flex items-center gap-1 text-sm font-medium text-[#dc2626]"
+              key={tab.label}
+              href={tab.href}
+              className={`rounded-full px-4 py-1.5 text-xs font-bold ${
+                tab.active
+                  ? "text-white"
+                  : "bg-white/10 text-white/70 hover:bg-white/15"
+              }`}
+              style={tab.active ? { background: DASH.accent } : undefined}
             >
-              Review <ArrowRight className="h-3.5 w-3.5" />
+              {tab.label}
+              {tab.label === "Pending" ? ` (${pendingCompanies})` : ""}
             </Link>
-          </div>
-          {pendingList.length === 0 ? (
-            <p className="mt-4 text-sm text-[#6b7a9e]">No pending reviews.</p>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {pendingList.map((c) => (
-                <li key={String(c._id)} className="text-sm">
-                  <p className="font-medium text-[#1e293b]">{c.name}</p>
-                  <p className="text-[#6b7a9e]">
-                    {c.industry || "—"} · {c.location || "—"}
+          ))}
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-3">
+          <DashboardSoftPanel>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-bold text-[#0f172a]">Pending companies</h2>
+              <Link
+                href="/dashboard/admin/companies"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#5850ec]"
+              >
+                Review <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            {pendingList.length === 0 ? (
+              <p className="text-sm text-[#6b7280]">No pending reviews.</p>
+            ) : (
+              <ul className="space-y-3">
+                {pendingList.map((c) => (
+                  <li key={String(c._id)} className="text-sm">
+                    <p className="font-semibold text-[#0f172a]">{c.name}</p>
+                    <p className="text-[#6b7280]">
+                      {c.industry || "—"} · {c.location || "—"}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </DashboardSoftPanel>
+
+          <DashboardSoftPanel>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-bold text-[#0f172a]">Latest users</h2>
+              <Link
+                href="/dashboard/admin/users"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#5850ec]"
+              >
+                All <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <ul className="space-y-3">
+              {recentUsers.map((u) => (
+                <li key={String(u._id)} className="text-sm">
+                  <p className="font-semibold text-[#0f172a]">{u.name}</p>
+                  <p className="text-[#6b7280]">
+                    {u.role} · {formatDate(u.createdAt as Date)}
                   </p>
                 </li>
               ))}
             </ul>
-          )}
-        </section>
+          </DashboardSoftPanel>
 
-        <section className="rounded-2xl border border-[#e6eaf2] bg-white p-5 lg:col-span-1">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Latest users</h2>
-            <Link
-              href="/dashboard/admin/users"
-              className="inline-flex items-center gap-1 text-sm font-medium text-[#dc2626]"
-            >
-              All <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-          <ul className="mt-4 space-y-3">
-            {recentUsers.map((u) => (
-              <li key={String(u._id)} className="text-sm">
-                <p className="font-medium text-[#1e293b]">{u.name}</p>
-                <p className="text-[#6b7a9e]">
-                  {u.role} · {formatDate(u.createdAt as Date)}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
+          <DashboardSoftPanel>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-bold text-[#0f172a]">Latest jobs</h2>
+              <Link
+                href="/dashboard/admin/jobs"
+                className="inline-flex items-center gap-1 text-xs font-bold text-[#5850ec]"
+              >
+                All <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            {recentJobs.length === 0 ? (
+              <p className="text-sm text-[#6b7280]">No jobs yet.</p>
+            ) : (
+              <ul className="space-y-3">
+                {recentJobs.map((j) => (
+                  <li key={String(j._id)} className="text-sm">
+                    <p className="font-semibold text-[#0f172a]">{j.title}</p>
+                    <p className="text-[#6b7280]">
+                      {j.status} · {j.location}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </DashboardSoftPanel>
+        </div>
+      </DashboardDarkPanel>
 
-        <section className="rounded-2xl border border-[#e6eaf2] bg-white p-5 lg:col-span-1">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Latest jobs</h2>
-            <Link
-              href="/dashboard/admin/jobs"
-              className="inline-flex items-center gap-1 text-sm font-medium text-[#dc2626]"
-            >
-              All <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+      <section className="mt-6 rounded-[24px] border border-[#ebe9f5] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
+        <h2 className="font-bold text-[#0f172a]">Platform snapshot</h2>
+        <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-2xl bg-[#f4f3fb] p-4">
+            <p className="text-[#6b7280]">Companies total</p>
+            <p className="mt-1 text-xl font-bold">{totalCompanies}</p>
           </div>
-          {recentJobs.length === 0 ? (
-            <p className="mt-4 text-sm text-[#6b7a9e]">No jobs yet.</p>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {recentJobs.map((j) => (
-                <li key={String(j._id)} className="text-sm">
-                  <p className="font-medium text-[#1e293b]">{j.title}</p>
-                  <p className="text-[#6b7a9e]">
-                    {j.status} · {j.location}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
-
-      <section className="mt-6 rounded-2xl border border-[#e6eaf2] bg-white p-5">
-        <h2 className="font-semibold">Platform snapshot</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
-          <div className="rounded-xl bg-[#f8fafc] p-4">
-            <p className="text-[#6b7a9e]">Companies total</p>
-            <p className="mt-1 text-xl font-semibold">{totalCompanies}</p>
-          </div>
-          <div className="rounded-xl bg-[#fff8e8] p-4">
+          <div className="rounded-2xl bg-[#fef3c7] p-4">
             <p className="inline-flex items-center gap-1 text-[#9a6700]">
               <Clock3 className="h-3.5 w-3.5" /> Pending
             </p>
-            <p className="mt-1 text-xl font-semibold">{pendingCompanies}</p>
+            <p className="mt-1 text-xl font-bold">{pendingCompanies}</p>
           </div>
-          <div className="rounded-xl bg-[#f1f5f9] p-4">
-            <p className="inline-flex items-center gap-1 text-[#475569]">
+          <div className="rounded-2xl bg-[#dcfce7] p-4">
+            <p className="inline-flex items-center gap-1 text-[#166534]">
               <CheckCircle2 className="h-3.5 w-3.5" /> Approved
             </p>
-            <p className="mt-1 text-xl font-semibold">{approvedCompanies}</p>
+            <p className="mt-1 text-xl font-bold">{approvedCompanies}</p>
           </div>
-          <div className="rounded-xl bg-[#f8fafc] p-4">
-            <p className="text-[#6b7a9e]">Jobs total</p>
-            <p className="mt-1 text-xl font-semibold">{totalJobs}</p>
+          <div className="rounded-2xl bg-[#ecebff] p-4">
+            <p className="text-[#5850ec]">Jobs total</p>
+            <p className="mt-1 text-xl font-bold">{totalJobs}</p>
           </div>
         </div>
       </section>

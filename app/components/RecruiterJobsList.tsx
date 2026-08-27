@@ -55,7 +55,7 @@ export default function RecruiterJobsList() {
   if (loading) {
     return (
       <div className="mt-8 flex items-center gap-3 rounded-2xl border border-[#e8ecf3] bg-white p-6 text-[#64748b]">
-        <Loader2 className="h-5 w-5 animate-spin text-[#1e3a5f]" />
+        <Loader2 className="h-5 w-5 animate-spin text-[#5850ec]" />
         <span className="font-medium">Loading jobs…</span>
       </div>
     );
@@ -64,7 +64,7 @@ export default function RecruiterJobsList() {
   if (jobs.length === 0) {
     return (
       <div className="mt-8 rounded-2xl border-2 border-dashed border-[#e2e8f0] bg-[#f8fafc] px-6 py-16 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#ede9fe] text-[#1e3a5f]">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#ecebff] text-[#5850ec]">
           <Briefcase className="h-8 w-8" />
         </div>
         <p className="text-lg font-bold text-[#0f172a]">No jobs posted yet</p>
@@ -73,7 +73,7 @@ export default function RecruiterJobsList() {
         </p>
         <Link
           href="/dashboard/recruiter/jobs/new"
-          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#0f2744]"
+          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[#5850ec] px-5 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(88,80,236,0.35)] transition-colors hover:bg-[#4f46e5]"
         >
           <PlusCircle className="h-4 w-4" />
           Post a job

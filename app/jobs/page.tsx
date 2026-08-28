@@ -51,9 +51,15 @@ type JobItem = {
   benefits: string;
   createdAt: string | null;
   company: CompanyInfo | null;
+  source?: "stella" | "adzuna" | string;
+  applyUrl?: string;
+  country?: string;
+  countryLabel?: string;
 };
 
 type CompanyOption = { id: string; name: string };
+
+type CountryOption = { code: string; label: string; flag: string };
 
 const WORK_MODE_LABELS: Record<string, string> = {
   onsite: "Onsite",
@@ -140,9 +146,15 @@ function JobSearchInner() {
 
   const [jobs, setJobs] = useState<JobItem[]>([]);
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([]);
+  const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
   const [categories, setCategories] = useState<string[]>(["All"]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [adzunaWarning, setAdzunaWarning] = useState("");
+  const [adzunaCacheNote, setAdzunaCacheNote] = useState("");
+
+  const SESSION_JOBS_KEY = "stella-jobs-browse-v2";
+  const SESSION_JOBS_TTL_MS = 5 * 60 * 1000;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -150,6 +162,7 @@ function JobSearchInner() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [selectedCompanyId, setSelectedCompanyId] = useState("All");
+  const [selectedCountry, setSelectedCountry] = useState("all");
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -174,6 +187,53 @@ function JobSearchInner() {
     setLoading(true);
     setError("");
     try {
+      if (typeof window !== "undefined") {
+        const raw = sessionStorage.getItem(SESSION_JOBS_KEY);
+        if (raw) {
+          const cached = JSON.parse(raw) as {
+            at: number;
+            payload: {
+              jobs: JobItem[];
+              companies: CompanyOption[];
+              categories: string[];
+              countries: CountryOption[];
+              adzuna?: {
+                configured?: boolean;
+                error?: string;
+                fromCache?: boolean;
+                cacheTtlHours?: number;
+              };
+            };
+          };
+          if (Date.now() - cached.at < SESSION_JOBS_TTL_MS) {
+            setJobs(cached.payload.jobs ?? []);
+            setCompanyOptions(cached.payload.companies ?? []);
+            setCategories([
+              "All",
+              ...((cached.payload.categories as string[]) ?? []),
+            ]);
+            setCountryOptions(cached.payload.countries ?? []);
+            if (
+              cached.payload.adzuna?.configured === false &&
+              cached.payload.adzuna?.error
+            ) {
+              setAdzunaWarning(cached.payload.adzuna.error);
+            } else {
+              setAdzunaWarning("");
+            }
+            if (cached.payload.adzuna?.fromCache) {
+              setAdzunaCacheNote(
+                `External jobs loaded from cache (refreshes every ${cached.payload.adzuna.cacheTtlHours ?? 6}h).`,
+              );
+            } else {
+              setAdzunaCacheNote("");
+            }
+            setLoading(false);
+            return;
+          }
+        }
+      }
+
       const res = await fetch("/api/jobs/browse");
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -182,6 +242,39 @@ function JobSearchInner() {
       setJobs(data.jobs ?? []);
       setCompanyOptions(data.companies ?? []);
       setCategories(["All", ...((data.categories as string[]) ?? [])]);
+      setCountryOptions(data.countries ?? []);
+      if (
+        data.adzuna &&
+        data.adzuna.configured === false &&
+        data.adzuna.error
+      ) {
+        setAdzunaWarning(data.adzuna.error);
+      } else {
+        setAdzunaWarning("");
+      }
+      if (data.adzuna?.fromCache) {
+        setAdzunaCacheNote(
+          `External jobs loaded from cache (refreshes every ${data.adzuna.cacheTtlHours ?? 6}h).`,
+        );
+      } else {
+        setAdzunaCacheNote("");
+      }
+
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          SESSION_JOBS_KEY,
+          JSON.stringify({
+            at: Date.now(),
+            payload: {
+              jobs: data.jobs ?? [],
+              companies: data.companies ?? [],
+              categories: data.categories ?? [],
+              countries: data.countries ?? [],
+              adzuna: data.adzuna,
+            },
+          }),
+        );
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load jobs");
       setJobs([]);
@@ -226,12 +319,7 @@ function JobSearchInner() {
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [
-    currentPlaceholderText,
-    isDeleting,
-    wordIdx,
-    placeholderWords,
-  ]);
+  }, [currentPlaceholderText, isDeleting, wordIdx, placeholderWords]);
 
   const jobTypes = ["full-time", "part-time", "contract", "casual"];
   const workModels = ["onsite", "remote", "hybrid"];
@@ -267,10 +355,36 @@ function JobSearchInner() {
     setSelectedCategory("All");
     setSelectedLevel("All");
     setSelectedCompanyId("All");
+    setSelectedCountry("all");
   };
+
+  const matchesSelectedCountry = useCallback(
+    (job: JobItem) => {
+      if (selectedCountry === "all") return true;
+      if (job.source === "adzuna") {
+        return job.country === selectedCountry;
+      }
+      const loc = job.location.toLowerCase();
+      const label =
+        countryOptions
+          .find((c) => c.code === selectedCountry)
+          ?.label.toLowerCase() || "";
+      const needles = [
+        selectedCountry,
+        label,
+        selectedCountry === "gb" ? "uk" : "",
+        selectedCountry === "gb" ? "united kingdom" : "",
+        selectedCountry === "us" ? "united states" : "",
+        selectedCountry === "us" ? "usa" : "",
+      ].filter(Boolean);
+      return needles.some((needle) => loc.includes(needle));
+    },
+    [selectedCountry, countryOptions],
+  );
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
+      if (!matchesSelectedCountry(job)) return false;
       const companyName = job.company?.name || "";
       if (
         searchQuery &&
@@ -295,10 +409,7 @@ function JobSearchInner() {
       ) {
         return false;
       }
-      if (
-        selectedModels.length > 0 &&
-        !selectedModels.includes(job.workMode)
-      ) {
+      if (selectedModels.length > 0 && !selectedModels.includes(job.workMode)) {
         return false;
       }
       if (
@@ -317,6 +428,7 @@ function JobSearchInner() {
     selectedTypes,
     selectedModels,
     selectedCompanyId,
+    matchesSelectedCountry,
   ]);
 
   useEffect(() => {
@@ -328,6 +440,7 @@ function JobSearchInner() {
     selectedTypes,
     selectedModels,
     selectedCompanyId,
+    selectedCountry,
   ]);
 
   const activeJobDetail = useMemo(
@@ -344,7 +457,7 @@ function JobSearchInner() {
         className="relative overflow-hidden border-b border-slate-200 px-4 py-10 sm:px-6 lg:px-8"
         style={{ background: "#f0f4f8" }}
       >
-        <div className="relative z-10 mx-auto max-w-5xl text-center">
+        <div className="relative z-10 mx-auto max-w-screen-2xl text-center">
           <div className="mb-6">
             <h1 className="font-manrope text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
               Find Your Next Dream Role
@@ -395,7 +508,7 @@ function JobSearchInner() {
         </div>
       </section>
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-screen-2xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 lg:flex-row">
           <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-xs lg:hidden">
             <span className="text-sm font-bold text-slate-900">
@@ -433,8 +546,60 @@ function JobSearchInner() {
               </button>
             </div>
 
-            {/* Company filter */}
+            {/* Country filter */}
             <div className="mb-6">
+              <h4 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
+                Country
+              </h4>
+              <div className="max-h-56 space-y-1.5 overflow-y-auto">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCountry("all")}
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors ${
+                    selectedCountry === "all"
+                      ? "border border-[#3b8d99]/30 bg-[#3b8d99]/10 font-bold text-[#3b8d99]"
+                      : "text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <span>All countries</span>
+                  {selectedCountry === "all" ? (
+                    <Check className="h-3.5 w-3.5 text-[#3b8d99]" />
+                  ) : null}
+                </button>
+                {(countryOptions.length
+                  ? countryOptions
+                  : [
+                      { code: "au", label: "Australia", flag: "🇦🇺" },
+                      { code: "us", label: "USA", flag: "🇺🇸" },
+                      { code: "gb", label: "UK", flag: "🇬🇧" },
+                      { code: "nz", label: "New Zealand", flag: "🇳🇿" },
+                      { code: "ca", label: "Canada", flag: "🇨🇦" },
+                      { code: "sg", label: "Singapore", flag: "🇸🇬" },
+                    ]
+                ).map((c) => (
+                  <button
+                    key={c.code}
+                    type="button"
+                    onClick={() => setSelectedCountry(c.code)}
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-colors ${
+                      selectedCountry === c.code
+                        ? "border border-[#3b8d99]/30 bg-[#3b8d99]/10 font-bold text-[#3b8d99]"
+                        : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span className="truncate">
+                      {c.flag} {c.label}
+                    </span>
+                    {selectedCountry === c.code ? (
+                      <Check className="h-3.5 w-3.5 shrink-0 text-[#3b8d99]" />
+                    ) : null}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Company filter */}
+            <div className="mb-6 border-t border-slate-200 pt-5">
               <h4 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
                 Company
               </h4>
@@ -575,6 +740,27 @@ function JobSearchInner() {
           </aside>
 
           <section className="flex-1">
+            {adzunaCacheNote ? (
+              <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+                {adzunaCacheNote}
+              </div>
+            ) : null}
+            {adzunaWarning ? (
+              <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                Adzuna jobs need both keys in <code>.env</code>:{" "}
+                <strong>ADZUNA_APP_ID</strong> + <strong>ADZUNA_API_KEY</strong>
+                . Get Application ID from{" "}
+                <a
+                  href="https://developer.adzuna.com/admin/access_details"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold underline"
+                >
+                  Adzuna dashboard
+                </a>
+                . Stella jobs still show below.
+              </div>
+            ) : null}
             {loading ? (
               <div className="flex items-center justify-center gap-2 rounded-[28px] border border-slate-200 bg-white py-20 text-sm text-slate-500">
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -671,7 +857,18 @@ function JobSearchInner() {
                 </div>
 
                 <div className="mb-10 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
-                  {!authLoading && !user ? (
+                  {activeJobDetail.source === "adzuna" &&
+                  activeJobDetail.applyUrl ? (
+                    <a
+                      href={activeJobDetail.applyUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl px-8 py-3.5 text-sm font-extrabold text-white shadow-md transition-all duration-200 hover:opacity-95 active:scale-95 sm:text-base"
+                      style={{ background: "#1e3a5f" }}
+                    >
+                      Apply
+                    </a>
+                  ) : !authLoading && !user ? (
                     <Link
                       href={`/login?role=user&next=${encodeURIComponent(`/jobs?job=${activeJobDetail.id}`)}`}
                       className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl px-8 py-3.5 text-sm font-extrabold text-white shadow-md transition-all duration-200 hover:opacity-95 active:scale-95 sm:text-base"
@@ -699,35 +896,45 @@ function JobSearchInner() {
                     <h3 className="mb-3 font-manrope text-base font-bold text-slate-900">
                       About The Role
                     </h3>
-                    <div
-                      className="prose prose-sm max-w-none text-slate-600"
-                      dangerouslySetInnerHTML={{
-                        __html: activeJobDetail.description,
-                      }}
-                    />
+                    {activeJobDetail.source === "adzuna" ? (
+                      <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600 break-words [overflow-wrap:anywhere]">
+                        {activeJobDetail.description}
+                      </p>
+                    ) : (
+                      <div
+                        className="prose prose-sm max-w-none text-slate-600"
+                        dangerouslySetInnerHTML={{
+                          __html: activeJobDetail.description,
+                        }}
+                      />
+                    )}
                   </div>
-                  <div>
-                    <h3 className="mb-3 font-manrope text-base font-bold text-slate-900">
-                      Key Responsibilities
-                    </h3>
-                    <div
-                      className="prose prose-sm max-w-none text-slate-600"
-                      dangerouslySetInnerHTML={{
-                        __html: activeJobDetail.responsibilities,
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <h3 className="mb-3 font-manrope text-base font-bold text-slate-900">
-                      Qualifications & Requirements
-                    </h3>
-                    <div
-                      className="prose prose-sm max-w-none text-slate-600"
-                      dangerouslySetInnerHTML={{
-                        __html: activeJobDetail.requirements,
-                      }}
-                    />
-                  </div>
+                  {activeJobDetail.source !== "adzuna" ? (
+                    <>
+                      <div>
+                        <h3 className="mb-3 font-manrope text-base font-bold text-slate-900">
+                          Key Responsibilities
+                        </h3>
+                        <div
+                          className="prose prose-sm max-w-none text-slate-600"
+                          dangerouslySetInnerHTML={{
+                            __html: activeJobDetail.responsibilities,
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <h3 className="mb-3 font-manrope text-base font-bold text-slate-900">
+                          Qualifications & Requirements
+                        </h3>
+                        <div
+                          className="prose prose-sm max-w-none text-slate-600"
+                          dangerouslySetInnerHTML={{
+                            __html: activeJobDetail.requirements,
+                          }}
+                        />
+                      </div>
+                    </>
+                  ) : null}
                   {activeJobDetail.skills.length > 0 ? (
                     <div>
                       <h3 className="mb-3 font-manrope text-base font-bold text-slate-900">
@@ -743,6 +950,19 @@ function JobSearchInner() {
                           </span>
                         ))}
                       </div>
+                    </div>
+                  ) : null}
+                  {activeJobDetail.countryLabel ? (
+                    <div>
+                      <h3 className="mb-3 font-manrope text-base font-bold text-slate-900">
+                        Country
+                      </h3>
+                      <p className="text-sm text-slate-600">
+                        {activeJobDetail.countryLabel}
+                        {activeJobDetail.source === "adzuna"
+                          ? " · via Adzuna"
+                          : ""}
+                      </p>
                     </div>
                   ) : null}
                   {activeJobDetail.company?.about ? (
@@ -770,7 +990,7 @@ function JobSearchInner() {
                 </div>
 
                 {filteredJobs.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {filteredJobs.map((job) => {
                       const isBookmarked = savedJobs.includes(job.id);
                       const companyName = job.company?.name || "Company";
@@ -828,6 +1048,8 @@ function JobSearchInner() {
                             </div>
                             <p className="mb-0.5 font-inter text-xs font-semibold text-slate-400">
                               {companyName}
+                              {job.source === "adzuna" ? " · Adzuna" : ""}
+                              {job.countryLabel ? ` · ${job.countryLabel}` : ""}
                             </p>
                             <h3 className="mb-3 font-manrope text-base font-bold text-slate-900">
                               {job.title}

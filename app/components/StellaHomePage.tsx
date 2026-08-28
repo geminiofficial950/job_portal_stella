@@ -1,7 +1,31 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Search,
+  MapPin,
+  Users,
+  Heart,
+  ShieldCheck,
+  Building2,
+  ChevronRight,
+  Utensils,
+  Stethoscope,
+  Laptop,
+  HeartHandshake,
+  TrendingUp,
+  CheckCircle2,
+  DollarSign,
+} from "lucide-react";
 import "../stella-jobs.css";
+import HeroSection from "./HeroSection";
+import TrustedBySection from "./TrustedBySection";
+import FourThingsSection from "./FourThingsSection";
+import PathsSection from "./PathsSection";
+import SupportSection from "./SupportSection";
+import LevelsSection from "./LevelsSection";
+import NewcomersSection from "./NewcomersSection";
+import CtaSection from "./CtaSection";
 
 /* ── data ── */
 
@@ -113,7 +137,6 @@ const I18N: Record<
   },
 };
 
-type PathTab = "seek" | "hire" | "new";
 type Region = "all" | "vic" | "nsw" | "qld" | "remote";
 
 interface BoardRow {
@@ -125,6 +148,8 @@ interface BoardRow {
   t: "" | "up" | "hot";
   tl: string;
   s: number[];
+  icon: React.ElementType;
+  iconBg: string;
 }
 
 const BOARD_ROWS: BoardRow[] = [
@@ -137,6 +162,8 @@ const BOARD_ROWS: BoardRow[] = [
     t: "hot",
     tl: "+38%",
     s: [3, 4, 4, 6, 7, 9, 10],
+    icon: HeartHandshake,
+    iconBg: "bg-[#0284c7]",
   },
   {
     role: "Disability support worker",
@@ -147,6 +174,8 @@ const BOARD_ROWS: BoardRow[] = [
     t: "hot",
     tl: "+31%",
     s: [4, 4, 5, 6, 6, 8, 10],
+    icon: Users,
+    iconBg: "bg-purple-600",
   },
   {
     role: "Enrolled nurse",
@@ -157,6 +186,8 @@ const BOARD_ROWS: BoardRow[] = [
     t: "up",
     tl: "+14%",
     s: [5, 5, 6, 6, 7, 7, 8],
+    icon: Stethoscope,
+    iconBg: "bg-emerald-600",
   },
   {
     role: "Aged care cook",
@@ -167,6 +198,8 @@ const BOARD_ROWS: BoardRow[] = [
     t: "up",
     tl: "+9%",
     s: [5, 6, 5, 6, 7, 7, 8],
+    icon: Utensils,
+    iconBg: "bg-amber-500",
   },
   {
     role: "Support coordinator",
@@ -177,6 +210,8 @@ const BOARD_ROWS: BoardRow[] = [
     t: "",
     tl: "+2%",
     s: [6, 6, 7, 6, 6, 7, 6],
+    icon: Users,
+    iconBg: "bg-sky-500",
   },
   {
     role: "Community services worker",
@@ -187,6 +222,8 @@ const BOARD_ROWS: BoardRow[] = [
     t: "up",
     tl: "+11%",
     s: [4, 5, 5, 6, 7, 7, 8],
+    icon: Building2,
+    iconBg: "bg-teal-500",
   },
   {
     role: "Remote admin support",
@@ -197,6 +234,8 @@ const BOARD_ROWS: BoardRow[] = [
     t: "up",
     tl: "+17%",
     s: [3, 4, 5, 5, 6, 8, 9],
+    icon: Laptop,
+    iconBg: "bg-indigo-600",
   },
   {
     role: "Chef, regional venue",
@@ -207,6 +246,8 @@ const BOARD_ROWS: BoardRow[] = [
     t: "",
     tl: "0%",
     s: [6, 6, 6, 7, 6, 6, 6],
+    icon: Utensils,
+    iconBg: "bg-orange-600",
   },
 ];
 
@@ -218,138 +259,7 @@ const TICKER_ITEMS = [
   ["Rania S.", "completed a free newcomer consult in Arabic", "24 min ago"],
 ];
 
-const PATH_CONTENT: Record<
-  PathTab,
-  {
-    steps: { title: string; desc: string }[];
-    human: {
-      header: string;
-      initials: string;
-      name: string;
-      role: string;
-      rows: [string, string][];
-      speaks: string[];
-    };
-  }
-> = {
-  seek: {
-    steps: [
-      {
-        title: "Bring what you already have",
-        desc: "Import LinkedIn, upload certificates, add overseas qualifications. Once, not ten times.",
-      },
-      {
-        title: "Prove the parts that matter",
-        desc: "Short assessments on job-relevant skills. Each one lifts your level and your ranking.",
-      },
-      {
-        title: "Get a call, not an auto-reply",
-        desc: "Reach Level 5 and a consultant rings you, in English or your first language.",
-      },
-      {
-        title: "Go to employers pre-checked",
-        desc: "Your clearances and screening note travel with you, so interviews start at the real questions.",
-      },
-    ],
-    human: {
-      header: "Seeker support line",
-      initials: "AK",
-      name: "Anjali Kaur",
-      role: "Candidate consultant, Melbourne",
-      rows: [
-        ["Direct line", "1300 000 000"],
-        ["Typical answer", "< 90 sec"],
-        ["Callback", "Same day"],
-      ],
-      speaks: ["English", "हिन्दी", "ਪੰਜਾਬੀ", "Interpreter"],
-    },
-  },
-  hire: {
-    steps: [
-      {
-        title: "Post the role in five minutes",
-        desc: "Or call your account manager and dictate it. Both work.",
-      },
-      {
-        title: "Set your own bar",
-        desc: "Choose the minimum level, clearances, and availability. Anything below it never reaches you.",
-      },
-      {
-        title: "We verify the details for you",
-        desc: "Identity, work rights, qualifications, and clearances checked at the source before a candidate reaches your shortlist.",
-      },
-      {
-        title: "Read the note, not just the score",
-        desc: "Every shortlisted candidate has been interviewed by phone and written up by a person you can ring.",
-      },
-      {
-        title: "Fill the shift",
-        desc: "Compliance evidence is attached before the first interview, so onboarding does not stall.",
-      },
-    ],
-    human: {
-      header: "Your account manager",
-      initials: "MT",
-      name: "Marcus Tan",
-      role: "Dedicated employer manager",
-      rows: [
-        ["Direct mobile", "Yours, not a queue"],
-        ["Knows your roster", "Every role you run"],
-        ["Pipeline call", "Weekly, 15 min"],
-      ],
-      speaks: ["English", "中文", "Bahasa", "Interpreter"],
-    },
-  },
-  new: {
-    steps: [
-      {
-        title: "Find out what your qualification counts as",
-        desc: "We map overseas study to the Australian framework and tell you plainly where the gap is.",
-      },
-      {
-        title: "Understand your work rights",
-        desc: "Visa conditions, hour limits, and what employers are allowed to ask. No jargon.",
-      },
-      {
-        title: "Get the missing pieces",
-        desc: "Police check, NDIS screening, first aid, whatever your target job actually requires.",
-      },
-      {
-        title: "Talk to someone who has done it",
-        desc: "A consultant who speaks your language walks through the first job, not the tenth.",
-      },
-    ],
-    human: {
-      header: "Newcomer support",
-      initials: "RS",
-      name: "Rania Salim",
-      role: "Settlement and skills adviser",
-      rows: [
-        ["First consult", "Free, 30 min"],
-        ["Walk-in centres", "Melbourne, Sydney"],
-        ["Written summary", "In your language"],
-      ],
-      speaks: ["English", "العربية", "Tiếng Việt", "Interpreter"],
-    },
-  },
-};
-
 /* ── helpers ── */
-
-function ArrowIcon() {
-  return (
-    <svg
-      width="15"
-      height="15"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  );
-}
 
 function Reveal({
   children,
@@ -393,82 +303,17 @@ function Spark({ vals, up }: { vals: number[]; up: boolean }) {
   );
 }
 
-function CountStat({
-  target,
-  suffix = "",
-  text,
-}: {
-  target: number;
-  suffix?: string;
-  text?: string;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [display, setDisplay] = useState(text ?? "0");
-
-  useEffect(() => {
-    if (text) {
-      setDisplay(text);
-      return;
-    }
-
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-
-        const reduced = window.matchMedia(
-          "(prefers-reduced-motion: reduce)",
-        ).matches;
-        if (reduced) {
-          setDisplay(`${target.toLocaleString()}${suffix}`);
-          return;
-        }
-
-        const dur = 1300;
-        const t0 = performance.now();
-
-        const step = (ts: number) => {
-          const p = Math.min((ts - t0) / dur, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          setDisplay(`${Math.round(target * eased).toLocaleString()}${suffix}`);
-          if (p < 1) requestAnimationFrame(step);
-        };
-
-        requestAnimationFrame(step);
-      },
-      { threshold: 0.5 },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [target, suffix, text]);
-
-  return (
-    <b ref={ref} data-count={target} data-suffix={suffix}>
-      {display}
-    </b>
-  );
-}
-
 /* ── main page ── */
 
 export default function StellaHomePage() {
   const [progress, setProgress] = useState(0);
-  const [activePath, setActivePath] = useState<PathTab>("seek");
   const [region, setRegion] = useState<Region>("all");
   const [lang, setLang] = useState<Lang>("en");
-  const [jobQuery, setJobQuery] = useState("");
-  const [locationQuery, setLocationQuery] = useState("");
   const [barsAnimated, setBarsAnimated] = useState(false);
-  const [ladderFill, setLadderFill] = useState(false);
   const [tickerOffset, setTickerOffset] = useState(0);
   const [tickerTransition, setTickerTransition] = useState(true);
 
   const barsRef = useRef<HTMLDivElement>(null);
-  const ladderRef = useRef<HTMLDivElement>(null);
   const tickViewRef = useRef<HTMLDivElement>(null);
 
   const t = I18N[lang];
@@ -504,23 +349,6 @@ export default function StellaHomePage() {
         }
       },
       { threshold: 0.4 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  /* ladder fill */
-  useEffect(() => {
-    const el = ladderRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setLadderFill(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.5 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -574,768 +402,459 @@ export default function StellaHomePage() {
     );
   }, [lang]);
 
-  const selectPath = useCallback((tab: PathTab) => setActivePath(tab), []);
-
-  const pathContent = PATH_CONTENT[activePath];
-
-  const goToJobs = useCallback(() => {
-    const params = new URLSearchParams();
-    if (jobQuery.trim()) params.set("q", jobQuery.trim());
-    if (locationQuery.trim()) params.set("location", locationQuery.trim());
-    const qs = params.toString();
-    window.location.href = `/jobs${qs ? `?${qs}` : ""}`;
-  }, [jobQuery, locationQuery]);
-
   return (
     <div className="stella-home">
       <div id="prog" style={{ width: `${progress}%` }} />
 
       <main id="top">
-        {/* hero */}
-        <section className="hero hero-next">
-          <div className="hero-floats" aria-hidden="true">
-            <div className="hero-float hero-float--company">
-              <strong>51–200</strong>
-              <span>Company size</span>
-            </div>
+        <HeroSection />
 
-            <div className="hero-float hero-float--icon hero-float--slack">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="#36C5F0"
-                  d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52z"
-                />
-                <path
-                  fill="#36C5F0"
-                  d="M6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z"
-                />
-                <path
-                  fill="#2EB67D"
-                  d="M8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834z"
-                />
-                <path
-                  fill="#2EB67D"
-                  d="M8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312z"
-                />
-                <path
-                  fill="#ECB22E"
-                  d="M18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834z"
-                />
-                <path
-                  fill="#ECB22E"
-                  d="M17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312z"
-                />
-                <path
-                  fill="#E01E5A"
-                  d="M15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52z"
-                />
-                <path
-                  fill="#E01E5A"
-                  d="M15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.528 2.528 0 0 1 2.52-2.52h6.313A2.528 2.528 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"
-                />
-              </svg>
-            </div>
+        <TrustedBySection />
 
-            <div className="hero-float hero-float--icon hero-float--plant">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M12 22V12"
-                  stroke="#16a34a"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path d="M12 12C12 6 18 4 20 4c0 4-2 8-8 8z" fill="#22c55e" />
-                <path d="M12 14C12 8 6 6 4 6c0 4 2 8 8 8z" fill="#4ade80" />
-                <rect x="9" y="20" width="6" height="2" rx="1" fill="#92400e" />
-              </svg>
-            </div>
-
-            <div className="hero-float hero-float--mail">
-              <div className="hero-float-mail-icon" aria-hidden="true">
-                <span className="g">G</span>
-              </div>
-              <div>
-                <p className="hero-float-mail-title">New message</p>
-                <p className="hero-float-mail-copy">
-                  You have 5 interviews ready
-                </p>
-              </div>
-            </div>
-
-            <div className="hero-float hero-float--icon hero-float--notion">
-              <span>N</span>
-            </div>
-          </div>
-
-          <div className="shell hero-next-in">
-            <p className="hero-eyebrow">
-              OVER 130K REMOTE &amp; LOCAL STARTUP JOBS
-            </p>
-            <h1 className="hero-next-title">Find what&apos;s next:</h1>
-
-            <div className="hero-search-pill" role="search">
-              <div className="hero-search-field">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="M20 20l-3.5-3.5" strokeLinecap="round" />
-                </svg>
-                <input
-                  type="text"
-                  aria-label="Job title"
-                  placeholder="Job title"
-                  value={jobQuery}
-                  onChange={(e) => setJobQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") goToJobs();
-                  }}
-                />
-              </div>
-              <div className="hero-search-divider" />
-              <div className="hero-search-field hero-search-field--loc">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle cx="12" cy="10" r="2.5" />
-                </svg>
-                <input
-                  type="text"
-                  aria-label="Location"
-                  placeholder="Location"
-                  value={locationQuery}
-                  onChange={(e) => setLocationQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") goToJobs();
-                  }}
-                />
-              </div>
-              <button
-                type="button"
-                className="hero-search-btn"
-                onClick={goToJobs}
-              >
-                Search
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* marquee */}
-        <div className="marq" aria-label="Employers hiring on Stella">
-          <div className="marq-t">
-            {[...EMPLOYERS, ...EMPLOYERS].map((name, i) => (
-              <span key={`${name}-${i}`}>
-                <i aria-hidden="true" />
-                {name}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* difference */}
-        <section id="difference">
-          <div className="shell">
-            <Reveal className="diff-intro">
-              <h2>Four things a job board cannot do.</h2>
-              <p>
-                Matching is the easy part. Everything around it is where hiring
-                actually breaks.
-              </p>
-            </Reveal>
-
-            <Reveal className="diff-panel">
-              <article className="diff-cell diff-match">
-                <div className="diff-cell-top">
-                  <span className="diff-lab">Matching Engine</span>
-                  <span className="diff-chip">98% Match Score</span>
-                </div>
-                <h3>Ranked with the reasoning shown.</h3>
-                <p>
-                  Every score comes with its evidence: which credential matched,
-                  which shift pattern fits, and exactly what is missing. No black
-                  box, no unexplained rejection.
-                </p>
-                <div className="diff-bars">
-                  {[
-                    { label: "Shift Pattern & Availability", val: "96%" },
-                    { label: "Verified Credentials & Clearances", val: "94%" },
-                    { label: "Role Capability & Skills Test", val: "88%" },
-                  ].map((bar) => (
-                    <div key={bar.label} className="diff-bar">
-                      <div className="diff-bar-top">
-                        <span>{bar.label}</span>
-                        <b>{bar.val}</b>
-                      </div>
-                      <div className="diff-bar-track">
-                        <i style={{ width: bar.val }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </article>
-
-              <article className="diff-cell diff-verify">
-                <div className="diff-cell-top">
-                  <span className="diff-lab">Instant Verification</span>
-                </div>
-                <h3>We check, so you don&apos;t.</h3>
-                <ul className="diff-checks">
-                  {[
-                    { label: "Identity matched", sub: "Passport & Driver License" },
-                    { label: "Work rights via VEVO", sub: "Direct DHA Database Link" },
-                    { label: "Qualification at source", sub: "University & TAFE Verified" },
-                    { label: "Clearance current today", sub: "NDIS & Police Check Valid" },
-                  ].map((item) => (
-                    <li key={item.label}>
-                      <strong>{item.label}</strong>
-                      <span>{item.sub}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-
-              <article className="diff-cell diff-lang">
-                <div className="diff-cell-top">
-                  <span className="diff-lab">Multilingual Support</span>
-                </div>
-                <h3>Twelve languages on the phones.</h3>
-                <p>Interpreters at no cost to candidates.</p>
-                <ul className="diff-langs">
-                  {[
-                    "English",
-                    "हिन्दी",
-                    "中文",
-                    "ਪੰਜਾਬੀ",
-                    "Tiếng Việt",
-                    "العربية",
-                    "नेपाली",
-                    "+5 More",
-                  ].map((name) => (
-                    <li key={name}>{name}</li>
-                  ))}
-                </ul>
-              </article>
-
-              <article className="diff-cell diff-screen">
-                <div className="diff-cell-top">
-                  <span className="diff-lab">Level 5 Pre-Screened</span>
-                  <span className="diff-chip">Phone Verified</span>
-                </div>
-                <h3>A phone interview before the shortlist.</h3>
-                <p>
-                  Once a candidate reaches Level 5, a consultant calls, works through
-                  a script built from the gaps in that profile, and writes a note that
-                  travels with them. Employers read the note, not just the number.
-                </p>
-                <blockquote className="diff-note">
-                  <cite>Consultant Notes (Anjali K.)</cite>
-                  <p>
-                    &ldquo;5+ years aged care experience. Full 24/7 availability.
-                    Excellent communication skills and verified NDIS clearance.&rdquo;
-                  </p>
-                </blockquote>
-              </article>
-            </Reveal>
-          </div>
-        </section>
+        <FourThingsSection />
 
         <hr className="rule" />
 
-        {/* paths */}
-        <section id="paths">
-          <div className="shell">
-            <Reveal className="paths-head">
-              <h2>{t.pathh2}</h2>
-              <div
-                className="paths-switch"
-                role="tablist"
-                aria-label="Choose your path"
-              >
-                {(
-                  [
-                    { id: "seek" as PathTab, t: t.d1t, s: t.d1s },
-                    { id: "hire" as PathTab, t: t.d2t, s: t.d2s },
-                    { id: "new" as PathTab, t: t.d3t, s: t.d3s },
-                  ] as const
-                ).map((door) => (
-                  <button
-                    key={door.id}
-                    type="button"
-                    className="paths-switch-btn"
-                    role="tab"
-                    aria-selected={activePath === door.id}
-                    aria-controls={`p-${door.id}`}
-                    onClick={() => selectPath(door.id)}
-                  >
-                    {door.t}
-                  </button>
-                ))}
-              </div>
-              <p className="paths-lead">
-                {
-                  (
-                    {
-                      seek: t.d1s,
-                      hire: t.d2s,
-                      new: t.d3s,
-                    } as const
-                  )[activePath]
-                }
-              </p>
-            </Reveal>
-
-            <div
-              className="path"
-              id={`p-${activePath}`}
-              role="tabpanel"
-              aria-labelledby={`tab-${activePath}`}
-            >
-              <ol
-                className="paths-rail"
-                style={{
-                  ["--paths-count" as string]: pathContent.steps.length,
-                }}
-              >
-                {pathContent.steps.map((step, i) => (
-                  <li key={step.title}>
-                    <span className="paths-rail-n">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <b>{step.title}</b>
-                    <span>{step.desc}</span>
-                  </li>
-                ))}
-              </ol>
-
-              <div className="paths-contact">
-                <div className="paths-contact-who">
-                  <span>{pathContent.human.header}</span>
-                  <strong>{pathContent.human.name}</strong>
-                  <em>{pathContent.human.role}</em>
-                </div>
-                <div className="paths-contact-meta">
-                  {pathContent.human.rows.map(([label, value]) => (
-                    <p key={label}>
-                      <span>{label}</span>
-                      <b>{value}</b>
-                    </p>
-                  ))}
-                </div>
-                <div className="paths-contact-langs">
-                  {pathContent.human.speaks.map((lang) => (
-                    <span key={lang}>{lang}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className="rule" />
+        <PathsSection
+          labels={{
+            titleLine: "Three",
+            titleAccent: "ways in.",
+            tabs: [
+              { id: "seek", label: t.d1t, lead: t.d1s },
+              { id: "hire", label: t.d2t, lead: t.d2s },
+              { id: "new", label: t.d3t, lead: t.d3s },
+            ],
+          }}
+        />
 
         {/* demand board */}
-        <section id="demand">
-          <div className="shell">
-            <Reveal className="board-top">
-              <div className="head">
-                <h2>What Australia is actually hiring for.</h2>
-                <p className="sub">
-                  Open roles on Stella right now, ranked by unfilled positions.
-                  Updated hourly.
-                </p>
-              </div>
-              <div
-                className="filters"
-                role="group"
-                aria-label="Filter by region"
-              >
-                {(["all", "vic", "nsw", "qld", "remote"] as Region[]).map(
-                  (r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      className="filt"
-                      aria-pressed={region === r}
-                      onClick={() => setRegion(r)}
-                    >
-                      {r === "all" ? "ALL" : r.toUpperCase()}
-                    </button>
-                  ),
-                )}
-              </div>
-            </Reveal>
-
+        <section id="demand" className="pt-3 pb-8 sm:pt-5 sm:pb-12 bg-slate-50/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Reveal>
-              <div className="board-card-wrapper">
-                <table className="board">
-                  <thead>
-                    <tr>
-                      <th style={{ width: "32%" }}>Role</th>
-                      <th>Location</th>
-                      <th>Pay guide</th>
-                      <th className="num">Open Positions</th>
-                      <th className="num" style={{ width: 170 }}>
-                        30-day trend
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredRows.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan={5}
-                          style={{
-                            padding: "32px 0",
-                            textAlign: "center",
-                            color: "#64748b",
-                          }}
-                        >
-                          No open roles in this region right now. Try another
-                          region filter.
-                        </td>
+              {/* Top Row: Left Content + Center Map + Right Live Activity */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-8">
+                {/* Top Left: Title, Subtitle & Region Filters */}
+                <div className="lg:col-span-4 flex flex-col items-start text-left">
+                  <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-[1.15] mb-3 sm:mb-4">
+                    What Australia is{" "}
+                    <span className="font-serif italic text-[#065985] font-normal tracking-wide">
+                      actually
+                    </span>{" "}
+                    hiring for.
+                  </h2>
+                  <p className="text-slate-500 text-sm sm:text-base mb-6 leading-relaxed">
+                    Open roles on Stella right now, ranked by unfilled positions. Updated hourly.
+                  </p>
+                  <div className="flex items-center gap-3.5 sm:gap-4 flex-wrap">
+                    {(["all", "vic", "nsw", "qld"] as Region[]).map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setRegion(r)}
+                        className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          region === r
+                            ? "bg-[#074e79] text-white shadow-sm"
+                            : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300"
+                        }`}
+                      >
+                        {r === "all" ? "ALL" : r.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top Center: Australia Map & Floating Badge */}
+                <div className="lg:col-span-5 relative flex flex-col items-center justify-center min-h-[220px]">
+                  <svg
+                    className="w-full h-auto max-w-[340px] text-sky-200"
+                    viewBox="0 0 400 280"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    {/* Australia map silhouette / outline */}
+                    <path
+                      d="M110 80 Q150 50 200 70 Q250 40 290 60 Q340 70 355 110 Q370 150 350 190 Q330 230 290 250 Q240 260 200 250 Q160 260 120 240 Q80 210 70 170 Q60 130 80 95 Z"
+                      strokeWidth="1.5"
+                      strokeDasharray="4 4"
+                      fill="rgba(240, 249, 255, 0.5)"
+                    />
+                    {/* Arcs connecting cities */}
+                    <path
+                      d="M130 140 Q190 75 270 130"
+                      stroke="#0284c7"
+                      strokeWidth="1.5"
+                      strokeDasharray="3 3"
+                    />
+                    <path
+                      d="M190 100 Q240 130 270 130"
+                      stroke="#0284c7"
+                      strokeWidth="1.5"
+                      strokeDasharray="3 3"
+                    />
+                    <path
+                      d="M270 130 Q305 170 315 200"
+                      stroke="#0284c7"
+                      strokeWidth="1.5"
+                      strokeDasharray="3 3"
+                    />
+
+                    {/* Map Pin Locations */}
+                    {/* WA/Perth */}
+                    <g transform="translate(130, 140)">
+                      <circle cx="0" cy="0" r="4.5" fill="#0284c7" />
+                      <circle cx="0" cy="0" r="8" fill="#0284c7" fillOpacity="0.2" />
+                    </g>
+                    {/* NT/Darwin */}
+                    <g transform="translate(190, 100)">
+                      <circle cx="0" cy="0" r="4.5" fill="#0284c7" />
+                      <circle cx="0" cy="0" r="8" fill="#0284c7" fillOpacity="0.2" />
+                    </g>
+                    {/* QLD/Brisbane */}
+                    <g transform="translate(270, 130)">
+                      <circle cx="0" cy="0" r="4.5" fill="#0284c7" />
+                      <circle cx="0" cy="0" r="8" fill="#0284c7" fillOpacity="0.2" />
+                    </g>
+                    {/* NSW/Sydney */}
+                    <g transform="translate(315, 200)">
+                      <circle cx="0" cy="0" r="4.5" fill="#0284c7" />
+                      <circle cx="0" cy="0" r="8" fill="#0284c7" fillOpacity="0.2" />
+                    </g>
+                    {/* VIC/Melbourne */}
+                    <g transform="translate(290, 220)">
+                      <circle cx="0" cy="0" r="4.5" fill="#0284c7" />
+                      <circle cx="0" cy="0" r="8" fill="#0284c7" fillOpacity="0.2" />
+                    </g>
+                  </svg>
+
+                  {/* Floating 2.8K Badge */}
+                  <div className="mt-2 bg-white rounded-2xl p-2.5 px-4 shadow-sm border border-slate-200/80 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-sky-50 text-[#0284c7] flex items-center justify-center shrink-0">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <span className="text-sm font-extrabold text-slate-900 leading-tight">2.8K+</span>
+                      <span className="text-xs text-slate-500 font-medium">Open roles right now</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Top Right: Live Activity Card */}
+                <div className="lg:col-span-3 w-full">
+                  <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 text-left">
+                    <h3 className="text-xs font-bold text-slate-900 mb-3 tracking-wide">
+                      Live Activity
+                    </h3>
+                    <div className="space-y-3">
+                      {/* Item 1 */}
+                      <div className="flex items-start justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#0284c7] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                            PN
+                          </div>
+                          <span className="text-slate-700 leading-tight">
+                            <strong className="font-semibold text-slate-900">Priya N.</strong> reached Level 5 after a phone screen
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 shrink-0">2 min ago</span>
+                      </div>
+
+                      {/* Item 2 */}
+                      <div className="flex items-start justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shrink-0">
+                            <Heart className="w-3 h-3 fill-current" />
+                          </div>
+                          <span className="text-slate-700 leading-tight">
+                            <strong className="font-semibold text-slate-900">Mercy Aged Care</strong> shortlisted 4 verified candidates
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 shrink-0">6 min ago</span>
+                      </div>
+
+                      {/* Item 3 */}
+                      <div className="flex items-start justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                            <ShieldCheck className="w-3 h-3" />
+                          </div>
+                          <span className="text-slate-700 leading-tight">
+                            <strong className="font-semibold text-slate-900">Daniel K.</strong> had 3 credentials verified at the source
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 shrink-0">11 min ago</span>
+                      </div>
+
+                      {/* Item 4 */}
+                      <div className="flex items-start justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#074e79] text-white flex items-center justify-center shrink-0">
+                            <Building2 className="w-3 h-3" />
+                          </div>
+                          <span className="text-slate-700 leading-tight">
+                            <strong className="font-semibold text-slate-900">Ability First</strong> filled 2 night shifts in Werribee
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 shrink-0">18 min ago</span>
+                      </div>
+
+                      {/* Item 5 */}
+                      <div className="flex items-start justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded-full bg-teal-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                            RS
+                          </div>
+                          <span className="text-slate-700 leading-tight">
+                            <strong className="font-semibold text-slate-900">Rania S.</strong> completed a free newcomer consult in Arabic
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 shrink-0">24 min ago</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Table Card */}
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden text-left">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-400 text-xs font-semibold">
+                        <th className="py-3.5 px-6 font-semibold">Role</th>
+                        <th className="py-3.5 px-6 font-semibold">
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                            <span>Location</span>
+                          </div>
+                        </th>
+                        <th className="py-3.5 px-6 font-semibold">
+                          <div className="flex items-center gap-1.5">
+                            <Search className="w-3.5 h-3.5 text-slate-400" />
+                            <span>Pay guide</span>
+                          </div>
+                        </th>
+                        <th className="py-3.5 px-6 font-semibold">
+                          <div className="flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-slate-400" />
+                            <span>Open Positions</span>
+                          </div>
+                        </th>
+                        <th className="py-3.5 px-6 font-semibold">30-day trend</th>
+                        <th className="py-3.5 px-4"></th>
                       </tr>
-                    ) : (
-                      filteredRows.map((row) => (
-                        <tr key={row.role}>
-                          <td className="role">
-                            <span className="role-title">{row.role}</span>
-                          </td>
-                          <td className="dim">
-                            <span className="loc-text">{row.where}</span>
-                          </td>
-                          <td className="dim">
-                            <span className="pay-pill">{row.pay}</span>
-                          </td>
-                          <td className="num cnt">
-                            <span className="open-count-tag">{row.open}</span>
-                          </td>
-                          <td className="num trend-cell">
-                            <Spark vals={row.s} up={row.t !== ""} />
-                            <span className={`trend-pill ${row.t}`}>
-                              {row.tl}
-                            </span>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredRows.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="py-8 text-center text-slate-400 text-sm">
+                            No open roles in this region right now. Try another region filter.
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              <p className="board-note">{boardNote}</p>
+                      ) : (
+                        filteredRows.map((row) => {
+                          const RowIcon = row.icon;
+                          return (
+                            <tr
+                              key={row.role}
+                              className="hover:bg-slate-50/70 transition-colors group cursor-pointer"
+                            >
+                              {/* Role */}
+                              <td className="py-4 px-6">
+                                <div className="flex items-center gap-3">
+                                  <div
+                                    className={`w-9 h-9 rounded-full ${row.iconBg} text-white flex items-center justify-center shrink-0 shadow-sm`}
+                                  >
+                                    <RowIcon className="w-4 h-4" />
+                                  </div>
+                                  <span className="font-bold text-slate-900 text-sm group-hover:text-[#074e79] transition-colors">
+                                    {row.role}
+                                  </span>
+                                </div>
+                              </td>
 
-              <div className="tick-wrap">
-                <span className="tick-lab">
-                  <span className="pulse-green-dot" />
-                  Live Activity
-                </span>
-                <div className="tick-view" ref={tickViewRef}>
-                  <ul
-                    style={{
-                      transform: `translateY(-${tickerOffset}px)`,
-                      transition: tickerTransition
-                        ? "transform .6s cubic-bezier(.16,1,.3,1)"
-                        : "none",
-                    }}
-                  >
-                    {[...TICKER_ITEMS, TICKER_ITEMS[0]].map(
-                      ([who, what, when], i) => (
-                        <li key={i}>
-                          <b className="tick-who">{who}</b>
-                          <span className="tick-what">{what}</span>
-                          <em className="tick-when">{when}</em>
-                        </li>
-                      ),
-                    )}
-                  </ul>
+                              {/* Location */}
+                              <td className="py-4 px-6 text-slate-500 text-sm">
+                                <div className="flex items-center gap-1.5">
+                                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                  <span>{row.where}</span>
+                                </div>
+                              </td>
+
+                              {/* Pay guide */}
+                              <td className="py-4 px-6 text-slate-600 text-sm font-medium">
+                                {row.pay}
+                              </td>
+
+                              {/* Open Positions */}
+                              <td className="py-4 px-6">
+                                <span className="text-[#074e79] font-bold text-base sm:text-lg">
+                                  {row.open}
+                                </span>
+                              </td>
+
+                              {/* 30-day trend */}
+                              <td className="py-4 px-6">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-20">
+                                    <Spark vals={row.s} up={row.t !== ""} />
+                                  </div>
+                                  <span
+                                    className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                                      row.t !== ""
+                                        ? "text-emerald-600 bg-emerald-50"
+                                        : "text-slate-500 bg-slate-100"
+                                    }`}
+                                  >
+                                    {row.tl}
+                                  </span>
+                                </div>
+                              </td>
+
+                              {/* Chevron */}
+                              <td className="py-4 px-4 text-right">
+                                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="py-3 text-center border-t border-slate-100 bg-slate-50/30">
+                  <span className="text-xs text-slate-400 font-medium">
+                    Showing all regions · figures illustrative
+                  </span>
                 </div>
               </div>
             </Reveal>
           </div>
         </section>
 
-        <hr className="rule" />
+        <SupportSection />
 
-        {/* support */}
-        <section id="support">
-          <div className="shell">
-            <Reveal className="support-intro">
-              <h2>The matching is automated. The judgement is not.</h2>
-              <p>
-                Two support desks, staffed by people with names, direct lines,
-                and enough context to be useful on the first call.
-              </p>
-            </Reveal>
+        <LevelsSection />
 
-            <Reveal className="support-metrics">
-              <div className="support-metric">
-                <CountStat target={90} suffix="s" />
-                <span>Median answer time, seeker line</span>
-              </div>
-              <div className="support-metric">
-                <CountStat target={1} />
-                <span>Account manager per employer</span>
-              </div>
-              <div className="support-metric">
-                <CountStat target={12} />
-                <span>Languages across both desks</span>
-              </div>
-              <div className="support-metric">
-                <CountStat target={6} suffix="h" />
-                <span>Posting to screened shortlist</span>
-              </div>
-            </Reveal>
+        <hr className="rule my-0 opacity-40" />
 
-            <Reveal className="support-desks">
-              <article className="support-desk">
-                <p className="support-desk-label">For job seekers</p>
-                <div className="support-desk-body">
-                  <h3>A phone line a person picks up.</h3>
-                  <p>
-                    Not a chatbot, not a ticket number. If your application
-                    stalls, you ring and find out why.
-                  </p>
-                  <ul>
-                    <li>
-                      Free help writing your profile and choosing assessments
-                    </li>
-                    <li>Structured phone interview once you reach Level 5</li>
-                    <li>
-                      Honest feedback when you are not ready for a role yet
-                    </li>
-                    <li>Interpreter arranged at no cost for any call</li>
-                  </ul>
-                </div>
-              </article>
-              <article className="support-desk">
-                <p className="support-desk-label">For employers</p>
-                <div className="support-desk-body">
-                  <h3>We do the verifying, you do the hiring.</h3>
-                  <p>
-                    Identity, work rights, qualifications, and clearances are
-                    checked at the source before a shortlist reaches you.
-                  </p>
-                  <ul>
-                    <li>
-                      Every credential verified with the issuing body, not just
-                      uploaded
-                    </li>
-                    <li>
-                      Work rights confirmed against VEVO, expiry dates tracked
-                      for you
-                    </li>
-                    <li>
-                      Clearances checked as current on the day you see the
-                      profile
-                    </li>
-                    <li>
-                      Direct mobile to your manager, no call queue, no ticket
-                      triage
-                    </li>
-                  </ul>
-                </div>
-              </article>
-            </Reveal>
+        {/* Dark Testimonial & Stats Section */}
+        <section className="bg-[#051833] py-16 lg:py-20 text-white relative overflow-hidden my-4">
+          {/* Subtle Dotted Australia Silhouette Background on Left */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none opacity-15 text-sky-400 w-[350px] lg:w-[450px]">
+            <svg viewBox="0 0 460 300" fill="currentColor">
+              <pattern id="dot-pattern" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1.2" fill="currentColor" />
+              </pattern>
+              <path
+                d="M 215 50 C 220 40 226 28 230 15 C 234 28 238 42 236 52 C 242 60 252 68 258 74 C 264 55 272 35 278 15 C 284 32 290 58 300 75 C 315 92 335 110 350 128 C 365 145 382 165 386 190 C 388 212 378 225 365 232 C 348 240 336 222 325 212 C 315 228 302 242 288 250 C 275 254 258 245 242 238 C 222 232 198 238 178 234 C 158 230 140 218 126 202 C 110 182 105 158 112 135 C 118 112 136 100 154 94 C 170 90 184 96 196 86 C 208 76 212 62 215 50 Z"
+                fill="url(#dot-pattern)"
+              />
+            </svg>
           </div>
-        </section>
 
-        <hr className="rule" />
-
-        {/* levels */}
-        <section id="levels">
-          <div className="shell">
-            <Reveal className="levels-intro">
-              <p className="levels-kicker">The level system</p>
-              <h2>A level you earn, not a badge you buy.</h2>
-              <p>
-                Every profile starts at one. Each level adds evidence that somebody actually
-                checked. Employers filter on it, so it has to mean something.
-              </p>
-            </Reveal>
-
-            <Reveal className="levels-board">
-              <div className="levels-steps">
-                {[
-                  {
-                    n: "L1",
-                    title: "Profile started",
-                    desc: "History, availability, location.",
-                  },
-                  {
-                    n: "L2",
-                    title: "Identity and work rights",
-                    desc: "ID matched, visa status confirmed.",
-                  },
-                  {
-                    n: "L3",
-                    title: "Credentials verified",
-                    desc: "Checked at the source, overseas study included.",
-                  },
-                  {
-                    n: "L4",
-                    title: "Skills tested",
-                    desc: "Job-relevant assessments and referees.",
-                  },
-                ].map((rung) => (
-                  <div key={rung.n} className="levels-step">
-                    <span className="levels-n">{rung.n}</span>
-                    <h3>{rung.title}</h3>
-                    <p>{rung.desc}</p>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <Reveal>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+                {/* Left Side: Large Quote */}
+                <div className="lg:col-span-6 flex flex-col items-start text-left">
+                  {/* Quote Icon */}
+                  <div className="text-[#2b65bd] mb-4">
+                    <svg className="w-10 h-10 fill-current" viewBox="0 0 32 32">
+                      <path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H6c0-2.2 1.8-4 4-4V8zm18 0c-3.3 0-6 2.7-6 6v10h10V14h-8c0-2.2 1.8-4 4-4V8z" />
+                    </svg>
                   </div>
-                ))}
-              </div>
 
-              <div
-                className={`levels-gate${ladderFill ? " on" : ""}`}
-                ref={ladderRef}
-              >
-                <div className="levels-gate-in">
-                  <span className="levels-n">L5</span>
-                  <div>
-                    <h3>Human screened</h3>
-                    <p>Phone interview, written note, shortlist ready.</p>
+                  {/* Main Quote Text */}
+                  <blockquote className="text-xl sm:text-2xl lg:text-3xl font-normal text-white leading-snug tracking-tight mb-6">
+                    “We stopped chasing certificates. The shortlist arrives already checked, and there is a person I can ring about every name on it.”
+                  </blockquote>
+
+                  {/* Subtle Underline */}
+                  <div className="w-10 h-[3px] bg-[#2563eb] rounded-full mb-4" />
+
+                  {/* Author / Designation */}
+                  <p className="text-xs sm:text-sm text-slate-300 font-light leading-relaxed">
+                    Operations manager, 240-bed residential aged care provider, Melbourne
+                  </p>
+                </div>
+
+                {/* Right Side: 2x2 Stats Card Container */}
+                <div className="lg:col-span-6">
+                  <div className="bg-[#071d3d]/90 border border-slate-700/60 rounded-2xl overflow-hidden shadow-2xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-700/60 border-b border-slate-700/60">
+                      {/* Stat 1 */}
+                      <div className="p-6 flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-full bg-[#13325e] text-[#38bdf8] flex items-center justify-center shrink-0">
+                          <Users className="w-6 h-6" />
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-3xl sm:text-4xl font-extrabold text-white leading-none mb-1.5">
+                            412
+                          </span>
+                          <span className="text-xs text-slate-300 font-medium leading-normal">
+                            Open personal care roles, VIC
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Stat 2 */}
+                      <div className="p-6 flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-full bg-[#13325e] text-[#38bdf8] flex items-center justify-center shrink-0">
+                          <ShieldCheck className="w-6 h-6" />
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-3xl sm:text-4xl font-extrabold text-white leading-none mb-1.5">
+                            84k
+                          </span>
+                          <span className="text-xs text-slate-300 font-medium leading-normal">
+                            Verified profiles on Stella
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-700/60">
+                      {/* Stat 3 */}
+                      <div className="p-6 flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-full bg-[#13325e] text-[#38bdf8] flex items-center justify-center shrink-0">
+                          <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-3xl sm:text-4xl font-extrabold text-white leading-none mb-1.5">
+                            97%
+                          </span>
+                          <span className="text-xs text-slate-300 font-medium leading-normal">
+                            Shortlists accepted first round
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Stat 4 */}
+                      <div className="p-6 flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-full bg-[#13325e] text-[#38bdf8] flex items-center justify-center shrink-0">
+                          <DollarSign className="w-6 h-6" />
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-3xl sm:text-4xl font-extrabold text-white leading-none mb-1.5">
+                            $0
+                          </span>
+                          <span className="text-xs text-slate-300 font-medium leading-normal">
+                            Cost for a candidate to join
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <span className="levels-gate-mark">Gate</span>
               </div>
             </Reveal>
           </div>
         </section>
 
-        <hr className="rule" />
+        <NewcomersSection />
 
-        {/* quote + stats */}
-        <section className="sec-quote">
-          <div className="shell qgrid">
-            <Reveal className="quote">
-              <p>
-                We stopped chasing certificates. The shortlist arrives already
-                checked, and there is a person I can ring about every name on
-                it.
-              </p>
-              <p className="who">
-                Operations manager, 240-bed residential aged care provider,
-                Melbourne
-              </p>
-            </Reveal>
-            <Reveal
-              className="stats"
-              style={{ marginTop: 0, gridTemplateColumns: "1fr 1fr" }}
-            >
-              <div className="stat">
-                <CountStat target={412} />
-                <span>Open personal care roles, VIC</span>
-              </div>
-              <div className="stat">
-                <CountStat target={84} suffix="k" />
-                <span>Verified profiles on Stella</span>
-              </div>
-              <div className="stat">
-                <CountStat target={97} suffix="%" />
-                <span>Shortlists accepted first round</span>
-              </div>
-              <div className="stat">
-                <CountStat target={0} text="$0" />
-                <span>Cost for a candidate to join</span>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        <hr className="rule" />
-
-        {/* newcomers */}
-        <section id="newcomers">
-          <div className="shell">
-            <Reveal className="new-panel">
-              <div className="new-main">
-                <p className="new-kicker">New to Australia</p>
-                <h2>Nobody should have to guess how this country works.</h2>
-                <p>
-                  If you arrived recently, the hardest part is not the job. It is knowing which
-                  of your qualifications count, what an employer is allowed to ask, and which check
-                  to get first. That information is free here, whether you ever apply for a role
-                  or not.
-                </p>
-                <div className="new-actions">
-                  <a className="btn ac sm" href="#cta">
-                    Book a free consult <ArrowIcon />
-                  </a>
-                  <a className="btn ghost sm" href="#demand">
-                    See what is in demand
-                  </a>
-                </div>
-              </div>
-              <div className="new-grid">
-                {[
-                  {
-                    title: "Does my degree count?",
-                    desc: "How overseas qualifications are assessed against the Australian framework.",
-                  },
-                  {
-                    title: "Work rights by visa",
-                    desc: "Hour limits, conditions, and what changes when your visa does.",
-                  },
-                  {
-                    title: "Checks and clearances",
-                    desc: "Police check, NDIS screening, working with children. Which one, and when.",
-                  },
-                  {
-                    title: "Your first Australian job",
-                    desc: "Pay rates, award basics, and the questions employers cannot legally ask.",
-                  },
-                ].map((card) => (
-                  <a key={card.title} className="new-cell" href="#cta">
-                    <h3>{card.title}</h3>
-                    <p>{card.desc}</p>
-                  </a>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* cta */}
-        <section style={{ paddingTop: 0 }}>
-          <div className="shell">
-            <Reveal className="cta" id="cta">
-              <div className="glow" aria-hidden="true" />
-              <h2>Whichever side you are on, someone picks up.</h2>
-              <p>
-                Post a role, build a profile, or just ring and ask. The first
-                conversation costs nothing.
-              </p>
-              <div className="row">
-                <a className="btn ac" href="#">
-                  Post a job <ArrowIcon />
-                </a>
-                <a className="btn ghost" href="#">
-                  Create your profile
-                </a>
-              </div>
-              <p className="callout">
-                1300 000 000 · 7:00 to 21:00 AEST · interpreters available
-              </p>
-            </Reveal>
-          </div>
-        </section>
+        <CtaSection />
       </main>
 
     </div>

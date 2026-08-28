@@ -67,19 +67,19 @@
   font-weight: 500;
 }
 
-.stella-home h1 {
+.stella-home h1:not(.hero-title):not(.trusted-by-title):not(.four-things-title):not(.four-things-card-title) {
   font-size: clamp(2.8rem, 6vw, 4.9rem);
   line-height: 0.99;
   letter-spacing: -0.048em;
 }
 
-.stella-home h2 {
+.stella-home h2:not(.four-things-title):not(.trusted-by-title):not(.paths-title):not(.support-hero-title):not(.levels-title):not(.newcomers-title):not(.cta-title) {
   font-size: clamp(1.95rem, 3.7vw, 2.9rem);
   line-height: 1.05;
   letter-spacing: -0.042em;
 }
 
-.stella-home h3 {
+.stella-home h3:not(.four-things-card-title) {
   font-size: 1.05rem;
   font-weight: 500;
   letter-spacing: -0.024em;
@@ -1119,8 +1119,187 @@
   font-style: normal;
 }
 
-.stella-home section {
+.stella-home section:not(.hero-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
   padding: 104px 0;
+}
+
+.stella-home .hero-section {
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.stella-home .trusted-by-section {
+  padding: 0 !important;
+}
+
+.stella-home .trusted-by-header,
+.stella-home .trusted-by-title,
+.stella-home .trusted-by-sub {
+  text-align: center;
+}
+
+.stella-home .levels-section {
+  padding: 0 !important;
+}
+
+.stella-home .levels-hero-visual,
+.stella-home .levels-hero-visual img {
+  border: none !important;
+  outline: none;
+}
+
+.stella-home .levels-hero-avatar {
+  box-shadow: none;
+}
+
+.stella-home .newcomers-section,
+.stella-home .cta-section {
+  padding: 0 !important;
+}
+
+.stella-home .newcomers-section a.newcomers-card {
+  color: inherit;
+  text-decoration: none;
+}
+
+.stella-home .newcomers-section .newcomers-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.stella-home .newcomers-section .newcomers-btn-primary {
+  background: #0c2440;
+  border: 1px solid #0c2440;
+  color: #ffffff !important;
+}
+
+.stella-home .newcomers-section .newcomers-btn-primary:hover {
+  background: #13325e;
+  border-color: #13325e;
+  color: #ffffff !important;
+}
+
+.stella-home .newcomers-section .newcomers-btn-ghost {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0c2440 !important;
+}
+
+.stella-home .newcomers-section .newcomers-btn-ghost:hover {
+  border-color: #0c2440;
+  background: #f8fafc;
+  color: #0c2440 !important;
+}
+
+.stella-home .cta-section .cta-section-copy {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.stella-home .cta-section .cta-section-meta {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.stella-home .cta-section .cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.stella-home .cta-section .cta-btn-primary {
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  color: #0c2440 !important;
+}
+
+.stella-home .cta-section .cta-btn-primary:hover {
+  background: #eef2f7;
+  border-color: #eef2f7;
+  color: #0f2744 !important;
+}
+
+.stella-home .cta-section .cta-btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #ffffff !important;
+}
+
+.stella-home .cta-section .cta-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+  color: #ffffff !important;
+}
+
+.stella-home .support-section {
+  padding: 0 !important;
+}
+
+.stella-home .paths-section {
+  padding: 0 !important;
+}
+
+.stella-home .four-things-section {
+  padding: 0 !important;
+}
+
+.stella-home .four-things-header,
+.stella-home .four-things-title,
+.stella-home .four-things-sub {
+  text-align: center;
+}
+
+.stella-home .trusted-logo-scroll {
+  overflow: hidden;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 6%,
+    #000 94%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 6%,
+    #000 94%,
+    transparent
+  );
+}
+
+.stella-home .trusted-logo-marquee {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  animation: stella-slide 38s linear infinite;
+}
+
+.stella-home .trusted-logo-scroll:hover .trusted-logo-marquee {
+  animation-play-state: paused;
 }
 
 .stella-home #difference {
@@ -3391,7 +3570,7 @@
     align-items: flex-start;
   }
 
-  .stella-home section {
+  .stella-home section:not(.hero-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
     padding: 70px 0;
   }
 

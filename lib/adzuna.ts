@@ -40,6 +40,7 @@ export type AdzunaJobNormalized = {
   benefits: string;
   createdAt: string | null;
   applyUrl: string;
+  adref: string;
   country: string;
   countryLabel: string;
   company: {
@@ -56,6 +57,7 @@ export type AdzunaJobNormalized = {
 
 type AdzunaRawJob = {
   id: string | number;
+  adref?: string;
   title?: string;
   description?: string;
   created?: string;
@@ -132,8 +134,10 @@ function normalizeJob(
   const salaryMin = Number(job.salary_min) || 0;
   const salaryMax = Number(job.salary_max) || salaryMin;
 
+  const compositeId = `adzuna-${country.code}-${job.id}`;
+
   return {
-    id: `adzuna-${country.code}-${job.id}`,
+    id: compositeId,
     source: "adzuna",
     title: (job.title || "Untitled role").trim(),
     description,
@@ -151,7 +155,8 @@ function normalizeJob(
     skills: [],
     benefits: "",
     createdAt: job.created || null,
-    applyUrl: job.redirect_url || "",
+    applyUrl: normalizeAdzunaListingUrl(job.redirect_url || "", compositeId),
+    adref: job.adref?.trim() || "",
     country: country.code,
     countryLabel: country.label,
     company: {
@@ -168,6 +173,90 @@ function normalizeJob(
       size: "",
     },
   };
+}
+
+export function parseAdzunaJobId(
+  compositeId: string,
+): { country: string; jobId: string } | null {
+  const match = compositeId.match(/^adzuna-([a-z]{2})-(\d+)$/i);
+  if (!match) return null;
+  return { country: match[1].toLowerCase(), jobId: match[2] };
+}
+
+const ADZUNA_HOSTS: Record<string, string> = {
+  au: "www.adzuna.com.au",
+  us: "www.adzuna.com",
+  gb: "www.adzuna.co.uk",
+  nz: "www.adzuna.co.nz",
+  ca: "www.adzuna.ca",
+  sg: "www.adzuna.sg",
+};
+
+/** Adzuna API redirect_url uses /land/ad/ — scrape works on /details/{id}. */
+export function normalizeAdzunaListingUrl(
+  listingUrl: string,
+  compositeJobId?: string,
+): string {
+  let jobNum: string | undefined;
+  let host: string | undefined;
+
+  const parsed = compositeJobId ? parseAdzunaJobId(compositeJobId) : null;
+  if (parsed) {
+    jobNum = parsed.jobId;
+    host = ADZUNA_HOSTS[parsed.country];
+  }
+
+  if (listingUrl) {
+    try {
+      const url = new URL(listingUrl);
+      host = host || url.host;
+      const landMatch = url.pathname.match(/\/land\/ad\/(\d+)/i);
+      const detailsMatch = url.pathname.match(/\/details\/(\d+)/i);
+      jobNum = jobNum || landMatch?.[1] || detailsMatch?.[1];
+    } catch {
+      /* keep original */
+    }
+  }
+
+  if (jobNum && host) {
+    return `https://${host}/details/${jobNum}`;
+  }
+
+  return listingUrl;
+}
+
+export async function fetchAdzunaJobByAdref(
+  countryCode: string,
+  adref: string,
+): Promise<AdzunaJobNormalized | null> {
+  const country = ADZUNA_COUNTRIES.find((c) => c.code === countryCode);
+  if (!country || !adref) return null;
+
+  const { appId, appKey } = getCredentials();
+  if (!appId || !appKey) return null;
+
+  const params = new URLSearchParams({ app_id: appId, app_key: appKey });
+  const url = `https://api.adzuna.com/v1/api/jobs/${countryCode}/ad/${encodeURIComponent(adref)}?${params}`;
+
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) return null;
+    const job = (await res.json()) as AdzunaRawJob;
+    if (job.adref === undefined && !job.id) return null;
+    return normalizeJob(job, country);
+  } catch {
+    return null;
+  }
+}
+
+/** @deprecated Use fetchAdzunaJobByAdref — Adzuna has no job-id detail endpoint. */
+export async function fetchAdzunaJobDetail(
+  countryCode: string,
+  jobId: string,
+): Promise<AdzunaJobNormalized | null> {
+  void jobId;
+  void countryCode;
+  return null;
 }
 
 async function fetchCountryPage(options: {

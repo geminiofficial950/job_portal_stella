@@ -10,7 +10,7 @@ type CountryCacheEntry = {
 const memory = new Map<string, CountryCacheEntry>();
 const inflight = new Map<string, Promise<AdzunaJobNormalized[]>>();
 
-const CACHE_DIR = path.join(process.cwd(), ".cache", "adzuna");
+const CACHE_DIR = path.join(process.cwd(), ".cache", "adzuna-v2");
 
 function cacheTtlMs() {
   const hours = Number(process.env.ADZUNA_CACHE_HOURS || "6");

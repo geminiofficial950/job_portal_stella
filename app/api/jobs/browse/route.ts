@@ -218,11 +218,32 @@ export async function GET(request: Request) {
     }
 
     const jobs = [...stellaJobs, ...adzunaJobs];
+    const seenIds = new Set<string>();
+    const uniqueJobs = jobs.filter((job) => {
+      const id = String(job.id);
+      if (seenIds.has(id)) return false;
+      seenIds.add(id);
+      return true;
+    });
+
+    uniqueJobs.sort((a, b) => {
+      const au = (job: Record<string, unknown>) => {
+        if (job.country === "au") return 0;
+        const hay = `${job.location || ""} ${job.countryLabel || ""}`
+          .toLowerCase();
+        return hay.includes("australia") ? 0 : 1;
+      };
+      const auDiff = au(a) - au(b);
+      if (auDiff !== 0) return auDiff;
+      const ta = a.createdAt ? new Date(String(a.createdAt)).getTime() : 0;
+      const tb = b.createdAt ? new Date(String(b.createdAt)).getTime() : 0;
+      return tb - ta;
+    });
 
     return NextResponse.json(
       {
         success: true,
-        jobs,
+        jobs: uniqueJobs,
         companies: filterCompanies,
         categories,
         countries: ADZUNA_COUNTRIES.map((c) => ({

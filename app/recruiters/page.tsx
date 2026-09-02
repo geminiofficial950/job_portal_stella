@@ -5,12 +5,17 @@ import Link from "next/link";
 import {
   Search,
   Building2,
-  Star,
   CheckCircle2,
   ArrowUpRight,
-  Heart,
   Loader2,
+  MapPin,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
+  ArrowLeft,
+  X,
 } from "lucide-react";
+import "./recruiters.css";
 
 type CompanyCard = {
   id: string;
@@ -24,44 +29,151 @@ type CompanyCard = {
   openJobsCount: number;
 };
 
-function CompanyLogo({ name, logoUrl }: { name: string; logoUrl: string }) {
+function australiaCompanyPriority(company: CompanyCard): number {
+  const hay = company.location.toLowerCase();
+  return hay.includes("australia") ||
+    hay.includes("sydney") ||
+    hay.includes("melbourne")
+    ? 0
+    : 1;
+}
+
+function CompanyLogo({
+  name,
+  logoUrl,
+  className,
+}: {
+  name: string;
+  logoUrl: string;
+  className?: string;
+}) {
   const initial = name.trim().charAt(0).toUpperCase() || "C";
   if (logoUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={logoUrl}
-        alt={`${name} logo`}
-        className="h-12 w-12 shrink-0 rounded-2xl border border-slate-200 bg-white object-cover shadow-xs"
-      />
+      <img src={logoUrl} alt={`${name} logo`} className={className} />
     );
   }
+  return <span className={className}>{initial}</span>;
+}
+
+function CompanyDetailPanel({
+  company,
+  onClose,
+  showMobileBar,
+}: {
+  company: CompanyCard;
+  onClose?: () => void;
+  showMobileBar?: boolean;
+}) {
+  const websiteUrl = company.website
+    ? company.website.startsWith("http")
+      ? company.website
+      : `https://${company.website}`
+    : "";
+
   return (
-    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-slate-900 text-base font-black text-white shadow-xs">
-      {initial}
-    </div>
+    <>
+      {showMobileBar ? (
+        <div className="recruiters-detail-mobile-bar">
+          <button
+            type="button"
+            className="recruiters-detail-back"
+            onClick={onClose}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to list
+          </button>
+        </div>
+      ) : null}
+
+      <div className="recruiters-detail-scroll">
+        <div className="recruiters-detail-hero">
+          <div className="recruiters-detail-logo">
+            <CompanyLogo name={company.name} logoUrl={company.logoUrl} />
+          </div>
+          <h2 className="recruiters-detail-name font-manrope">
+            {company.name}
+          </h2>
+          <p className="recruiters-detail-sub">
+            <CheckCircle2 className="recruiters-detail-verified h-4 w-4" />
+            Verified employer
+          </p>
+        </div>
+
+        <div className="recruiters-detail-grid">
+          <div className="recruiters-detail-stat">
+            <p className="recruiters-detail-stat-label">Industry</p>
+            <p className="recruiters-detail-stat-value">
+              {company.industry || "—"}
+            </p>
+          </div>
+          <div className="recruiters-detail-stat">
+            <p className="recruiters-detail-stat-label">Company size</p>
+            <p className="recruiters-detail-stat-value">
+              {company.size || "—"}
+            </p>
+          </div>
+          <div className="recruiters-detail-stat">
+            <p className="recruiters-detail-stat-label">Location</p>
+            <p className="recruiters-detail-stat-value">
+              {company.location || "—"}
+            </p>
+          </div>
+          <div className="recruiters-detail-stat">
+            <p className="recruiters-detail-stat-label">Open jobs</p>
+            <p className="recruiters-detail-stat-value">
+              {company.openJobsCount}
+            </p>
+          </div>
+        </div>
+
+        <h3 className="recruiters-detail-section-title">About the company</h3>
+        <p className="recruiters-detail-about">
+          {company.about ||
+            `${company.name} is a verified employer on Stella Jobs.`}
+        </p>
+      </div>
+
+      <div className="recruiters-detail-footer">
+        <Link
+          href={`/jobs?company=${encodeURIComponent(company.name)}`}
+          className="recruiters-detail-cta"
+        >
+          View {company.openJobsCount} open job
+          {company.openJobsCount === 1 ? "" : "s"}
+          <ArrowUpRight className="h-4 w-4" />
+        </Link>
+        {websiteUrl ? (
+          <a
+            href={websiteUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="recruiters-detail-website"
+          >
+            Visit website
+          </a>
+        ) : null}
+      </div>
+    </>
   );
 }
 
 export default function RecruitersPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [locationQuery, setLocationQuery] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState("All");
-  const [followedCompanies, setFollowedCompanies] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<"jobs" | "name">("jobs");
   const [companies, setCompanies] = useState<CompanyCard[]>([]);
   const [industries, setIndustries] = useState<string[]>(["All"]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const placeholderCompanies = useMemo(
-    () =>
-      companies.length > 0
-        ? companies.slice(0, 5).map((c) => `${c.name}...`)
-        : ["Company name...", "Industry...", "Location..."],
-    [companies],
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [industryFilterOpen, setIndustryFilterOpen] = useState(true);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
+    null,
   );
-  const [wordIdx, setWordIdx] = useState(0);
-  const [currentPlaceholder, setCurrentPlaceholder] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
 
   const loadCompanies = useCallback(async () => {
     setLoading(true);
@@ -86,41 +198,14 @@ export default function RecruitersPage() {
     void loadCompanies();
   }, [loadCompanies]);
 
-  useEffect(() => {
-    const target = placeholderCompanies[wordIdx % placeholderCompanies.length];
-    const speed = isDeleting ? 40 : 85;
-
-    if (!isDeleting && currentPlaceholder === target) {
-      const timeout = setTimeout(() => setIsDeleting(true), 1800);
-      return () => clearTimeout(timeout);
+  const industryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of companies) {
+      const key = c.industry || "Other";
+      counts[key] = (counts[key] || 0) + 1;
     }
-    if (isDeleting && currentPlaceholder === "") {
-      setIsDeleting(false);
-      setWordIdx((prev) => (prev + 1) % placeholderCompanies.length);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setCurrentPlaceholder((prev) =>
-        isDeleting
-          ? target.substring(0, prev.length - 1)
-          : target.substring(0, prev.length + 1),
-      );
-    }, speed);
-
-    return () => clearTimeout(timer);
-  }, [
-    currentPlaceholder,
-    isDeleting,
-    wordIdx,
-    placeholderCompanies,
-  ]);
-
-  const toggleFollow = (id: string) => {
-    setFollowedCompanies((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-  };
+    return counts;
+  }, [companies]);
 
   const filteredRecruiters = useMemo(() => {
     return companies.filter((company) => {
@@ -133,6 +218,12 @@ export default function RecruitersPage() {
         return false;
       }
       if (
+        locationQuery &&
+        !company.location.toLowerCase().includes(locationQuery.toLowerCase())
+      ) {
+        return false;
+      }
+      if (
         selectedIndustry !== "All" &&
         company.industry.toLowerCase() !== selectedIndustry.toLowerCase()
       ) {
@@ -140,328 +231,356 @@ export default function RecruitersPage() {
       }
       return true;
     });
-  }, [companies, searchQuery, selectedIndustry]);
+  }, [companies, searchQuery, locationQuery, selectedIndustry]);
 
-  const totalOpenJobs = useMemo(
-    () => companies.reduce((sum, c) => sum + c.openJobsCount, 0),
-    [companies],
+  const sortedRecruiters = useMemo(() => {
+    const list = [...filteredRecruiters];
+    list.sort((a, b) => {
+      const auDiff = australiaCompanyPriority(a) - australiaCompanyPriority(b);
+      if (auDiff !== 0) return auDiff;
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      const jobsDiff = b.openJobsCount - a.openJobsCount;
+      if (jobsDiff !== 0) return jobsDiff;
+      return a.name.localeCompare(b.name);
+    });
+    return list;
+  }, [filteredRecruiters, sortBy]);
+
+  const selectedCompany = useMemo(
+    () => sortedRecruiters.find((c) => c.id === selectedCompanyId) || null,
+    [sortedRecruiters, selectedCompanyId],
   );
 
+  useEffect(() => {
+    if (sortedRecruiters.length === 0) {
+      setSelectedCompanyId(null);
+      return;
+    }
+    if (
+      !selectedCompanyId ||
+      !sortedRecruiters.some((c) => c.id === selectedCompanyId)
+    ) {
+      setSelectedCompanyId(sortedRecruiters[0].id);
+    }
+  }, [sortedRecruiters, selectedCompanyId]);
+
+  const activeFilters = useMemo(() => {
+    const chips: { key: string; label: string; clear: () => void }[] = [];
+    if (searchQuery) {
+      chips.push({
+        key: "q",
+        label: searchQuery,
+        clear: () => setSearchQuery(""),
+      });
+    }
+    if (locationQuery) {
+      chips.push({
+        key: "loc",
+        label: locationQuery,
+        clear: () => setLocationQuery(""),
+      });
+    }
+    if (selectedIndustry !== "All") {
+      chips.push({
+        key: "ind",
+        label: selectedIndustry,
+        clear: () => setSelectedIndustry("All"),
+      });
+    }
+    return chips;
+  }, [searchQuery, locationQuery, selectedIndustry]);
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setLocationQuery("");
+    setSelectedIndustry("All");
+  };
+
+  const openCompanyDetail = (id: string) => {
+    setSelectedCompanyId(id);
+    if (window.matchMedia("(max-width: 1279px)").matches) {
+      setMobileDetailOpen(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const closeMobileDetail = () => {
+    setMobileDetailOpen(false);
+  };
+
+  const hasActiveFilters = activeFilters.length > 0;
+
   return (
-    <div className="flex min-h-screen flex-col bg-[#F8FAFC] font-inter text-slate-800">
-      <section
-        className="relative overflow-hidden border-b border-slate-200 px-4 py-10 sm:px-6 lg:px-8"
-        style={{ background: "#f0f4f8" }}
-      >
-        <div className="relative z-10 mx-auto max-w-5xl text-center">
-          <div className="mb-6">
-            <h1 className="font-manrope text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-              Top Employers &amp; Recruiters
-            </h1>
-            <p className="mt-1 font-inter text-sm text-slate-500">
-              Discover verified employers hiring top talent. Explore culture,
-              size, and open roles.
-            </p>
+    <div className="recruiters-page font-inter">
+      <div className="recruiters-toolbar">
+        <div className="recruiters-toolbar-inner">
+          <h1 className="recruiters-toolbar-title font-manrope">Employers</h1>
+
+          <div className="recruiters-toolbar-search-group">
+          <div className="recruiters-toolbar-search">
+            <div className="recruiters-toolbar-field">
+              <Search className="h-4 w-4 shrink-0 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Company or industry"
+              />
+            </div>
+            <div className="recruiters-toolbar-field">
+              <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+              <input
+                type="text"
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+                placeholder="Location"
+              />
+            </div>
           </div>
 
-          <div
-            className="mx-auto flex max-w-2xl items-center gap-3 rounded-2xl bg-white px-4 py-3 text-left"
-            style={{
-              border: "1px solid #e2e8f0",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.07)",
-            }}
+          <button type="button" className="recruiters-toolbar-btn">
+            Search
+          </button>
+          </div>
+
+          <button
+            type="button"
+            className="recruiters-mobile-filter-btn"
+            onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
           >
-            <Search className="h-5 w-5 shrink-0 text-slate-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={
-                searchQuery ? "" : `Search e.g. "${currentPlaceholder}"`
-              }
-              className="flex-1 bg-transparent font-inter text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
-            />
-            {searchQuery ? (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="text-xs font-medium text-slate-400 transition-colors hover:text-slate-700"
-              >
-                Clear
-              </button>
-            ) : null}
-            <div className="h-5 w-px bg-slate-200" />
+            <SlidersHorizontal className="h-4 w-4" />
+            Filters
+          </button>
+        </div>
+      </div>
+
+      <div
+        className={`recruiters-board ${selectedCompany ? "has-detail" : ""}`}
+      >
+        <aside
+          className={`recruiters-sidebar ${isMobileFilterOpen ? "is-open" : ""}`}
+        >
+          <div className="recruiters-sidebar-head">
+            <h3>Filters</h3>
             <button
               type="button"
-              className="rounded-xl px-5 py-2 text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95"
-              style={{
-                background: "#1e3a5f",
-                boxShadow: "0 4px 12px rgba(30,58,95,0.22)",
+              className="recruiters-filter-reset"
+              onClick={() => {
+                resetFilters();
+                setIsMobileFilterOpen(false);
               }}
             >
-              Search
+              Reset all
             </button>
           </div>
-        </div>
-      </section>
 
-      <section className="border-b border-slate-100 bg-white px-4 py-5 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 text-center md:grid-cols-4">
-          {[
-            {
-              val: loading ? "—" : String(companies.length),
-              label: "Verified Employers",
-              color: "text-slate-900",
-            },
-            {
-              val: loading ? "—" : String(totalOpenJobs),
-              label: "Active Positions",
-              color: "text-slate-900",
-            },
-            {
-              val: loading
-                ? "—"
-                : String(Math.max(industries.length - 1, 0)),
-              label: "Industries",
-              color: "text-emerald-600",
-            },
-            {
-              val: "Live",
-              label: "From recruiter profiles",
-              color: "text-amber-500",
-            },
-          ].map((stat, i) => (
-            <div
-              key={stat.label}
-              className={i < 3 ? "border-r border-slate-100 pr-4" : ""}
-            >
-              <div
-                className={`font-manrope text-xl font-black sm:text-2xl ${stat.color}`}
-              >
-                {stat.val}
-              </div>
-              <div className="mt-0.5 text-xs font-medium text-slate-500">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            {industries.map((ind) => (
+          <div className="recruiters-filter-section">
+            <p className="text-xs font-bold text-slate-500 mb-2">Show by</p>
+            <div className="recruiters-sort-pills">
               <button
-                key={ind}
                 type="button"
-                onClick={() => setSelectedIndustry(ind)}
-                className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold transition-all duration-200"
-                style={{
-                  background: selectedIndustry === ind ? "#0f172a" : "#f1f5f9",
-                  color: selectedIndustry === ind ? "#fff" : "#64748b",
-                  boxShadow:
-                    selectedIndustry === ind
-                      ? "0 4px 12px rgba(15,23,42,0.18)"
-                      : "none",
-                  transform:
-                    selectedIndustry === ind ? "scale(1.03)" : "scale(1)",
-                }}
+                className={`recruiters-sort-pill ${sortBy === "jobs" ? "is-active" : ""}`}
+                onClick={() => setSortBy("jobs")}
               >
-                {ind}
+                Most jobs
               </button>
-            ))}
+              <button
+                type="button"
+                className={`recruiters-sort-pill ${sortBy === "name" ? "is-active" : ""}`}
+                onClick={() => setSortBy("name")}
+              >
+                A – Z
+              </button>
+            </div>
           </div>
-          <span className="text-xs font-medium text-slate-500">
-            Showing{" "}
-            <strong className="text-slate-900">
-              {filteredRecruiters.length}
-            </strong>{" "}
-            recruiters
-          </span>
-        </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-16 text-sm text-slate-500">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            Loading companies…
-          </div>
-        ) : error ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-xs">
-            <Building2 className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-            <h3 className="mb-1 text-lg font-bold text-slate-900">
-              Couldn’t load companies
-            </h3>
-            <p className="mb-4 text-xs text-slate-500">{error}</p>
+          <div className="recruiters-filter-section">
             <button
               type="button"
-              onClick={() => void loadCompanies()}
-              className="rounded-xl px-4 py-2 text-xs font-bold text-white"
-              style={{ background: "#1e3a5f" }}
+              className="recruiters-filter-section-title"
+              onClick={() => setIndustryFilterOpen(!industryFilterOpen)}
             >
-              Try again
+              Industry
+              {industryFilterOpen ? (
+                <ChevronUp className="h-4 w-4 text-slate-400" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-slate-400" />
+              )}
             </button>
+            {industryFilterOpen ? (
+              <div className="recruiters-filter-options">
+                {industries.map((ind) => (
+                  <label key={ind} className="recruiters-filter-option">
+                    <input
+                      type="radio"
+                      name="industry"
+                      checked={selectedIndustry === ind}
+                      onChange={() => {
+                        setSelectedIndustry(ind);
+                        setIsMobileFilterOpen(false);
+                      }}
+                    />
+                    {ind}
+                    {ind !== "All" ? (
+                      <span className="recruiters-filter-count">
+                        ({industryCounts[ind] || 0})
+                      </span>
+                    ) : null}
+                  </label>
+                ))}
+              </div>
+            ) : null}
           </div>
-        ) : filteredRecruiters.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {filteredRecruiters.map((company) => {
-              const isFollowed = followedCompanies.includes(company.id);
-              const tags = [company.size, company.industry, company.location]
-                .map((t) => t.trim())
-                .filter(Boolean);
 
-              return (
-                <div
-                  key={company.id}
-                  className="flex flex-col justify-between rounded-3xl border border-slate-100 bg-white p-5"
-                  style={{
-                    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-                    transition:
-                      "transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget as HTMLDivElement;
-                    el.style.transform = "translateY(-4px)";
-                    el.style.boxShadow = "0 12px 32px rgba(0,0,0,0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget as HTMLDivElement;
-                    el.style.transform = "translateY(0)";
-                    el.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-                  }}
-                >
-                  <div>
-                    <div className="mb-4 flex items-start justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <CompanyLogo
-                          name={company.name}
-                          logoUrl={company.logoUrl}
-                        />
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <h3 className="font-manrope text-base font-extrabold text-slate-900">
-                              {company.name}
-                            </h3>
-                            <CheckCircle2 className="h-4 w-4 fill-current text-emerald-500" />
-                          </div>
-                          <p className="mt-0.5 text-[11px] font-medium text-slate-500">
-                            {company.industry || "Employer"}
-                            {company.location ? (
-                              <>
-                                {" "}
-                                ·{" "}
-                                <span className="font-normal text-slate-400">
-                                  {company.location}
-                                </span>
-                              </>
-                            ) : null}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => toggleFollow(company.id)}
-                        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all duration-200"
-                        style={{
-                          background: isFollowed ? "#f0fdf4" : "#f8fafc",
-                          color: isFollowed ? "#16a34a" : "#64748b",
-                          border: isFollowed
-                            ? "1px solid #bbf7d0"
-                            : "1px solid #e2e8f0",
-                        }}
-                      >
-                        <Heart
-                          className={`h-3.5 w-3.5 ${isFollowed ? "fill-current" : ""}`}
-                        />
-                        {isFollowed ? "Following" : "Follow"}
-                      </button>
+          {isMobileFilterOpen ? (
+            <button
+              type="button"
+              className="recruiters-toolbar-btn mt-4 w-full"
+              onClick={() => setIsMobileFilterOpen(false)}
+            >
+              Apply filters
+            </button>
+          ) : null}
+        </aside>
+
+        <div
+          className={`recruiters-list-panel ${mobileDetailOpen ? "is-hidden-mobile" : ""}`}
+        >
+          {hasActiveFilters ? (
+            <div className="recruiters-active-filters">
+              {activeFilters.map((chip) => (
+                <span key={chip.key} className="recruiters-filter-chip">
+                  {chip.label}
+                  <button
+                    type="button"
+                    onClick={chip.clear}
+                    aria-label={`Remove ${chip.label}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              <button
+                type="button"
+                className="recruiters-clear-all"
+                onClick={resetFilters}
+              >
+                Delete all
+              </button>
+            </div>
+          ) : null}
+
+          {loading ? (
+            <div className="recruiters-loading flex items-center justify-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Loading employers…
+            </div>
+          ) : error ? (
+            <div className="recruiters-empty">
+              <Building2 className="mx-auto mb-3 h-12 w-12 text-slate-300" />
+              <p className="font-bold text-slate-900">Couldn&apos;t load companies</p>
+              <p className="mt-1 text-sm">{error}</p>
+              <button
+                type="button"
+                className="recruiters-btn-primary"
+                onClick={() => void loadCompanies()}
+              >
+                Try again
+              </button>
+            </div>
+          ) : sortedRecruiters.length > 0 ? (
+            <div className="recruiters-list-scroll">
+              {sortedRecruiters.map((company) => {
+                const isSelected = company.id === selectedCompanyId;
+
+                return (
+                  <article
+                    key={company.id}
+                    role="button"
+                    tabIndex={0}
+                    className={`recruiters-list-card ${isSelected ? "is-selected" : ""}`}
+                    onClick={() => openCompanyDetail(company.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        openCompanyDetail(company.id);
+                      }
+                    }}
+                  >
+                    <div className="recruiters-list-card-logo">
+                      <CompanyLogo
+                        name={company.name}
+                        logoUrl={company.logoUrl}
+                      />
                     </div>
 
-                    <p className="mb-4 text-xs leading-relaxed text-slate-500">
-                      {company.about ||
-                        `${company.name} is hiring on Stella Jobs.`}
+                    <p className="recruiters-list-card-name font-manrope">
+                      {company.name}
                     </p>
 
-                    {tags.length > 0 ? (
-                      <div className="mb-4 flex flex-wrap gap-1.5">
-                        {tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
+                    <p className="recruiters-list-card-meta">
+                      {company.industry || "Employer"}
+                      {company.location ? ` · ${company.location}` : ""}
+                    </p>
 
-                  <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                    <div className="flex items-center gap-4 text-xs">
-                      {company.website ? (
-                        <a
-                          href={
-                            company.website.startsWith("http")
-                              ? company.website
-                              : `https://${company.website}`
-                          }
-                          target="_blank"
-                          rel="noreferrer"
-                          className="font-medium text-slate-500 hover:text-slate-800 hover:underline"
+                    <div className="recruiters-list-card-bottom">
+                      <span className="recruiters-list-card-jobs">
+                        {company.openJobsCount} open job
+                        {company.openJobsCount === 1 ? "" : "s"}
+                      </span>
+                      <div className="recruiters-list-card-actions">
+                        <button
+                          type="button"
+                          className="recruiters-details-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openCompanyDetail(company.id);
+                          }}
                         >
-                          Website
-                        </a>
-                      ) : (
-                        <div className="flex items-center gap-1 font-bold text-slate-800">
-                          <Star className="h-3.5 w-3.5 fill-current text-amber-400" />
-                          Verified
-                        </div>
-                      )}
-                      {company.size ? (
-                        <div className="font-medium text-slate-400">
-                          {company.size}
-                        </div>
-                      ) : null}
+                          Details
+                        </button>
+                      </div>
                     </div>
-                    <Link
-                      href={`/jobs?company=${encodeURIComponent(company.name)}`}
-                      className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold text-white transition-all hover:opacity-90"
-                      style={{
-                        background: "#1e3a5f",
-                        boxShadow: "0 4px 10px rgba(30,58,95,0.2)",
-                      }}
-                    >
-                      {company.openJobsCount} Open Jobs
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-xs">
-            <Building2 className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-            <h3 className="mb-1 text-lg font-bold text-slate-900">
-              No Recruiters Found
-            </h3>
-            <p className="mb-4 text-xs text-slate-500">
-              Try adjusting your search query or selecting a different industry.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedIndustry("All");
-              }}
-              className="rounded-xl px-4 py-2 text-xs font-bold text-white"
-              style={{ background: "#1e3a5f" }}
-            >
-              Reset Search
-            </button>
-          </div>
-        )}
-      </main>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="recruiters-empty">
+              <Building2 className="mx-auto mb-3 h-12 w-12 text-slate-300" />
+              <p className="font-bold">No employers found</p>
+              <button
+                type="button"
+                className="recruiters-btn-primary"
+                onClick={resetFilters}
+              >
+                Reset filters
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div
+          className={`recruiters-detail-panel ${
+            mobileDetailOpen ? "is-mobile-open" : ""
+          } ${selectedCompany ? "is-visible" : ""}`}
+        >
+          {selectedCompany ? (
+            <CompanyDetailPanel
+              company={selectedCompany}
+              onClose={closeMobileDetail}
+              showMobileBar={mobileDetailOpen}
+            />
+          ) : (
+            <div className="recruiters-detail-placeholder">
+              <Building2 className="h-16 w-16" />
+              <p className="text-sm font-semibold">
+                Select an employer to view details
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

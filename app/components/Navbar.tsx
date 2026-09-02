@@ -11,7 +11,6 @@ import { useAuth } from "./AuthProvider";
 const navLinks = [
   { name: "Find Jobs", href: "/jobs" },
   { name: "Recruiters", href: "/recruiters" },
-  { name: "People Search", href: "#" },
 ];
 
 export default function Navbar() {

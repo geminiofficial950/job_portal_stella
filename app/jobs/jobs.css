@@ -209,6 +209,62 @@
   border-radius: 1rem;
   padding: 1.25rem;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  max-height: min(70vh, calc(100vh - 10rem));
+  scrollbar-width: thin;
+  scrollbar-color: rgba(70, 64, 222, 0.4) rgba(70, 64, 222, 0.06);
+}
+
+.jobs-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.jobs-sidebar::-webkit-scrollbar-track {
+  margin: 0.65rem 0;
+  background: transparent;
+  border-radius: 999px;
+}
+
+.jobs-sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(70, 64, 222, 0.35),
+    rgba(99, 102, 241, 0.45)
+  );
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.jobs-sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(70, 64, 222, 0.55),
+    rgba(99, 102, 241, 0.65)
+  );
+}
+
+.jobs-filter-options--scroll {
+  max-height: 12rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.35rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(70, 64, 222, 0.35) transparent;
+}
+
+.jobs-filter-options--scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.jobs-filter-options--scroll::-webkit-scrollbar-thumb {
+  background: rgba(70, 64, 222, 0.28);
+  border-radius: 999px;
+}
+
+.jobs-filter-options--scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(70, 64, 222, 0.5);
 }
 
 @media (min-width: 1024px) {
@@ -216,6 +272,7 @@
     width: 280px;
     position: sticky;
     top: 5.5rem;
+    max-height: calc(100vh - 6.5rem);
   }
 }
 

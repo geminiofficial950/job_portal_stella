@@ -58,7 +58,7 @@ type JobItem = {
   benefits: string;
   createdAt: string | null;
   company: CompanyInfo | null;
-  source?: "stella" | "adzuna" | string;
+  source?: "stella" | "adzuna" | "himalayas" | string;
   applyUrl?: string;
   adref?: string;
   country?: string;
@@ -119,8 +119,14 @@ function formatSalary(job: JobItem): string | null {
   return `${formatSalaryAmount(lo)}–${formatSalaryAmount(hi)} / ${period}`;
 }
 
-function looksLikeHtml(text: string) {
-  return /<\/?[a-z][\s\S]*>/i.test(text);
+function jobSourceLabel(source?: string) {
+  if (source === "adzuna") return "Adzuna";
+  if (source === "himalayas") return "Himalayas";
+  return "Stella";
+}
+
+function isExternalJobSource(source?: string) {
+  return source === "adzuna" || source === "himalayas";
 }
 
 function renderJobDescription(job: JobItem) {
@@ -144,18 +150,36 @@ function renderJobDescription(job: JobItem) {
     );
   }
 
+  if (job.source === "himalayas" || looksLikeHtml(raw)) {
+    return (
+      <div
+        className="prose prose-sm max-w-none text-slate-600"
+        dangerouslySetInnerHTML={{ __html: raw }}
+      />
+    );
+  }
+
   return (
-    <div
-      className="prose prose-sm max-w-none text-slate-600"
-      dangerouslySetInnerHTML={{ __html: raw }}
-    />
+    <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600 wrap-anywhere">
+      {raw}
+    </p>
   );
+}
+
+function looksLikeHtml(text: string) {
+  return /<\/?[a-z][\s\S]*>/i.test(text);
 }
 
 function australiaJobPriority(job: JobItem): number {
   if (job.country === "au") return 0;
   const hay = `${job.location || ""} ${job.countryLabel || ""}`.toLowerCase();
   return hay.includes("australia") ? 0 : 1;
+}
+
+function jobBrowseSortRank(job: JobItem): number {
+  const isAustralia = australiaJobPriority(job) === 0;
+  if (isAustralia) return hasSalary(job) ? 0 : 1;
+  return 2;
 }
 
 function timeAgo(iso: string | null) {
@@ -233,10 +257,7 @@ function JobSearchInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adzunaWarning, setAdzunaWarning] = useState("");
-  const [adzunaCacheNote, setAdzunaCacheNote] = useState("");
-
-  const SESSION_JOBS_KEY = "stella-jobs-browse-v6";
-  const SESSION_JOBS_TTL_MS = 5 * 60 * 1000;
+  const [externalCacheNote, setExternalCacheNote] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -341,53 +362,6 @@ function JobSearchInner() {
     setLoading(true);
     setError("");
     try {
-      if (typeof window !== "undefined") {
-        const raw = sessionStorage.getItem(SESSION_JOBS_KEY);
-        if (raw) {
-          const cached = JSON.parse(raw) as {
-            at: number;
-            payload: {
-              jobs: JobItem[];
-              companies: CompanyOption[];
-              categories: string[];
-              countries: CountryOption[];
-              adzuna?: {
-                configured?: boolean;
-                error?: string;
-                fromCache?: boolean;
-                cacheTtlHours?: number;
-              };
-            };
-          };
-          if (Date.now() - cached.at < SESSION_JOBS_TTL_MS) {
-            setJobs(cached.payload.jobs ?? []);
-            setCompanyOptions(cached.payload.companies ?? []);
-            setCategories([
-              "All",
-              ...((cached.payload.categories as string[]) ?? []),
-            ]);
-            setCountryOptions(cached.payload.countries ?? []);
-            if (
-              cached.payload.adzuna?.configured === false &&
-              cached.payload.adzuna?.error
-            ) {
-              setAdzunaWarning(cached.payload.adzuna.error);
-            } else {
-              setAdzunaWarning("");
-            }
-            if (cached.payload.adzuna?.fromCache) {
-              setAdzunaCacheNote(
-                `External jobs loaded from cache (refreshes every ${cached.payload.adzuna.cacheTtlHours ?? 6}h).`,
-              );
-            } else {
-              setAdzunaCacheNote("");
-            }
-            setLoading(false);
-            return;
-          }
-        }
-      }
-
       const res = await fetch("/api/jobs/browse");
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -406,28 +380,14 @@ function JobSearchInner() {
       } else {
         setAdzunaWarning("");
       }
-      if (data.adzuna?.fromCache) {
-        setAdzunaCacheNote(
-          `External jobs loaded from cache (refreshes every ${data.adzuna.cacheTtlHours ?? 6}h).`,
+      if (data.adzuna?.fromCache || data.himalayas?.fromCache) {
+        const hours =
+          data.himalayas?.cacheTtlHours ?? data.adzuna?.cacheTtlHours ?? 6;
+        setExternalCacheNote(
+          `Adzuna + Himalayas jobs from server cache (refreshes every ${hours}h).`,
         );
       } else {
-        setAdzunaCacheNote("");
-      }
-
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem(
-          SESSION_JOBS_KEY,
-          JSON.stringify({
-            at: Date.now(),
-            payload: {
-              jobs: data.jobs ?? [],
-              companies: data.companies ?? [],
-              categories: data.categories ?? [],
-              countries: data.countries ?? [],
-              adzuna: data.adzuna,
-            },
-          }),
-        );
+        setExternalCacheNote("");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load jobs");
@@ -440,6 +400,18 @@ function JobSearchInner() {
   useEffect(() => {
     void loadJobs();
   }, [loadJobs]);
+
+  useEffect(() => {
+    try {
+      for (const key of Object.keys(sessionStorage)) {
+        if (key.startsWith("stella-jobs-browse-")) {
+          sessionStorage.removeItem(key);
+        }
+      }
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }, []);
 
   // Preselect company filter from /jobs?company=Name
   useEffect(() => {
@@ -519,7 +491,7 @@ function JobSearchInner() {
   const matchesSelectedCountry = useCallback(
     (job: JobItem) => {
       if (selectedCountry === "all") return true;
-      if (job.source === "adzuna") {
+      if (job.source === "adzuna" || job.source === "himalayas") {
         return job.country === selectedCountry;
       }
       const loc = job.location.toLowerCase();
@@ -599,8 +571,8 @@ function JobSearchInner() {
   const sortedJobs = useMemo(() => {
     const list = [...filteredJobs];
     list.sort((a, b) => {
-      const auDiff = australiaJobPriority(a) - australiaJobPriority(b);
-      if (auDiff !== 0) return auDiff;
+      const rankDiff = jobBrowseSortRank(a) - jobBrowseSortRank(b);
+      if (rankDiff !== 0) return rankDiff;
 
       if (sortBy === "newest") {
         const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -766,18 +738,6 @@ function JobSearchInner() {
 
   const renderApplyAction = () => {
     if (!displayJobDetail) return null;
-    if (displayJobDetail.source === "adzuna" && displayJobDetail.applyUrl) {
-      return (
-        <a
-          href={displayJobDetail.applyUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="job-detail-apply-btn"
-        >
-          Apply
-        </a>
-      );
-    }
     if (!authLoading && !user) {
       return (
         <Link
@@ -797,7 +757,7 @@ function JobSearchInner() {
         }
         className="job-detail-apply-btn"
       >
-        Apply now
+        Apply
       </Link>
     );
   };
@@ -949,9 +909,24 @@ function JobSearchInner() {
               ) : (
                 <p className="job-detail-empty">No description provided.</p>
               )}
+              {displayJobDetail.source === "himalayas" ? (
+                <p className="mt-4 text-xs text-slate-500">
+                  Remote job listing originally posted on{" "}
+                  <a
+                    href="https://himalayas.app"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-[#4640de] underline"
+                  >
+                    Himalayas
+                  </a>
+                  .
+                </p>
+              ) : null}
             </section>
 
-            {displayJobDetail.source !== "adzuna" ? (
+            {displayJobDetail.source !== "adzuna" &&
+            displayJobDetail.source !== "himalayas" ? (
               <>
                 <section className="job-detail-section">
                   <h3 className="job-detail-section-title">
@@ -1191,7 +1166,7 @@ function JobSearchInner() {
               )}
             </button>
             {openFilters.category ? (
-              <div className="jobs-filter-options max-h-48 overflow-y-auto">
+              <div className="jobs-filter-options jobs-filter-options--scroll">
                 {categories.map((cat) => (
                   <label key={cat} className="jobs-filter-option">
                     <input
@@ -1271,9 +1246,9 @@ function JobSearchInner() {
         </aside>
 
         <section className="min-w-0 flex-1">
-            {adzunaCacheNote ? (
+            {externalCacheNote ? (
               <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-                {adzunaCacheNote}
+                {externalCacheNote}
               </div>
             ) : null}
             {adzunaWarning ? (
@@ -1410,7 +1385,8 @@ function JobSearchInner() {
                             </h3>
                             <p className="jobs-card-company">
                               {companyName}
-                              {job.source === "adzuna" ? " · Adzuna" : " · Stella"}
+                              {" · "}
+                              {jobSourceLabel(job.source)}
                               {" · "}
                               {job.location}
                               {job.countryLabel ? ` · ${job.countryLabel}` : ""}

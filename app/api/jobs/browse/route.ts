@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import { Job, serializeJob } from "@/models/Job";
 import { Company } from "@/models/Company";
 import { ADZUNA_COUNTRIES, fetchAdzunaJobs } from "@/lib/adzuna";
+import { fetchHimalayasJobs } from "@/lib/himalayas";
 
 export async function GET(request: Request) {
   try {
@@ -19,6 +20,7 @@ export async function GET(request: Request) {
 
     const includeStella = source === "all" || source === "stella";
     const includeAdzuna = source === "all" || source === "adzuna";
+    const includeHimalayas = source === "all" || source === "himalayas";
 
     let stellaJobs: Array<Record<string, unknown>> = [];
     let filterCompanies: Array<{ id: string; name: string }> = [];
@@ -141,7 +143,15 @@ export async function GET(request: Request) {
     }
 
     let adzunaJobs: Array<Record<string, unknown>> = [];
+    let himalayasJobs: Array<Record<string, unknown>> = [];
     let adzunaMeta: {
+      configured: boolean;
+      error?: string;
+      countriesFetched: string[];
+      fromCache?: boolean;
+      cacheTtlHours?: number;
+    } = { configured: false, countriesFetched: [] };
+    let himalayasMeta: {
       configured: boolean;
       error?: string;
       countriesFetched: string[];
@@ -217,7 +227,75 @@ export async function GET(request: Request) {
       );
     }
 
-    const jobs = [...stellaJobs, ...adzunaJobs];
+    if (includeHimalayas) {
+      const himalayas = await fetchHimalayasJobs({
+        country: "all",
+        q: q || undefined,
+      });
+      himalayasMeta = {
+        configured: himalayas.configured,
+        error: himalayas.error,
+        countriesFetched: himalayas.countriesFetched,
+        fromCache: himalayas.fromCache,
+        cacheTtlHours: himalayas.cacheTtlHours,
+      };
+
+      let himalayasFiltered = himalayas.jobs;
+      if (country !== "all") {
+        himalayasFiltered = himalayasFiltered.filter(
+          (job) => job.country === country,
+        );
+      }
+
+      himalayasJobs = himalayasFiltered
+        .filter((job) => {
+          if (category && category !== "All") {
+            if (job.category.toLowerCase() !== category.toLowerCase()) {
+              return false;
+            }
+          }
+          if (workMode && job.workMode !== workMode.toLowerCase()) return false;
+          if (
+            employmentType &&
+            job.employmentType !== employmentType.toLowerCase()
+          ) {
+            return false;
+          }
+          if (
+            experienceLevel &&
+            job.experienceLevel !== experienceLevel.toLowerCase()
+          ) {
+            return false;
+          }
+          if (companyName) {
+            if (
+              !job.company.name.toLowerCase().includes(companyName.toLowerCase())
+            ) {
+              return false;
+            }
+          }
+          return true;
+        })
+        .map((job) => ({ ...job }));
+
+      const catSet = new Set(categories);
+      const companyMap = new Map(filterCompanies.map((c) => [c.id, c]));
+      for (const job of himalayas.jobs) {
+        if (job.category) catSet.add(job.category);
+        if (!companyMap.has(job.company.id)) {
+          companyMap.set(job.company.id, {
+            id: job.company.id,
+            name: job.company.name,
+          });
+        }
+      }
+      categories = [...catSet].sort((a, b) => a.localeCompare(b));
+      filterCompanies = [...companyMap.values()].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+    }
+
+    const jobs = [...stellaJobs, ...adzunaJobs, ...himalayasJobs];
     const seenIds = new Set<string>();
     const uniqueJobs = jobs.filter((job) => {
       const id = String(job.id);
@@ -227,14 +305,21 @@ export async function GET(request: Request) {
     });
 
     uniqueJobs.sort((a, b) => {
-      const au = (job: Record<string, unknown>) => {
-        if (job.country === "au") return 0;
-        const hay = `${job.location || ""} ${job.countryLabel || ""}`
-          .toLowerCase();
-        return hay.includes("australia") ? 0 : 1;
+      const rank = (job: Record<string, unknown>) => {
+        const isAu =
+          job.country === "au" ||
+          `${job.location || ""} ${job.countryLabel || ""}`
+            .toLowerCase()
+            .includes("australia");
+        if (isAu) {
+          const hasPay =
+            Number(job.salaryMin) > 0 || Number(job.salaryMax) > 0;
+          return hasPay ? 0 : 1;
+        }
+        return 2;
       };
-      const auDiff = au(a) - au(b);
-      if (auDiff !== 0) return auDiff;
+      const rankDiff = rank(a) - rank(b);
+      if (rankDiff !== 0) return rankDiff;
       const ta = a.createdAt ? new Date(String(a.createdAt)).getTime() : 0;
       const tb = b.createdAt ? new Date(String(b.createdAt)).getTime() : 0;
       return tb - ta;
@@ -252,6 +337,7 @@ export async function GET(request: Request) {
           flag: c.flag,
         })),
         adzuna: adzunaMeta,
+        himalayas: himalayasMeta,
       },
       {
         headers: {

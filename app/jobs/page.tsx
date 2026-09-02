@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useCallback,
+  useRef,
   Suspense,
 } from "react";
 import Link from "next/link";
@@ -262,6 +263,63 @@ function JobSearchInner() {
     workModel: true,
     level: true,
   });
+
+  const selectedJobIdRef = useRef<string | null>(null);
+  const detailHistoryRef = useRef(false);
+
+  const isMobileJobsView = useCallback(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 1023px)").matches;
+  }, []);
+
+  const openJobDetail = useCallback(
+    (id: string) => {
+      const hadDetailOpen = Boolean(selectedJobIdRef.current);
+
+      setSelectedJobId(id);
+
+      if (!isMobileJobsView()) return;
+
+      if (hadDetailOpen && detailHistoryRef.current) {
+        window.history.replaceState({ jobsDetail: true, jobId: id }, "");
+        return;
+      }
+
+      window.history.pushState({ jobsDetail: true, jobId: id }, "");
+      detailHistoryRef.current = true;
+    },
+    [isMobileJobsView],
+  );
+
+  const closeJobDetail = useCallback(
+    (fromPopstate = false) => {
+      if (!selectedJobIdRef.current) return;
+
+      if (!fromPopstate && detailHistoryRef.current && isMobileJobsView()) {
+        detailHistoryRef.current = false;
+        setSelectedJobId(null);
+        window.history.back();
+        return;
+      }
+
+      detailHistoryRef.current = false;
+      setSelectedJobId(null);
+    },
+    [isMobileJobsView],
+  );
+
+  selectedJobIdRef.current = selectedJobId;
+
+  useEffect(() => {
+    const onPopState = () => {
+      if (!selectedJobIdRef.current) return;
+      detailHistoryRef.current = false;
+      setSelectedJobId(null);
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   const placeholderWords = useMemo(
     () =>
@@ -580,7 +638,8 @@ function JobSearchInner() {
   };
 
   useEffect(() => {
-    setSelectedJobId((prev) => (prev !== null ? null : prev));
+    if (!selectedJobIdRef.current) return;
+    closeJobDetail();
   }, [
     searchQuery,
     selectedCategory,
@@ -590,6 +649,7 @@ function JobSearchInner() {
     selectedCompanyId,
     selectedCountry,
     locationQuery,
+    closeJobDetail,
   ]);
 
   const activeJobDetail = useMemo(
@@ -688,14 +748,14 @@ function JobSearchInner() {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelectedJobId(null);
+      if (e.key === "Escape") closeJobDetail();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [displayJobDetail]);
+  }, [displayJobDetail, closeJobDetail]);
 
   useEffect(() => {
     if (!selectedJobId) return;
@@ -773,7 +833,7 @@ function JobSearchInner() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSelectedJobId(null)}
+                  onClick={() => closeJobDetail()}
                   className="job-detail-icon-btn"
                   aria-label="Close"
                 >
@@ -785,7 +845,7 @@ function JobSearchInner() {
             <>
               <button
                 type="button"
-                onClick={() => setSelectedJobId(null)}
+                onClick={() => closeJobDetail()}
                 className="job-detail-back-btn"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -1267,7 +1327,7 @@ function JobSearchInner() {
                     role="dialog"
                     aria-modal="true"
                     aria-label="Job details"
-                    onClick={() => setSelectedJobId(null)}
+                    onClick={() => closeJobDetail()}
                   >
                     <div
                       className="job-detail-modal__panel"
@@ -1323,11 +1383,11 @@ function JobSearchInner() {
                           key={job.id}
                           role="button"
                           tabIndex={0}
-                          onClick={() => setSelectedJobId(job.id)}
+                          onClick={() => openJobDetail(job.id)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
-                              setSelectedJobId(job.id);
+                              openJobDetail(job.id);
                             }
                           }}
                           className="jobs-card"
@@ -1396,7 +1456,7 @@ function JobSearchInner() {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedJobId(job.id);
+                                openJobDetail(job.id);
                               }}
                               className="jobs-apply-btn"
                             >

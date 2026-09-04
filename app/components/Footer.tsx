@@ -34,7 +34,10 @@ export default function Footer() {
             className="flex items-center gap-2 text-[19px] font-semibold tracking-tight text-slate-900 no-underline"
           >
             <LogoMark />
-            Stella<span className="font-normal text-slate-500">Jobs</span>
+            Gemini{" "}
+            <span className="font-normal text-slate-500">
+              Education and Careers
+            </span>
           </Link>
           <nav className="ms-auto flex flex-wrap gap-5 text-[13.5px]">
             {NAV_LINKS.map((link) => (
@@ -49,7 +52,7 @@ export default function Footer() {
           </nav>
         </div>
         <p className="mt-7 max-w-[82ch] text-[12.5px] leading-relaxed text-slate-500">
-          Stella Jobs verifies credentials and work rights supplied by
+          Gemini Education and Careers verifies credentials and work rights supplied by
           candidates. Assessments measure job-relevant capability against a
           published rubric and are never used to rank candidates on attributes
           protected under Australian anti-discrimination law. Interpreter

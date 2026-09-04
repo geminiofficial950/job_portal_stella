@@ -17,7 +17,7 @@ import {
   CheckCircle2,
   DollarSign,
 } from "lucide-react";
-import "../stella-jobs.css";
+import "../gemini-home.css";
 import HeroSection from "./HeroSection";
 import TrustedBySection from "./TrustedBySection";
 import FourThingsSection from "./FourThingsSection";
@@ -305,7 +305,7 @@ function Spark({ vals, up }: { vals: number[]; up: boolean }) {
 
 /* ── main page ── */
 
-export default function StellaHomePage() {
+export default function GeminiHomePage() {
   const [progress, setProgress] = useState(0);
   const [region, setRegion] = useState<Region>("all");
   const [lang, setLang] = useState<Lang>("en");
@@ -403,7 +403,7 @@ export default function StellaHomePage() {
   }, [lang]);
 
   return (
-    <div className="stella-home">
+    <div className="gemini-home">
       <div id="prog" style={{ width: `${progress}%` }} />
 
       <main id="top">
@@ -443,7 +443,7 @@ export default function StellaHomePage() {
                     hiring for.
                   </h2>
                   <p className="text-slate-500 text-sm sm:text-base mb-6 leading-relaxed">
-                    Open roles on Stella right now, ranked by unfilled positions. Updated hourly.
+                    Open roles on Gemini Education and Careers right now, ranked by unfilled positions. Updated hourly.
                   </p>
                   <div className="flex items-center gap-3.5 sm:gap-4 flex-wrap">
                     {(["all", "vic", "nsw", "qld"] as Region[]).map((r) => (
@@ -808,7 +808,7 @@ export default function StellaHomePage() {
                             84k
                           </span>
                           <span className="text-xs text-slate-300 font-medium leading-normal">
-                            Verified profiles on Stella
+                            Verified profiles on Gemini Education and Careers
                           </span>
                         </div>
                       </div>

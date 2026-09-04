@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       ) {
         const uploaded = await uploadRawBuffer(
           buffer,
-          "stella-jobs/resumes",
+          "gemini-education/resumes",
           `seeker-${result.auth.sub}`
         );
         resumeUrl = uploaded.url;

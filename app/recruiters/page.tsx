@@ -131,7 +131,7 @@ function CompanyDetailPanel({
         <h3 className="recruiters-detail-section-title">About the company</h3>
         <p className="recruiters-detail-about">
           {company.about ||
-            `${company.name} is a verified employer on Stella Jobs.`}
+            `${company.name} is a verified employer on Gemini Education and Careers.`}
         </p>
       </div>
 

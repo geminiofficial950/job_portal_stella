@@ -383,7 +383,7 @@ export default function FourThingsSection() {
                 <ScriptAccent className="text-orange-600">on the phones.</ScriptAccent>
               </h3>
               <p className="mt-2 text-[13px] leading-relaxed text-slate-600 sm:text-sm">
-                Stella consultants speak your language — and the platform does too. No
+                Gemini Education and Careers consultants speak your language — and the platform does too. No
                 translation layers, no miscommunication.
               </p>
 

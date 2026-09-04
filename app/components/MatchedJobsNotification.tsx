@@ -10,7 +10,7 @@ type CompanyChip = {
   initial: string;
 };
 
-const DISMISS_KEY = "stella-matched-jobs-dismissed";
+const DISMISS_KEY = "gemini-matched-jobs-dismissed";
 
 export default function MatchedJobsNotification() {
   const [count, setCount] = useState(0);

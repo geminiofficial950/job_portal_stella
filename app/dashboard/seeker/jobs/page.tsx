@@ -8,7 +8,7 @@ export default function SeekerJobsPage() {
           Open Roles
         </h1>
         <p className="mt-1 text-sm text-[#64748b]">
-          Live openings from approved employers on Stella Jobs.
+          Live openings from approved employers on Gemini Education and Careers.
         </p>
       </div>
 

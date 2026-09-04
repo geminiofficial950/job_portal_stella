@@ -1,16 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import {
-  ChevronDown,
-  UserRound,
-  Building2,
-  LayoutDashboard,
-  LogOut,
-} from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 import { toast } from "react-toastify";
 import { useAuth } from "./AuthProvider";
+import { useAuthModal } from "./AuthModalProvider";
 
 interface SignInMenuProps {
   variant?: "ghost" | "solid";
@@ -29,12 +24,15 @@ export default function SignInMenu({
   className = "",
 }: SignInMenuProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, loading, logout } = useAuth();
+  const { openAuth } = useAuthModal();
+  const isJobsPage = pathname === "/jobs";
 
   const triggerClass =
     variant === "ghost"
       ? "btn ghost sm"
-      : "inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-[#1e3a5f] border border-[#c5d0e0] bg-white hover:bg-[#eef2f7] hover:border-[#1e3a5f] transition-colors";
+      : "inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-[#0000FF] border border-[#0000FF] bg-white hover:bg-[#f0f4ff] hover:border-[#0000FF] transition-colors";
 
   async function handleLogout() {
     await logout();
@@ -66,6 +64,15 @@ export default function SignInMenu({
         <button
           type="button"
           className={`signin-trigger profile-trigger ${triggerClass}`}
+          style={
+            variant === "solid" && isJobsPage
+              ? {
+                  color: "#ffffff",
+                  borderColor: "#ffffff",
+                  background: "transparent",
+                }
+              : undefined
+          }
           aria-haspopup="true"
         >
           <span className="profile-avatar" aria-hidden>
@@ -104,7 +111,7 @@ export default function SignInMenu({
             </span>
             <span>
               <strong>Logout</strong>
-              <em>Sign out of Stella Jobs</em>
+              <em>Sign out of Gemini Education and Careers</em>
             </span>
           </button>
         </div>
@@ -113,40 +120,21 @@ export default function SignInMenu({
   }
 
   return (
-    <div className={`signin-menu ${className}`}>
-      <button
-        type="button"
-        className={`signin-trigger ${triggerClass}`}
-        aria-haspopup="true"
-      >
-        <span>Sign in</span>
-        <ChevronDown className="signin-chevron h-3.5 w-3.5" />
-      </button>
-
-      <div className="signin-dropdown" role="menu">
-        <Link href="/login?role=user" className="signin-item" role="menuitem">
-          <span className="signin-icon">
-            <UserRound className="h-4 w-4" />
-          </span>
-          <span>
-            <strong>As job seeker</strong>
-            <em>Find work &amp; build your profile</em>
-          </span>
-        </Link>
-        <Link
-          href="/login?role=recruiter"
-          className="signin-item"
-          role="menuitem"
-        >
-          <span className="signin-icon recruiter">
-            <Building2 className="h-4 w-4" />
-          </span>
-          <span>
-            <strong>As recruiter</strong>
-            <em>Hire verified candidates</em>
-          </span>
-        </Link>
-      </div>
-    </div>
+    <button
+      type="button"
+      className={`${triggerClass} ${className}`}
+      style={
+        variant === "solid"
+          ? {
+              color: isJobsPage ? "#ffffff" : "#0000FF",
+              borderColor: isJobsPage ? "#ffffff" : "#0000FF",
+              background: isJobsPage ? "transparent" : "#ffffff",
+            }
+          : undefined
+      }
+      onClick={() => openAuth({ mode: "login", role: "user" })}
+    >
+      Sign in
+    </button>
   );
 }

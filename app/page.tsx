@@ -1,5 +1,5 @@
-import StellaHomePage from "./components/StellaHomePage";
+import GeminiHomePage from "./components/GeminiHomePage";
 
 export default function Home() {
-  return <StellaHomePage />;
+  return <GeminiHomePage />;
 }

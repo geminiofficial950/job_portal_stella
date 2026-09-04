@@ -18,15 +18,15 @@ export async function GET(request: Request) {
     const country = searchParams.get("country")?.trim().toLowerCase() || "all";
     const source = searchParams.get("source")?.trim().toLowerCase() || "all";
 
-    const includeStella = source === "all" || source === "stella";
+    const includeGemini = source === "all" || source === "gemini";
     const includeAdzuna = source === "all" || source === "adzuna";
     const includeHimalayas = source === "all" || source === "himalayas";
 
-    let stellaJobs: Array<Record<string, unknown>> = [];
+    let geminiJobs: Array<Record<string, unknown>> = [];
     let filterCompanies: Array<{ id: string; name: string }> = [];
     let categories: string[] = [];
 
-    if (includeStella) {
+    if (includeGemini) {
       await connectDB();
 
       const filter: Record<string, unknown> = { status: "open" };
@@ -55,7 +55,10 @@ export async function GET(request: Request) {
         filter.companyId = companyId;
       }
 
-      let jobs = await Job.find(filter).sort({ createdAt: -1 }).limit(100).lean();
+      let jobs = await Job.find(filter)
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .lean();
 
       const companyIds = [...new Set(jobs.map((j) => String(j.companyId)))];
       const companies = await Company.find({
@@ -76,7 +79,7 @@ export async function GET(request: Request) {
         });
       }
 
-      // Country filter for Stella jobs (location text heuristic)
+      // Country filter for Gemini jobs (location text heuristic)
       if (country !== "all") {
         const countryMeta = ADZUNA_COUNTRIES.find((c) => c.code === country);
         const needles = [
@@ -94,7 +97,9 @@ export async function GET(request: Request) {
         });
       }
 
-      const openCompanyIds = await Job.distinct("companyId", { status: "open" });
+      const openCompanyIds = await Job.distinct("companyId", {
+        status: "open",
+      });
       const dbCompanies = await Company.find({
         _id: { $in: openCompanyIds },
         status: "approved",
@@ -118,11 +123,11 @@ export async function GET(request: Request) {
         .filter(Boolean)
         .sort((a, b) => a.localeCompare(b));
 
-      stellaJobs = jobs.map((job) => {
+      geminiJobs = jobs.map((job) => {
         const company = companyMap.get(String(job.companyId));
         return {
           ...serializeJob(job as unknown as Parameters<typeof serializeJob>[0]),
-          source: "stella",
+          source: "gemini",
           applyUrl: "",
           country: "",
           countryLabel: "",
@@ -175,7 +180,9 @@ export async function GET(request: Request) {
 
       let adzunaFiltered = adzuna.jobs;
       if (country !== "all") {
-        adzunaFiltered = adzunaFiltered.filter((job) => job.country === country);
+        adzunaFiltered = adzunaFiltered.filter(
+          (job) => job.country === country,
+        );
       }
 
       adzunaJobs = adzunaFiltered
@@ -200,7 +207,9 @@ export async function GET(request: Request) {
           }
           if (companyName) {
             if (
-              !job.company.name.toLowerCase().includes(companyName.toLowerCase())
+              !job.company.name
+                .toLowerCase()
+                .includes(companyName.toLowerCase())
             ) {
               return false;
             }
@@ -269,7 +278,9 @@ export async function GET(request: Request) {
           }
           if (companyName) {
             if (
-              !job.company.name.toLowerCase().includes(companyName.toLowerCase())
+              !job.company.name
+                .toLowerCase()
+                .includes(companyName.toLowerCase())
             ) {
               return false;
             }
@@ -295,7 +306,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const jobs = [...stellaJobs, ...adzunaJobs, ...himalayasJobs];
+    const jobs = [...geminiJobs, ...adzunaJobs, ...himalayasJobs];
     const seenIds = new Set<string>();
     const uniqueJobs = jobs.filter((job) => {
       const id = String(job.id);
@@ -305,21 +316,22 @@ export async function GET(request: Request) {
     });
 
     uniqueJobs.sort((a, b) => {
-      const rank = (job: Record<string, unknown>) => {
-        const isAu =
-          job.country === "au" ||
-          `${job.location || ""} ${job.countryLabel || ""}`
-            .toLowerCase()
-            .includes("australia");
-        if (isAu) {
-          const hasPay =
-            Number(job.salaryMin) > 0 || Number(job.salaryMax) > 0;
-          return hasPay ? 0 : 1;
-        }
-        return 2;
-      };
-      const rankDiff = rank(a) - rank(b);
+      const hasPay = (job: Record<string, unknown>) =>
+        Number(job.salaryMin) > 0 || Number(job.salaryMax) > 0;
+
+      // Salary / payout first, then jobs without pay — all categories/countries
+      const rankDiff = Number(hasPay(b)) - Number(hasPay(a));
       if (rankDiff !== 0) return rankDiff;
+
+      const isAu = (job: Record<string, unknown>) => {
+        if (job.country === "au") return true;
+        return `${job.location || ""} ${job.countryLabel || ""}`
+          .toLowerCase()
+          .includes("australia");
+      };
+      const auDiff = Number(isAu(b)) - Number(isAu(a));
+      if (auDiff !== 0) return auDiff;
+
       const ta = a.createdAt ? new Date(String(a.createdAt)).getTime() : 0;
       const tb = b.createdAt ? new Date(String(b.createdAt)).getTime() : 0;
       return tb - ta;

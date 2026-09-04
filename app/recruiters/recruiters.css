@@ -349,7 +349,7 @@
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
   background: var(--rec-primary-soft);
-  border: 1px solid rgba(70, 64, 222, 0.2);
+  border: 1px solid rgba(30, 58, 95, 0.2);
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--rec-primary);
@@ -406,7 +406,7 @@
 
 .recruiters-list-card.is-selected {
   border-color: var(--rec-primary);
-  box-shadow: 0 4px 20px rgba(70, 64, 222, 0.12);
+  box-shadow: 0 4px 20px rgba(30, 58, 95, 0.12);
 }
 
 .recruiters-list-card-logo {

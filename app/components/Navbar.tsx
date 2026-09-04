@@ -7,16 +7,18 @@ import { Menu, X } from "lucide-react";
 import { toast } from "react-toastify";
 import SignInMenu from "./SignInMenu";
 import { useAuth } from "./AuthProvider";
+import { useAuthModal } from "./AuthModalProvider";
 
 const navLinks = [
   { name: "Find Jobs", href: "/jobs" },
-  { name: "Recruiters", href: "/recruiters" },
+  // { name: "Recruiters", href: "/recruiters" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { openAuth } = useAuthModal();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -40,68 +42,92 @@ export default function Navbar() {
       : user?.role === "admin"
         ? "/dashboard/admin"
         : "/dashboard/seeker";
+  const isJobsPage = pathname === "/jobs";
 
   return (
     <header
-      className="w-full sticky top-0 z-50 transition-all duration-300"
+      className={`w-full sticky top-0 z-50 ${isJobsPage ? "" : "transition-all duration-300"}`}
       style={{
-        background: "rgba(255,255,255,0.97)",
+        background: isJobsPage ? "#0000B8" : "rgba(255,255,255,0.97)",
         backdropFilter: "blur(16px)",
-        borderBottom: scrolled
-          ? "1px solid rgba(226,232,240,0.9)"
-          : "1px solid rgba(226,232,240,0.5)",
-        boxShadow: scrolled
-          ? "0 2px 20px rgba(0,0,0,0.06)"
-          : "none",
+        borderBottom: isJobsPage
+          ? "1px solid #0000B8"
+          : scrolled
+            ? "1px solid rgba(226,232,240,0.9)"
+            : "1px solid rgba(226,232,240,0.5)",
+        boxShadow: isJobsPage
+          ? "none"
+          : scrolled
+            ? "0 2px 20px rgba(0,0,0,0.06)"
+            : "none",
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center justify-between h-16 sm:h-[68px]">
-
+        <div className="relative flex items-center justify-between h-12 sm:h-14">
           {/* Left: Logo */}
-          <Link href="/" className="relative z-10 flex items-center select-none group shrink-0">
+          <Link
+            href="/"
+            className="relative z-10 flex items-center select-none group shrink-0"
+          >
             <img
               src="/logo.webp"
-              alt="Stella Incline logo"
-              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.04]"
+              alt="Gemini Education and Careers logo"
+              className="h-7 sm:h-8 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.04]"
             />
           </Link>
 
-          {/* Center: Desktop Nav */}
-          <nav className="hidden md:flex absolute left-1/2 top-0 h-full -translate-x-1/2 items-center gap-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`relative flex items-center h-full px-3.5 text-sm font-medium transition-colors duration-150 ${
-                    isActive
-                      ? "text-[#1e3a5f]"
-                      : "text-slate-500 hover:text-[#1e3a5f]"
-                  }`}
-                >
-                  {link.name}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-3 right-3 h-[2.5px] bg-[#1e3a5f] rounded-t-full" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+          {/* Right: Find Jobs + Post a Job + Sign In + Hamburger */}
+          <div className="relative z-10 flex items-center gap-1 sm:gap-2.5">
+            <nav className="hidden md:flex items-center gap-1">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    style={
+                      isJobsPage
+                        ? { color: "#ffffff" }
+                        : isActive
+                          ? { color: "#0000FF" }
+                          : undefined
+                    }
+                    className={`relative flex items-center h-full px-3.5 text-sm font-medium transition-colors duration-150 ${
+                      isJobsPage
+                        ? "text-white hover:text-white"
+                        : isActive
+                        ? "text-[#0000FF]"
+                        : "text-slate-500 hover:text-[#0000FF]"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+            </nav>
 
-          {/* Right: Post a Job (recruiters only) + Log In + Hamburger */}
-          <div className="relative z-10 flex items-center gap-2.5">
             {user?.role === "recruiter" && (
               <Link
                 href="/dashboard/recruiter/jobs/new"
-                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1e3a5f] hover:bg-[#0f2744] transition-colors"
+                style={
+                  isJobsPage
+                    ? { background: "#ffffff", color: "#0000FF" }
+                    : { background: "#0000FF" }
+                }
+                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#0000FF] hover:bg-[#0000CC] transition-colors"
               >
                 Post a job
               </Link>
             )}
 
-            <SignInMenu variant="solid" />
+            <SignInMenu
+              variant="solid"
+              className={
+                isJobsPage
+                  ? "text-white border-white hover:bg-white/10 hover:border-white"
+                  : ""
+              }
+            />
 
             {/* Mobile Hamburger */}
             <button
@@ -132,8 +158,8 @@ export default function Navbar() {
                 onClick={() => setIsMobileOpen(false)}
                 className={`flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-slate-50 text-slate-900 font-semibold"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-[#f0f4ff] text-[#0000FF] font-semibold"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-[#0000FF]"
                 }`}
               >
                 {link.name}
@@ -160,20 +186,26 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link
-                  href="/login?role=user"
-                  onClick={() => setIsMobileOpen(false)}
-                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#eef2f7]"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileOpen(false);
+                    openAuth({ mode: "login", role: "user" });
+                  }}
+                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#eef2f7] text-left"
                 >
                   Sign in as job seeker
-                </Link>
-                <Link
-                  href="/login?role=recruiter"
-                  onClick={() => setIsMobileOpen(false)}
-                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#eef2f7]"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileOpen(false);
+                    openAuth({ mode: "login", role: "recruiter" });
+                  }}
+                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-[#eef2f7] text-left"
                 >
                   Sign in as recruiter
-                </Link>
+                </button>
               </>
             )}
           </div>

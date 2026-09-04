@@ -1,6 +1,6 @@
 STELLA — DEVELOPMENT IMAGE ASSETS
 ===================================
-Extracted from the high-resolution Stella concepts created in this conversation.
+Extracted from the high-resolution Gemini Education and Careers concepts created in this conversation.
 
 01 hero-woman-laptop.png
 02 four-things-man.png

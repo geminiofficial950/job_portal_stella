@@ -156,7 +156,7 @@ export default function TrustedBySection() {
 
         <p className="trusted-by-sub mt-4 max-w-2xl text-center text-sm leading-relaxed text-slate-500 sm:text-[15px]">
           Healthcare. Community services. Corporate. Government. Australia&apos;s most
-          trusted workplaces hire on Stella.
+          trusted workplaces hire on Gemini Education and Careers.
         </p>
       </div>
 

@@ -261,7 +261,7 @@ export default function SeekerProfileForm() {
               Career profile
             </h1>
             <p className="mt-1 text-sm text-[#6b7280]">
-              How employers see your profile on Stella Jobs.
+              How employers see your profile on Gemini Education and Careers.
             </p>
           </div>
           <button

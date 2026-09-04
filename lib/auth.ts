@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import type { UserRole } from "./roles";
 
-export const AUTH_COOKIE = "stella_token";
+export const AUTH_COOKIE = "gemini_token";
 
 export interface AuthTokenPayload {
   sub: string;

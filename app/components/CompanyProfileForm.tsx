@@ -269,7 +269,7 @@ export default function CompanyProfileForm() {
             value={form.name}
             onChange={(e) => updateField("name", e.target.value)}
             className="w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626] focus:ring-2 focus:ring-[#dc2626]/20 transition-all"
-            placeholder="Stella Care Pty Ltd"
+            placeholder="Gemini Education Pty Ltd"
           />
         </label>
 

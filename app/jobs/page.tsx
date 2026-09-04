@@ -18,14 +18,25 @@ import {
   ArrowLeft,
   Loader2,
   Briefcase,
+  Building2,
+  Clock,
+  Banknote,
   ChevronDown,
   ChevronUp,
   X,
 } from "lucide-react";
 import { useAuth } from "@/app/components/AuthProvider";
+import { useAuthModal } from "@/app/components/AuthModalProvider";
 import {
   formatAdzunaDescriptionPreview,
+  stripHtmlToText,
 } from "@/lib/adzuna-description";
+import { normalizeJobDescriptionHtml } from "@/lib/job-description-html";
+import {
+  rateSkillMatch,
+  type SkillMatchResult,
+  type SkillMatchTier,
+} from "@/lib/skill-match";
 import "./jobs.css";
 
 type CompanyInfo = {
@@ -58,7 +69,7 @@ type JobItem = {
   benefits: string;
   createdAt: string | null;
   company: CompanyInfo | null;
-  source?: "stella" | "adzuna" | "himalayas" | string;
+  source?: "gemini" | "adzuna" | "himalayas" | string;
   applyUrl?: string;
   adref?: string;
   country?: string;
@@ -76,8 +87,8 @@ const WORK_MODE_LABELS: Record<string, string> = {
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  "full-time": "Fulltime",
-  "part-time": "Parttime",
+  "full-time": "Full time",
+  "part-time": "Part time",
   casual: "Casual",
   contract: "Contract",
 };
@@ -119,14 +130,51 @@ function formatSalary(job: JobItem): string | null {
   return `${formatSalaryAmount(lo)}–${formatSalaryAmount(hi)} / ${period}`;
 }
 
+function formatSalaryDetail(job: JobItem): string | null {
+  const min = Math.round(job.salaryMin);
+  const max = Math.round(job.salaryMax);
+  if (min <= 0 && max <= 0) return null;
+
+  const periodWords: Record<string, string> = {
+    hour: "per hour",
+    day: "per day",
+    week: "per week",
+    year: "per year",
+  };
+  const period =
+    periodWords[job.salaryPeriod] || `per ${job.salaryPeriod || "year"}`;
+  const lo = min > 0 ? min : max;
+  const hi = max > 0 ? max : min;
+  const fmt = (n: number) => `$${n.toLocaleString()}`;
+
+  if (lo === hi) return `${fmt(lo)} ${period}`;
+  return `${fmt(lo)} – ${fmt(hi)} ${period}`;
+}
+
 function jobSourceLabel(source?: string) {
   if (source === "adzuna") return "Adzuna";
   if (source === "himalayas") return "Himalayas";
-  return "Stella";
+  if (source === "jooble") return "Jooble";
+  return "Gemini";
+}
+
+/** Short plain-text blurb for job list cards */
+function jobCardSnippet(job: JobItem, maxLen = 140): string | null {
+  const raw = (job.description || "").trim();
+  if (!raw) return null;
+  const plain = stripHtmlToText(raw)
+    .replace(/\s+/g, " ")
+    .replace(/^[….\s]+/, "")
+    .trim();
+  if (plain.length < 24) return null;
+  if (plain.length <= maxLen) return plain;
+  const cut = plain.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 60 ? cut.slice(0, lastSpace) : cut).trim()}…`;
 }
 
 function isExternalJobSource(source?: string) {
-  return source === "adzuna" || source === "himalayas";
+  return source === "adzuna" || source === "himalayas" || source === "jooble";
 }
 
 function renderJobDescription(job: JobItem) {
@@ -138,31 +186,41 @@ function renderJobDescription(job: JobItem) {
     if (looksLikeHtml(raw)) {
       return (
         <div
-          className="prose prose-sm max-w-none text-slate-600"
-          dangerouslySetInnerHTML={{ __html: raw }}
+          className="job-detail-prose"
+          dangerouslySetInnerHTML={{
+            __html: normalizeJobDescriptionHtml(raw),
+          }}
         />
       );
     }
     return (
-      <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600 wrap-anywhere">
-        {preview}
-      </p>
+      <div
+        className="job-detail-prose"
+        dangerouslySetInnerHTML={{
+          __html: normalizeJobDescriptionHtml(preview),
+        }}
+      />
     );
   }
 
   if (job.source === "himalayas" || looksLikeHtml(raw)) {
     return (
       <div
-        className="prose prose-sm max-w-none text-slate-600"
-        dangerouslySetInnerHTML={{ __html: raw }}
+        className="job-detail-prose"
+        dangerouslySetInnerHTML={{
+          __html: normalizeJobDescriptionHtml(raw),
+        }}
       />
     );
   }
 
   return (
-    <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600 wrap-anywhere">
-      {raw}
-    </p>
+    <div
+      className="job-detail-prose"
+      dangerouslySetInnerHTML={{
+        __html: normalizeJobDescriptionHtml(raw),
+      }}
+    />
   );
 }
 
@@ -170,16 +228,15 @@ function looksLikeHtml(text: string) {
   return /<\/?[a-z][\s\S]*>/i.test(text);
 }
 
+function jobBrowseSortRank(job: JobItem): number {
+  // Salary / payout first, then jobs without pay — every category/country
+  return hasSalary(job) ? 0 : 1;
+}
+
 function australiaJobPriority(job: JobItem): number {
   if (job.country === "au") return 0;
   const hay = `${job.location || ""} ${job.countryLabel || ""}`.toLowerCase();
   return hay.includes("australia") ? 0 : 1;
-}
-
-function jobBrowseSortRank(job: JobItem): number {
-  const isAustralia = australiaJobPriority(job) === 0;
-  if (isAustralia) return hasSalary(job) ? 0 : 1;
-  return 2;
 }
 
 function timeAgo(iso: string | null) {
@@ -213,6 +270,194 @@ const POPULAR_KEYWORDS = [
   "Marketing",
   "Nurse",
 ];
+
+function skillMatchTierClass(tier: SkillMatchTier): string {
+  return `job-skill-match job-skill-match--${tier}`;
+}
+
+function SkillMatchCard({
+  match,
+  signedIn,
+  hasProfileSkills,
+  loading,
+  onSignIn,
+}: {
+  match: SkillMatchResult | null;
+  signedIn: boolean;
+  hasProfileSkills: boolean;
+  loading: boolean;
+  onSignIn?: () => void;
+}) {
+  return (
+    <section
+      className="job-skill-match-wrap"
+      aria-label="Job 2 Skill Match Rating"
+    >
+      <h3 className="job-skill-match-kicker">Job 2 Skill Match Rating</h3>
+
+      {loading ? (
+        <div className="job-skill-match job-skill-match--loading">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Checking your skill match…
+        </div>
+      ) : !signedIn ? (
+        <div className="job-skill-match job-skill-match--locked">
+          <p className="job-skill-match-title">Sign in to see your match</p>
+          <p className="job-skill-match-desc">
+            See how this role rates against your profile skills.
+          </p>
+          <button
+            type="button"
+            className="job-skill-match-cta"
+            onClick={onSignIn}
+          >
+            Sign in as job seeker
+          </button>
+        </div>
+      ) : !hasProfileSkills ? (
+        <div className="job-skill-match job-skill-match--locked">
+          <p className="job-skill-match-title">Add skills to unlock rating</p>
+          <p className="job-skill-match-desc">
+            Add skills on your profile to get a match rating for this job.
+          </p>
+          <Link
+            href="/dashboard/seeker/profile"
+            className="job-skill-match-cta"
+          >
+            Edit profile skills
+          </Link>
+        </div>
+      ) : match ? (
+        <div className={skillMatchTierClass(match.tier)}>
+          <div className="job-skill-match-body">
+            <div className="job-skill-match-main">
+              <div
+                className={`job-skill-match-ring job-skill-match-ring--${match.tier}`}
+                style={
+                  {
+                    "--match-pct": `${match.score}`,
+                  } as React.CSSProperties
+                }
+                aria-label={`${match.score}% match`}
+              >
+                <span className="job-skill-match-ring-value">
+                  {match.score}%
+                </span>
+              </div>
+
+              <div className="job-skill-match-copy">
+                <span
+                  className={`job-skill-match-badge job-skill-match-badge--${match.tier}`}
+                >
+                  {match.title}
+                </span>
+                <p className="job-skill-match-desc">{match.description}</p>
+              </div>
+            </div>
+
+            {(match.matchedSkills.length > 0 ||
+              match.missingSkills.length > 0) && (
+              <div className="job-skill-match-tags">
+                {match.matchedSkills.length > 0 ? (
+                  <div className="job-skill-match-tags-group">
+                    <p className="job-skill-match-tags-label">You have</p>
+                    <div className="job-skill-match-tags-row">
+                      {match.matchedSkills.slice(0, 6).map((skill) => (
+                        <span
+                          key={`m-${skill}`}
+                          className="job-skill-match-tag is-matched"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {match.missingSkills.length > 0 ? (
+                  <div className="job-skill-match-tags-group">
+                    <p className="job-skill-match-tags-label">
+                      Missing for this role
+                    </p>
+                    <div className="job-skill-match-tags-row">
+                      {match.missingSkills.slice(0, 6).map((skill) => (
+                        <span
+                          key={`x-${skill}`}
+                          className="job-skill-match-tag is-missing"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function SkillMatchMini({
+  match,
+  signedIn,
+  hasProfileSkills,
+  loading,
+}: {
+  match: SkillMatchResult | null;
+  signedIn: boolean;
+  hasProfileSkills: boolean;
+  loading: boolean;
+}) {
+  if (loading) {
+    return (
+      <div className="jobs-card-match jobs-card-match--muted">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <span>Checking match…</span>
+      </div>
+    );
+  }
+
+  if (!signedIn) {
+    return (
+      <div className="jobs-card-match jobs-card-match--muted">
+        <span className="jobs-card-match-label">Skill match</span>
+        <span className="jobs-card-match-title">Sign in to see rating</span>
+      </div>
+    );
+  }
+
+  if (!hasProfileSkills) {
+    return (
+      <div className="jobs-card-match jobs-card-match--muted">
+        <span className="jobs-card-match-label">Skill match</span>
+        <span className="jobs-card-match-title">Add skills to unlock</span>
+      </div>
+    );
+  }
+
+  if (!match) return null;
+
+  return (
+    <div
+      className={`jobs-card-match jobs-card-match--${match.tier}`}
+      aria-label={`${match.score}% skill match — ${match.title}`}
+    >
+      <div
+        className={`jobs-card-match-ring jobs-card-match-ring--${match.tier}`}
+        style={{ "--match-pct": `${match.score}` } as React.CSSProperties}
+      >
+        <span>{match.score}%</span>
+      </div>
+      <div className="jobs-card-match-copy">
+        <span className="jobs-card-match-label">Skill match</span>
+        <span className="jobs-card-match-title">{match.title}</span>
+      </div>
+    </div>
+  );
+}
 
 function CompanyLogo({
   name,
@@ -249,6 +494,7 @@ function JobSearchInner() {
   const searchParams = useSearchParams();
   const companyFromUrl = searchParams.get("company")?.trim() || "";
   const { user, loading: authLoading } = useAuth();
+  const { openAuth } = useAuthModal();
 
   const [jobs, setJobs] = useState<JobItem[]>([]);
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([]);
@@ -257,7 +503,6 @@ function JobSearchInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adzunaWarning, setAdzunaWarning] = useState("");
-  const [externalCacheNote, setExternalCacheNote] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -277,6 +522,8 @@ function JobSearchInner() {
   const [descriptionHtml, setDescriptionHtml] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
   const [sortBy, setSortBy] = useState<"relevant" | "newest">("relevant");
+  const [profileSkills, setProfileSkills] = useState<string[]>([]);
+  const [profileSkillsLoaded, setProfileSkillsLoaded] = useState(false);
   const [openFilters, setOpenFilters] = useState({
     country: true,
     employment: true,
@@ -342,6 +589,36 @@ function JobSearchInner() {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
+  useEffect(() => {
+    let compact = false;
+    let ticking = false;
+
+    const applyCompact = (next: boolean) => {
+      if (next === compact) return;
+      compact = next;
+      document.documentElement.classList.toggle("jobs-search-compact", next);
+    };
+
+    const syncCompactSearch = () => {
+      const y = window.scrollY;
+      applyCompact(compact ? y > 24 : y > 72);
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(syncCompactSearch);
+    };
+
+    syncCompactSearch();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      document.documentElement.classList.remove("jobs-search-compact");
+    };
+  }, []);
+
   const placeholderWords = useMemo(
     () =>
       jobs.length > 0
@@ -380,15 +657,6 @@ function JobSearchInner() {
       } else {
         setAdzunaWarning("");
       }
-      if (data.adzuna?.fromCache || data.himalayas?.fromCache) {
-        const hours =
-          data.himalayas?.cacheTtlHours ?? data.adzuna?.cacheTtlHours ?? 6;
-        setExternalCacheNote(
-          `Adzuna + Himalayas jobs from server cache (refreshes every ${hours}h).`,
-        );
-      } else {
-        setExternalCacheNote("");
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load jobs");
       setJobs([]);
@@ -402,9 +670,42 @@ function JobSearchInner() {
   }, [loadJobs]);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user || user.role !== "user") {
+      setProfileSkills([]);
+      setProfileSkillsLoaded(true);
+      return;
+    }
+
+    let cancelled = false;
+    setProfileSkillsLoaded(false);
+    fetch("/api/seeker/profile", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        const skills = Array.isArray(data?.profile?.skills)
+          ? data.profile.skills
+              .map((s: unknown) => String(s).trim())
+              .filter(Boolean)
+          : [];
+        setProfileSkills(skills);
+      })
+      .catch(() => {
+        if (!cancelled) setProfileSkills([]);
+      })
+      .finally(() => {
+        if (!cancelled) setProfileSkillsLoaded(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, authLoading]);
+
+  useEffect(() => {
     try {
       for (const key of Object.keys(sessionStorage)) {
-        if (key.startsWith("stella-jobs-browse-")) {
+        if (key.startsWith("gemini-jobs-browse-")) {
           sessionStorage.removeItem(key);
         }
       }
@@ -571,15 +872,25 @@ function JobSearchInner() {
   const sortedJobs = useMemo(() => {
     const list = [...filteredJobs];
     list.sort((a, b) => {
-      const rankDiff = jobBrowseSortRank(a) - jobBrowseSortRank(b);
-      if (rankDiff !== 0) return rankDiff;
-
-      if (sortBy === "newest") {
+      const dateDiff = () => {
         const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return tb - ta;
+      };
+
+      // Newest first = pure date order (user-selected sort wins)
+      if (sortBy === "newest") {
+        return dateDiff();
       }
-      return 0;
+
+      // Most relevant = salary jobs first, then AU priority, then newer
+      const rankDiff = jobBrowseSortRank(a) - jobBrowseSortRank(b);
+      if (rankDiff !== 0) return rankDiff;
+
+      const auDiff = australiaJobPriority(a) - australiaJobPriority(b);
+      if (auDiff !== 0) return auDiff;
+
+      return dateDiff();
     });
     return list;
   }, [filteredJobs, sortBy]);
@@ -630,6 +941,37 @@ function JobSearchInner() {
   );
 
   const displayJobDetail = enrichedJobDetail || activeJobDetail;
+
+  const skillMatch = useMemo(() => {
+    if (!displayJobDetail) return null;
+    if (!user || user.role !== "user") return null;
+    if (!profileSkills.length) return null;
+    return rateSkillMatch(profileSkills, {
+      skills: displayJobDetail.skills,
+      title: displayJobDetail.title,
+      category: displayJobDetail.category,
+      description: descriptionHtml || displayJobDetail.description,
+      requirements: displayJobDetail.requirements,
+    });
+  }, [displayJobDetail, user, profileSkills, descriptionHtml]);
+
+  const cardSkillMatches = useMemo(() => {
+    const map = new Map<string, SkillMatchResult>();
+    if (!user || user.role !== "user" || !profileSkills.length) return map;
+    for (const job of sortedJobs) {
+      map.set(
+        job.id,
+        rateSkillMatch(profileSkills, {
+          skills: job.skills,
+          title: job.title,
+          category: job.category,
+          description: job.description,
+          requirements: job.requirements,
+        }),
+      );
+    }
+    return map;
+  }, [sortedJobs, user, profileSkills]);
 
   useEffect(() => {
     const job = activeJobDetail;
@@ -740,22 +1082,25 @@ function JobSearchInner() {
     if (!displayJobDetail) return null;
     if (!authLoading && !user) {
       return (
-        <Link
-          href={`/login?role=user&next=${encodeURIComponent(`/jobs?job=${displayJobDetail.id}`)}`}
+        <button
+          type="button"
           className="job-detail-apply-btn"
+          onClick={() => openAuth({ mode: "login", role: "user" })}
         >
           Sign in to apply
-        </Link>
+        </button>
       );
     }
     return (
       <Link
-        href={
-          user?.role === "user"
-            ? "/dashboard/seeker/jobs"
-            : "/login?role=user"
-        }
+        href={user?.role === "user" ? "/dashboard/seeker/jobs" : "#"}
         className="job-detail-apply-btn"
+        onClick={(e) => {
+          if (user?.role !== "user") {
+            e.preventDefault();
+            openAuth({ mode: "login", role: "user" });
+          }
+        }}
       >
         Apply
       </Link>
@@ -779,15 +1124,11 @@ function JobSearchInner() {
                   type="button"
                   onClick={() => toggleBookmark(displayJobDetail.id)}
                   disabled={!canSaveJob}
-                  title={
-                    canSaveJob ? "Save job" : "Sign in to save jobs"
-                  }
+                  title={canSaveJob ? "Save job" : "Sign in to save jobs"}
                   className={`job-detail-icon-btn ${
                     savedJobs.includes(displayJobDetail.id) ? "is-saved" : ""
                   }`}
-                  aria-label={
-                    canSaveJob ? "Save job" : "Sign in to save jobs"
-                  }
+                  aria-label={canSaveJob ? "Save job" : "Sign in to save jobs"}
                 >
                   <Bookmark className="h-4 w-4 fill-current" />
                 </button>
@@ -827,63 +1168,69 @@ function JobSearchInner() {
                 <p className="job-detail-company">
                   {displayJobDetail.company?.name || "Company"}
                 </p>
-                <h2 className="job-detail-title font-manrope">
-                  {displayJobDetail.title}
-                </h2>
-                {displayJobDetail.category ? (
-                  <p className="job-detail-category">
-                    {displayJobDetail.category}
-                  </p>
-                ) : null}
+                <h2 className="job-detail-title">{displayJobDetail.title}</h2>
               </div>
             </div>
 
-            <div className="job-detail-salary-box">
-              <span className="job-detail-salary-label">
-                {hasSalary(displayJobDetail) ? "Salary range" : "Compensation"}
-              </span>
-              {formatSalary(displayJobDetail) ? (
-                <span className="job-detail-salary-value">
-                  {formatSalary(displayJobDetail)}
+            <ul className="job-detail-facts">
+              <li className="job-detail-fact">
+                <MapPin className="job-detail-fact-icon" aria-hidden />
+                <span>
+                  {displayJobDetail.location}
+                  {displayJobDetail.workMode
+                    ? ` (${WORK_MODE_LABELS[displayJobDetail.workMode] || displayJobDetail.workMode})`
+                    : ""}
                 </span>
-              ) : (
-                <span className="job-detail-salary-muted">
-                  Salary not disclosed
-                </span>
-              )}
-            </div>
-
-            <div className="job-detail-meta">
-              <span className="job-detail-meta-chip">
-                <MapPin className="h-3.5 w-3.5" />
-                {displayJobDetail.location}
-              </span>
-              <span className="job-detail-meta-chip">
-                {WORK_MODE_LABELS[displayJobDetail.workMode] ||
-                  displayJobDetail.workMode}
-              </span>
-              <span className="job-detail-meta-chip">
-                {TYPE_LABELS[displayJobDetail.employmentType] ||
-                  displayJobDetail.employmentType}
-              </span>
-              <span className="job-detail-meta-chip">
-                {LEVEL_LABELS[displayJobDetail.experienceLevel] ||
-                  displayJobDetail.experienceLevel}
-              </span>
-              {displayJobDetail.countryLabel ? (
-                <span className="job-detail-meta-chip">
-                  {displayJobDetail.countryLabel}
-                </span>
+              </li>
+              {displayJobDetail.category ? (
+                <li className="job-detail-fact">
+                  <Building2 className="job-detail-fact-icon" aria-hidden />
+                  <span>
+                    {displayJobDetail.category}
+                    {LEVEL_LABELS[displayJobDetail.experienceLevel]
+                      ? ` · ${LEVEL_LABELS[displayJobDetail.experienceLevel]}`
+                      : ""}
+                  </span>
+                </li>
               ) : null}
-              <span className="job-detail-meta-time">
-                Posted {timeAgo(displayJobDetail.createdAt)}
-              </span>
-            </div>
+              <li className="job-detail-fact">
+                <Clock className="job-detail-fact-icon" aria-hidden />
+                <span>
+                  {TYPE_LABELS[displayJobDetail.employmentType] ||
+                    displayJobDetail.employmentType ||
+                    "Full time"}
+                </span>
+              </li>
+              <li className="job-detail-fact">
+                <Banknote className="job-detail-fact-icon" aria-hidden />
+                <span>
+                  {formatSalaryDetail(displayJobDetail) ||
+                    "Salary not disclosed"}
+                </span>
+              </li>
+            </ul>
+
+            <p className="job-detail-posted">
+              Posted {timeAgo(displayJobDetail.createdAt)}
+              {displayJobDetail.countryLabel
+                ? ` · ${displayJobDetail.countryLabel}`
+                : ""}
+            </p>
+
+            <SkillMatchCard
+              match={skillMatch}
+              signedIn={!authLoading && Boolean(user)}
+              hasProfileSkills={profileSkills.length > 0}
+              loading={
+                authLoading ||
+                (Boolean(user?.role === "user") && !profileSkillsLoaded)
+              }
+              onSignIn={() => openAuth({ mode: "login", role: "user" })}
+            />
           </div>
 
           <div className="job-detail-panel__body">
-            <section className="job-detail-section">
-              <h3 className="job-detail-section-title">About the role</h3>
+            <section className="job-detail-section job-detail-section--description">
               {detailLoading ? (
                 <div className="job-detail-loading">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -892,7 +1239,9 @@ function JobSearchInner() {
               ) : descriptionHtml && !descriptionIsPreview ? (
                 <div
                   className="job-detail-prose"
-                  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                  dangerouslySetInnerHTML={{
+                    __html: normalizeJobDescriptionHtml(descriptionHtml),
+                  }}
                 />
               ) : displayJobDetail.source === "adzuna" && adzunaEmbedSrc ? (
                 <div className="job-detail-iframe-wrap">
@@ -903,24 +1252,20 @@ function JobSearchInner() {
                   />
                 </div>
               ) : displayJobDetail.description ? (
-                <div className="job-detail-prose">
-                  {renderJobDescription(displayJobDetail)}
-                </div>
+                renderJobDescription(displayJobDetail)
               ) : (
                 <p className="job-detail-empty">No description provided.</p>
               )}
               {displayJobDetail.source === "himalayas" ? (
-                <p className="mt-4 text-xs text-slate-500">
-                  Remote job listing originally posted on{" "}
+                <p className="job-detail-source-note">
+                  Originally posted on{" "}
                   <a
                     href="https://himalayas.app"
                     target="_blank"
                     rel="noreferrer"
-                    className="font-semibold text-[#4640de] underline"
                   >
                     Himalayas
                   </a>
-                  .
                 </p>
               ) : null}
             </section>
@@ -935,7 +1280,9 @@ function JobSearchInner() {
                   <div
                     className="job-detail-prose"
                     dangerouslySetInnerHTML={{
-                      __html: displayJobDetail.responsibilities,
+                      __html: normalizeJobDescriptionHtml(
+                        displayJobDetail.responsibilities,
+                      ),
                     }}
                   />
                 </section>
@@ -946,7 +1293,9 @@ function JobSearchInner() {
                   <div
                     className="job-detail-prose"
                     dangerouslySetInnerHTML={{
-                      __html: displayJobDetail.requirements,
+                      __html: normalizeJobDescriptionHtml(
+                        displayJobDetail.requirements,
+                      ),
                     }}
                   />
                 </section>
@@ -964,6 +1313,30 @@ function JobSearchInner() {
                   ))}
                 </div>
               </section>
+            ) : skillMatch &&
+              (skillMatch.matchedSkills.length > 0 ||
+                skillMatch.missingSkills.length > 0) ? (
+              <section className="job-detail-section">
+                <h3 className="job-detail-section-title">Skills</h3>
+                <div className="job-detail-skills">
+                  {skillMatch.matchedSkills.map((skill) => (
+                    <span
+                      key={`m-${skill}`}
+                      className="job-detail-skill is-matched"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                  {skillMatch.missingSkills.slice(0, 8).map((skill) => (
+                    <span
+                      key={`x-${skill}`}
+                      className="job-detail-skill is-missing"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </section>
             ) : null}
 
             {displayJobDetail.company?.about ? (
@@ -971,7 +1344,9 @@ function JobSearchInner() {
                 <h3 className="job-detail-section-title">
                   About {displayJobDetail.company.name}
                 </h3>
-                <p className="job-detail-about">{displayJobDetail.company.about}</p>
+                <p className="job-detail-about">
+                  {displayJobDetail.company.about}
+                </p>
               </section>
             ) : null}
           </div>
@@ -983,16 +1358,78 @@ function JobSearchInner() {
   };
 
   return (
-    <div className="jobs-page font-inter" style={{ fontFamily: "var(--font-inter)" }}>
-      <section className="jobs-hero">
+    <div
+      className="jobs-page font-inter"
+      style={
+        {
+          "--jobs-primary": "#0000B8",
+          "--jobs-primary-hover": "#00009A",
+          fontFamily: "var(--font-inter)",
+        } as React.CSSProperties
+      }
+    >
+      <div
+        className="jobs-search-fixed"
+        style={{ background: "#0000B8" }}
+      >
+        <div className="jobs-search-fixed-inner">
+          <div className="jobs-search-bar">
+            <div className="jobs-search-field">
+              <Search className="h-5 w-5 shrink-0 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                tabIndex={-1}
+                placeholder={
+                  searchQuery
+                    ? ""
+                    : `Job title or keyword — ${currentPlaceholderText}`
+                }
+              />
+            </div>
+            <div className="jobs-search-field">
+              <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
+              <input
+                type="text"
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+                tabIndex={-1}
+                placeholder="City or region"
+              />
+            </div>
+            <button
+              type="button"
+              className="jobs-search-btn"
+              tabIndex={-1}
+              style={{ background: "#0000B8" }}
+            >
+              Search
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <section
+        className="jobs-hero"
+        style={{
+          background: "#0000B8",
+          borderBottom: "1px solid #0000B8",
+        }}
+      >
         <div className="jobs-hero-inner">
-          <h1 className="font-manrope">
-            Find your <em>dream job</em>
-          </h1>
-          <p className="jobs-hero-sub">
-            Discover your next career at verified employers and top companies
-            across Australia and beyond.
-          </p>
+          <div className="jobs-hero-intro">
+            <h1 className="font-manrope" style={{ color: "#ffffff" }}>
+              Find your <em style={{ color: "#ffffff" }}>dream job</em>
+            </h1>
+            <p
+              className="jobs-hero-sub"
+              style={{ color: "rgba(255, 255, 255, 0.86)" }}
+            >
+              Discover your next career at verified employers and top companies
+              across Australia and beyond.
+            </p>
+          </div>
 
           <div className="jobs-search-bar">
             <div className="jobs-search-field">
@@ -1002,7 +1439,9 @@ function JobSearchInner() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={
-                  searchQuery ? "" : `Job title or keyword — ${currentPlaceholderText}`
+                  searchQuery
+                    ? ""
+                    : `Job title or keyword — ${currentPlaceholderText}`
                 }
               />
             </div>
@@ -1015,7 +1454,11 @@ function JobSearchInner() {
                 placeholder="City or region"
               />
             </div>
-            <button type="button" className="jobs-search-btn">
+            <button
+              type="button"
+              className="jobs-search-btn"
+              style={{ background: "#0000B8" }}
+            >
               Search
             </button>
           </div>
@@ -1025,7 +1468,11 @@ function JobSearchInner() {
             {POPULAR_KEYWORDS.map((kw, i) => (
               <span key={kw}>
                 {i > 0 ? ", " : " "}
-                <button type="button" onClick={() => setSearchQuery(kw)}>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery(kw)}
+                  style={{ color: "#ffffff" }}
+                >
                   {kw}
                 </button>
               </span>
@@ -1036,19 +1483,19 @@ function JobSearchInner() {
 
       <div className="jobs-layout">
         {!displayJobDetail ? (
-        <div className="jobs-mobile-filter-bar lg:hidden">
-          <span className="text-sm font-bold text-slate-900">
-            {filteredJobs.length} jobs found
-          </span>
-          <button
-            type="button"
-            onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-            className="inline-flex items-center gap-2 rounded-lg border border-[#4640de]/30 bg-[#4640de]/10 px-3 py-1.5 text-xs font-bold text-[#4640de]"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            Filters
-          </button>
-        </div>
+          <div className="jobs-mobile-filter-bar lg:hidden">
+            <span className="text-sm font-bold text-slate-900">
+              {filteredJobs.length} jobs found
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+              className="inline-flex items-center gap-2 rounded-lg border border-[#0000FF]/30 bg-[#0000FF]/10 px-3 py-1.5 text-xs font-bold text-[#0000FF]"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
+            </button>
+          </div>
         ) : null}
 
         <aside
@@ -1065,7 +1512,7 @@ function JobSearchInner() {
             <button
               type="button"
               onClick={resetFilters}
-              className="text-xs font-bold text-[#4640de] hover:underline"
+              className="text-xs font-bold text-[#0f2744] hover:underline"
             >
               Reset all
             </button>
@@ -1246,83 +1693,80 @@ function JobSearchInner() {
         </aside>
 
         <section className="min-w-0 flex-1">
-            {externalCacheNote ? (
-              <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-                {externalCacheNote}
-              </div>
-            ) : null}
-            {adzunaWarning ? (
-              <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                Adzuna jobs need both keys in <code>.env</code>:{" "}
-                <strong>ADZUNA_APP_ID</strong> + <strong>ADZUNA_API_KEY</strong>
-                . Get Application ID from{" "}
-                <a
-                  href="https://developer.adzuna.com/admin/access_details"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-semibold underline"
-                >
-                  Adzuna dashboard
-                </a>
-                . Stella jobs still show below.
-              </div>
-            ) : null}
-            {loading ? (
-              <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-20 text-sm text-slate-500">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Loading jobs…
-              </div>
-            ) : error ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
-                <Briefcase className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-                <h3 className="mb-1 text-lg font-bold text-slate-900">
-                  Couldn’t load jobs
-                </h3>
-                <p className="mb-4 text-xs text-slate-500">{error}</p>
-                <button
-                  type="button"
-                  onClick={() => void loadJobs()}
-                  className="rounded-xl px-4 py-2 text-xs font-bold text-white"
-                  style={{ background: "#4640de" }}
-                >
-                  Try again
-                </button>
-              </div>
-            ) : (
-              <>
-                {displayJobDetail ? (
-                  <div className="job-detail-mobile lg:hidden">
-                    {renderJobDetailContent("mobile")}
-                  </div>
-                ) : null}
+          {adzunaWarning ? (
+            <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Adzuna jobs need both keys in <code>.env</code>:{" "}
+              <strong>ADZUNA_APP_ID</strong> + <strong>ADZUNA_API_KEY</strong>.
+              Get Application ID from{" "}
+              <a
+                href="https://developer.adzuna.com/admin/access_details"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold underline"
+              >
+                Adzuna dashboard
+              </a>
+              . Gemini Education and Careers jobs still show below.
+            </div>
+          ) : null}
+          {loading ? (
+            <div className="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-20 text-sm text-slate-500">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Loading jobs…
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+              <Briefcase className="mx-auto mb-3 h-12 w-12 text-slate-300" />
+              <h3 className="mb-1 text-lg font-bold text-slate-900">
+                Couldn’t load jobs
+              </h3>
+              <p className="mb-4 text-xs text-slate-500">{error}</p>
+              <button
+                type="button"
+                onClick={() => void loadJobs()}
+                className="rounded-xl px-4 py-2 text-xs font-bold text-white"
+                style={{ background: "#0000FF" }}
+              >
+                Try again
+              </button>
+            </div>
+          ) : (
+            <>
+              {displayJobDetail ? (
+                <div className="job-detail-mobile lg:hidden">
+                  {renderJobDetailContent("mobile")}
+                </div>
+              ) : null}
 
-                {displayJobDetail ? (
-                  <div
-                    className="job-detail-modal"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label="Job details"
-                    onClick={() => closeJobDetail()}
-                  >
-                    <div
-                      className="job-detail-modal__panel"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {renderJobDetailContent("modal")}
-                    </div>
-                  </div>
-                ) : null}
-
+              {displayJobDetail ? (
                 <div
-                  className={
-                    displayJobDetail
-                      ? "jobs-list-wrap jobs-list-wrap--hidden-mobile"
-                      : "jobs-list-wrap"
-                  }
+                  className="job-detail-modal"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Job details"
+                  onClick={() => closeJobDetail()}
                 >
+                  <div
+                    className="job-detail-modal__panel"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {renderJobDetailContent("modal")}
+                  </div>
+                </div>
+              ) : null}
+
+              <div
+                className={
+                  displayJobDetail
+                    ? "jobs-list-wrap jobs-list-wrap--hidden-mobile"
+                    : "jobs-list-wrap"
+                }
+              >
                 <div className="jobs-results-header">
                   <div>
-                    <h2 className="jobs-results-title font-manrope">All Jobs</h2>
+                    <h2 className="jobs-results-title font-manrope">
+                      All Jobs
+                    </h2>
                     <p className="jobs-results-meta">
                       Showing {sortedJobs.length} result
                       {sortedJobs.length === 1 ? "" : "s"}
@@ -1347,6 +1791,7 @@ function JobSearchInner() {
                     {sortedJobs.map((job) => {
                       const isBookmarked = savedJobs.includes(job.id);
                       const companyName = job.company?.name || "Company";
+                      const snippet = jobCardSnippet(job);
                       const tags = [
                         TYPE_LABELS[job.employmentType] || job.employmentType,
                         job.category !== "General" ? job.category : null,
@@ -1367,45 +1812,62 @@ function JobSearchInner() {
                           }}
                           className="jobs-card"
                         >
-                          <div className="jobs-card-logo">
-                            {job.company?.logoUrl ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={job.company.logoUrl}
-                                alt={`${companyName} logo`}
-                              />
-                            ) : (
-                              companyName.trim().charAt(0).toUpperCase() || "J"
-                            )}
-                          </div>
+                          <div className="jobs-card-main">
+                            <div className="jobs-card-logo">
+                              {job.company?.logoUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={job.company.logoUrl}
+                                  alt={`${companyName} logo`}
+                                />
+                              ) : (
+                                companyName.trim().charAt(0).toUpperCase() ||
+                                "J"
+                              )}
+                            </div>
 
-                          <div className="jobs-card-body">
-                            <h3 className="jobs-card-title font-manrope">
-                              {job.title}
-                            </h3>
-                            <p className="jobs-card-company">
-                              {companyName}
-                              {" · "}
-                              {jobSourceLabel(job.source)}
-                              {" · "}
-                              {job.location}
-                              {job.countryLabel ? ` · ${job.countryLabel}` : ""}
-                            </p>
-                            <div className="jobs-card-tags">
-                              {tags.map((tag, i) => (
+                            <div className="jobs-card-body">
+                              <h3 className="jobs-card-title font-manrope">
+                                {job.title}
+                              </h3>
+                              {snippet ? (
+                                <p className="jobs-card-snippet">{snippet}</p>
+                              ) : null}
+                              <div className="jobs-card-tags">
+                                {tags.map((tag, i) => (
+                                  <span
+                                    key={`${job.id}-${tag}`}
+                                    className={`jobs-tag ${tagVariant(i)}`}
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
                                 <span
-                                  key={`${job.id}-${tag}`}
-                                  className={`jobs-tag ${tagVariant(i)}`}
+                                  className={`jobs-tag ${tagVariant(tags.length)}`}
                                 >
-                                  {tag}
+                                  {LEVEL_LABELS[job.experienceLevel] ||
+                                    job.experienceLevel}
                                 </span>
-                              ))}
-                              <span className={`jobs-tag ${tagVariant(tags.length)}`}>
-                                {LEVEL_LABELS[job.experienceLevel] ||
-                                  job.experienceLevel}
-                              </span>
+                              </div>
                             </div>
                           </div>
+
+                          <div className="jobs-card-divider" aria-hidden="true" />
+
+                          <div className="jobs-card-center">
+                            <SkillMatchMini
+                              match={cardSkillMatches.get(job.id) || null}
+                              signedIn={Boolean(user?.role === "user")}
+                              hasProfileSkills={profileSkills.length > 0}
+                              loading={
+                                authLoading ||
+                                (Boolean(user?.role === "user") &&
+                                  !profileSkillsLoaded)
+                              }
+                            />
+                          </div>
+
+                          <div className="jobs-card-divider" aria-hidden="true" />
 
                           <div className="jobs-card-actions">
                             <button
@@ -1427,7 +1889,11 @@ function JobSearchInner() {
                             </button>
                             {formatSalary(job) ? (
                               <p className="jobs-salary">{formatSalary(job)}</p>
-                            ) : null}
+                            ) : (
+                              <p className="jobs-salary jobs-salary--empty">
+                                Salary not listed
+                              </p>
+                            )}
                             <button
                               type="button"
                               onClick={(e) => {
@@ -1457,16 +1923,16 @@ function JobSearchInner() {
                       type="button"
                       onClick={resetFilters}
                       className="rounded-xl px-4 py-2 text-xs font-bold text-white"
-                      style={{ background: "#1e3a5f" }}
+                      style={{ background: "#0000FF" }}
                     >
                       Reset All Filters
                     </button>
                   </div>
                 )}
-                </div>
-              </>
-            )}
-          </section>
+              </div>
+            </>
+          )}
+        </section>
       </div>
     </div>
   );

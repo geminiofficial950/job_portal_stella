@@ -209,7 +209,7 @@ async function fetchSearchPage(options: {
       signal: AbortSignal.timeout(20000),
       headers: {
         Accept: "application/json",
-        "User-Agent": "StellaJobs/1.0 (+https://stellaincline.com)",
+        "User-Agent": "GeminiEducationCareers/1.0",
       },
     });
 

@@ -13,11 +13,12 @@ import { useAuth } from "./AuthProvider";
 
 type AuthRole = "user" | "recruiter";
 
-const ROLE_KEY = "stella_google_role";
+const ROLE_KEY = "gemini_google_role";
 
 interface GoogleAuthButtonProps {
   role: AuthRole;
   label?: string;
+  className?: string;
 }
 
 function redirectForRole(role: string, router: ReturnType<typeof useRouter>) {
@@ -89,6 +90,7 @@ async function finishGoogleLogin(
 export default function GoogleAuthButton({
   role,
   label = "Continue with Google",
+  className,
 }: GoogleAuthButtonProps) {
   const router = useRouter();
   const { refreshUser } = useAuth();
@@ -171,7 +173,10 @@ export default function GoogleAuthButton({
       type="button"
       onClick={handleGoogle}
       disabled={loading}
-      className="inline-flex w-full items-center justify-center gap-2.5 rounded-lg border border-[#cdd3e0] bg-white px-4 py-3 text-[15px] font-semibold text-[#b91c1c] transition hover:border-[#dc2626] hover:bg-[#fffafa] disabled:opacity-60"
+      className={
+        className ||
+        "inline-flex w-full items-center justify-center gap-2.5 rounded-lg border border-[#cdd3e0] bg-white px-4 py-3 text-[15px] font-semibold text-[#b91c1c] transition hover:border-[#dc2626] hover:bg-[#fffafa] disabled:opacity-60"
+      }
     >
       <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
         <path

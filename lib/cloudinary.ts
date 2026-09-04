@@ -19,7 +19,7 @@ export { cloudinary };
 
 export async function uploadImageBuffer(
   buffer: Buffer,
-  folder = "stella-jobs/company-logos"
+  folder = "gemini-education/company-logos"
 ) {
   return new Promise<{ url: string; publicId: string }>((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -48,7 +48,7 @@ export async function uploadImageBuffer(
 
 export async function uploadRawBuffer(
   buffer: Buffer,
-  folder = "stella-jobs/resumes",
+  folder = "gemini-education/resumes",
   filename = "resume"
 ) {
   return new Promise<{ url: string; publicId: string }>((resolve, reject) => {

@@ -14,7 +14,7 @@ type Notif = {
   createdAt: string | null;
 };
 
-const DISMISS_SESSION = "stella-app-notif-banner-dismissed";
+const DISMISS_SESSION = "gemini-app-notif-banner-dismissed";
 
 export default function ApplicationNotifications() {
   const [items, setItems] = useState<Notif[]>([]);

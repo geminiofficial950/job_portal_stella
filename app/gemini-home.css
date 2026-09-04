@@ -1,4 +1,4 @@
-/* Stella Jobs — navy blue & white palette */
+/* Gemini Education and Careers — navy blue & white palette */
 :root {
   --bg: #ffffff;
   --bg-1: #ffffff;
@@ -36,7 +36,7 @@
     0 2px 4px rgba(15, 39, 68, 0.05), 0 24px 60px -22px rgba(15, 39, 68, 0.16);
 }
 
-.stella-home {
+.gemini-home {
   box-sizing: border-box;
   background: var(--bg-1);
   color: var(--ink);
@@ -48,53 +48,53 @@
   overflow-x: hidden;
 }
 
-.stella-home *,
-.stella-home *::before,
-.stella-home *::after {
+.gemini-home *,
+.gemini-home *::before,
+.gemini-home *::after {
   box-sizing: border-box;
 }
 
-.stella-home .shell {
+.gemini-home .shell {
   max-width: var(--shell);
   margin: 0 auto;
   padding: 0 32px;
 }
 
-.stella-home h1,
-.stella-home h2,
-.stella-home h3 {
+.gemini-home h1,
+.gemini-home h2,
+.gemini-home h3 {
   margin: 0;
   font-weight: 500;
 }
 
-.stella-home h1:not(.hero-title):not(.trusted-by-title):not(.four-things-title):not(.four-things-card-title) {
+.gemini-home h1:not(.hero-title):not(.trusted-by-title):not(.four-things-title):not(.four-things-card-title) {
   font-size: clamp(2.8rem, 6vw, 4.9rem);
   line-height: 0.99;
   letter-spacing: -0.048em;
 }
 
-.stella-home h2:not(.four-things-title):not(.trusted-by-title):not(.paths-title):not(.support-hero-title):not(.levels-title):not(.newcomers-title):not(.cta-title) {
+.gemini-home h2:not(.four-things-title):not(.trusted-by-title):not(.paths-title):not(.support-hero-title):not(.levels-title):not(.newcomers-title):not(.cta-title) {
   font-size: clamp(1.95rem, 3.7vw, 2.9rem);
   line-height: 1.05;
   letter-spacing: -0.042em;
 }
 
-.stella-home h3:not(.four-things-card-title) {
+.gemini-home h3:not(.four-things-card-title) {
   font-size: 1.05rem;
   font-weight: 500;
   letter-spacing: -0.024em;
   line-height: 1.3;
 }
 
-.stella-home p {
+.gemini-home p {
   margin: 0;
 }
 
-.stella-home a {
+.gemini-home a {
   color: inherit;
 }
 
-.stella-home .mono {
+.gemini-home .mono {
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.12em;
@@ -103,13 +103,13 @@
   font-weight: 600;
 }
 
-.stella-home .rule {
+.gemini-home .rule {
   border: 0;
   border-top: 1px solid var(--line);
   margin: 0;
 }
 
-.stella-home #prog {
+.gemini-home #prog {
   position: fixed;
   top: 0;
   left: 0;
@@ -120,7 +120,7 @@
   transition: width 0.1s linear;
 }
 
-.stella-home .rv {
+.gemini-home .rv {
   opacity: 0;
   transform: translateY(16px);
   transition:
@@ -128,17 +128,17 @@
     transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stella-home .rv.in {
+.gemini-home .rv.in {
   opacity: 1;
   transform: none;
 }
 
-.stella-home .top {
+.gemini-home .top {
   border-bottom: 1px solid transparent;
   background: var(--grad-brand);
 }
 
-.stella-home .top-in {
+.gemini-home .top-in {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -147,7 +147,7 @@
   padding: 6px 0;
 }
 
-.stella-home .live {
+.gemini-home .live {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -158,7 +158,7 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-.stella-home .dot {
+.gemini-home .dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -167,17 +167,17 @@
   flex: none;
 }
 
-.stella-home .dot::after {
+.gemini-home .dot::after {
   content: "";
   position: absolute;
   inset: -4px;
   border-radius: 50%;
   border: 1px solid var(--ac);
   opacity: 0.5;
-  animation: stella-ping 2.4s infinite;
+  animation: gemini-ping 2.4s infinite;
 }
 
-@keyframes stella-ping {
+@keyframes gemini-ping {
   0% {
     transform: scale(0.6);
     opacity: 0.6;
@@ -188,21 +188,21 @@
   }
 }
 
-.stella-home .tel {
+.gemini-home .tel {
   font-family: var(--mono);
   font-size: 11.5px;
   text-decoration: none;
   color: #fff;
 }
 
-.stella-home .langs {
+.gemini-home .langs {
   display: flex;
   gap: 2px;
   margin-inline-start: auto;
   flex-wrap: wrap;
 }
 
-.stella-home .lang {
+.gemini-home .lang {
   font-family: var(--ui);
   font-size: 12.5px;
   padding: 4px 10px;
@@ -213,18 +213,18 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
-.stella-home .lang:hover {
+.gemini-home .lang:hover {
   color: #fff;
   background: rgba(255, 255, 255, 0.1);
 }
 
-.stella-home .lang[aria-pressed="true"] {
+.gemini-home .lang[aria-pressed="true"] {
   color: var(--ac);
   background: #fff;
   box-shadow: none;
 }
 
-.stella-home .nav {
+.gemini-home .nav {
   position: sticky;
   top: 0;
   z-index: 60;
@@ -237,12 +237,12 @@
     box-shadow 0.2s ease;
 }
 
-.stella-home .nav.stuck {
+.gemini-home .nav.stuck {
   border-bottom-color: var(--line);
   box-shadow: var(--sh-sm);
 }
 
-.stella-home .nav-in {
+.gemini-home .nav-in {
   display: flex;
   align-items: center;
   height: 66px;
@@ -250,7 +250,7 @@
   position: relative;
 }
 
-.stella-home .logo {
+.gemini-home .logo {
   font-size: 19px;
   font-weight: 600;
   letter-spacing: -0.05em;
@@ -260,19 +260,19 @@
   gap: 8px;
 }
 
-.stella-home .logo i {
+.gemini-home .logo i {
   font-style: normal;
   color: var(--ink-3);
   font-weight: 400;
 }
 
-.stella-home .mark {
+.gemini-home .mark {
   width: 20px;
   height: 20px;
   flex: none;
 }
 
-.stella-home .nav-links {
+.gemini-home .nav-links {
   display: flex;
   gap: 26px;
   position: absolute;
@@ -281,7 +281,7 @@
   font-size: 14.5px;
 }
 
-.stella-home .nav-links a {
+.gemini-home .nav-links a {
   text-decoration: none;
   color: var(--ink-2);
   letter-spacing: -0.012em;
@@ -289,7 +289,7 @@
   padding: 4px 0;
 }
 
-.stella-home .nav-links a::after {
+.gemini-home .nav-links a::after {
   content: "";
   position: absolute;
   left: 0;
@@ -300,33 +300,33 @@
   transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stella-home .nav-links a:hover {
+.gemini-home .nav-links a:hover {
   color: var(--ink);
 }
 
-.stella-home .nav-links a:hover::after {
+.gemini-home .nav-links a:hover::after {
   width: 100%;
 }
 
-.stella-home .nav-r {
+.gemini-home .nav-r {
   display: flex;
   gap: 9px;
   align-items: center;
   margin-inline-start: auto;
 }
 
-.stella-home .nav-r .btn:not(.ghost) {
+.gemini-home .nav-r .btn:not(.ghost) {
   background: var(--grad-btn);
   border-color: transparent;
   color: #fff;
 }
 
-.stella-home .nav-r .btn:not(.ghost):hover {
+.gemini-home .nav-r .btn:not(.ghost):hover {
   filter: brightness(1.06);
   box-shadow: 0 8px 20px -8px rgba(0, 31, 111, 0.45);
 }
 
-.stella-home .btn {
+.gemini-home .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -347,48 +347,48 @@
     opacity 0.15s;
 }
 
-.stella-home .btn:hover {
+.gemini-home .btn:hover {
   transform: translateY(-1.5px);
   box-shadow: 0 8px 20px -8px rgba(15, 39, 68, 0.4);
 }
 
-.stella-home .btn.ghost {
+.gemini-home .btn.ghost {
   background: #fff;
   color: var(--ink);
   border-color: var(--line-2);
   box-shadow: var(--sh-sm);
 }
 
-.stella-home .btn.ghost:hover {
+.gemini-home .btn.ghost:hover {
   border-color: var(--ink-4);
 }
 
-.stella-home .btn.ac {
+.gemini-home .btn.ac {
   background: var(--grad-btn);
   border-color: transparent;
   color: #fff;
 }
 
-.stella-home .btn.ac:hover {
+.gemini-home .btn.ac:hover {
   filter: brightness(1.06);
   box-shadow: 0 10px 24px -8px rgba(0, 31, 111, 0.4);
 }
 
-.stella-home .btn.sm {
+.gemini-home .btn.sm {
   padding: 8px 15px;
   font-size: 13.5px;
   border-radius: 6px;
 }
 
-.stella-home .btn svg {
+.gemini-home .btn svg {
   transition: transform 0.2s ease;
 }
 
-.stella-home .btn:hover svg {
+.gemini-home .btn:hover svg {
   transform: translateX(3px);
 }
 
-.stella-home .hero {
+.gemini-home .hero {
   position: relative;
   overflow: hidden;
   padding: 0;
@@ -397,7 +397,7 @@
   color: #111827;
 }
 
-.stella-home .hero-next {
+.gemini-home .hero-next {
   min-height: clamp(360px, 48vh, 460px);
   display: flex;
   align-items: center;
@@ -405,7 +405,7 @@
   padding: 56px 0 64px;
 }
 
-.stella-home .hero-next-in {
+.gemini-home .hero-next-in {
   position: relative;
   z-index: 3;
   width: 100%;
@@ -413,7 +413,7 @@
   margin: 0 auto;
 }
 
-.stella-home .hero-eyebrow {
+.gemini-home .hero-eyebrow {
   margin: 0;
   font-family: var(--mono);
   font-size: 13px;
@@ -425,7 +425,7 @@
   background: none;
 }
 
-.stella-home .hero-next-title {
+.gemini-home .hero-next-title {
   margin: 14px auto 0;
   max-width: none;
   font-size: clamp(2.75rem, 7vw, 4.75rem);
@@ -437,7 +437,7 @@
   background: none;
 }
 
-.stella-home .hero-search-pill {
+.gemini-home .hero-search-pill {
   display: flex;
   align-items: center;
   width: 100%;
@@ -451,12 +451,12 @@
   text-align: start;
 }
 
-.stella-home .hero-search-pill:focus-within {
+.gemini-home .hero-search-pill:focus-within {
   border-color: #d1d5db;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
-.stella-home .hero-search-field {
+.gemini-home .hero-search-field {
   flex: 1.15;
   display: flex;
   align-items: center;
@@ -465,16 +465,16 @@
   padding: 0 22px;
 }
 
-.stella-home .hero-search-field--loc {
+.gemini-home .hero-search-field--loc {
   flex: 0.95;
 }
 
-.stella-home .hero-search-field svg {
+.gemini-home .hero-search-field svg {
   flex: none;
   color: #9ca3af;
 }
 
-.stella-home .hero-search-field input {
+.gemini-home .hero-search-field input {
   width: 100%;
   border: 0;
   outline: 0;
@@ -486,18 +486,18 @@
   letter-spacing: -0.01em;
 }
 
-.stella-home .hero-search-field input::placeholder {
+.gemini-home .hero-search-field input::placeholder {
   color: #9ca3af;
 }
 
-.stella-home .hero-search-divider {
+.gemini-home .hero-search-divider {
   width: 1px;
   height: 28px;
   background: #e5e7eb;
   flex: none;
 }
 
-.stella-home .hero-search-btn {
+.gemini-home .hero-search-btn {
   flex: none;
   border: 0;
   border-radius: 999px;
@@ -517,31 +517,31 @@
   box-shadow: 0 8px 22px -10px rgba(0, 31, 111, 0.45);
 }
 
-.stella-home .hero-search-btn:hover {
+.gemini-home .hero-search-btn:hover {
   filter: brightness(1.06);
   box-shadow: 0 10px 26px -10px rgba(15, 39, 68, 0.5);
 }
 
-.stella-home .hero-search-btn:active {
+.gemini-home .hero-search-btn:active {
   transform: scale(0.98);
 }
 
 /* floating hero decorations */
-.stella-home .hero-floats {
+.gemini-home .hero-floats {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 1;
 }
 
-.stella-home .hero-float {
+.gemini-home .hero-float {
   position: absolute;
   background: #fff;
   border: 1px solid #ececec;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
-.stella-home .hero-float--company {
+.gemini-home .hero-float--company {
   left: 6%;
   top: 34%;
   --hero-rot: -10deg;
@@ -553,7 +553,7 @@
   animation: hero-float-drift 6s ease-in-out infinite;
 }
 
-.stella-home .hero-float--company strong {
+.gemini-home .hero-float--company strong {
   display: block;
   font-size: 26px;
   font-weight: 700;
@@ -562,14 +562,14 @@
   line-height: 1;
 }
 
-.stella-home .hero-float--company span {
+.gemini-home .hero-float--company span {
   display: block;
   margin-top: 4px;
   font-size: 12px;
   color: #6b7280;
 }
 
-.stella-home .hero-float--icon {
+.gemini-home .hero-float--icon {
   width: 56px;
   height: 56px;
   border-radius: 16px;
@@ -578,12 +578,12 @@
   padding: 10px;
 }
 
-.stella-home .hero-float--icon svg {
+.gemini-home .hero-float--icon svg {
   width: 100%;
   height: 100%;
 }
 
-.stella-home .hero-float--slack {
+.gemini-home .hero-float--slack {
   left: 4%;
   bottom: 22%;
   --hero-rot: 8deg;
@@ -592,7 +592,7 @@
   animation: hero-float-drift 5.5s ease-in-out infinite 0.4s;
 }
 
-.stella-home .hero-float--plant {
+.gemini-home .hero-float--plant {
   left: 16%;
   bottom: 12%;
   --hero-rot: -6deg;
@@ -601,7 +601,7 @@
   animation: hero-float-drift 6.2s ease-in-out infinite 0.8s;
 }
 
-.stella-home .hero-float--mail {
+.gemini-home .hero-float--mail {
   right: 4%;
   top: 8%;
   --hero-rot: 4deg;
@@ -616,7 +616,7 @@
   animation: hero-float-drift 5.6s ease-in-out infinite 0.3s;
 }
 
-.stella-home .hero-float-mail-icon {
+.gemini-home .hero-float-mail-icon {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -628,7 +628,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.stella-home .hero-float-mail-icon .g {
+.gemini-home .hero-float-mail-icon .g {
   font-size: 18px;
   font-weight: 700;
   background: linear-gradient(
@@ -643,7 +643,7 @@
   color: transparent;
 }
 
-.stella-home .hero-float-mail-title {
+.gemini-home .hero-float-mail-title {
   margin: 0;
   font-size: 14px;
   font-weight: 700;
@@ -651,14 +651,14 @@
   line-height: 1.2;
 }
 
-.stella-home .hero-float-mail-copy {
+.gemini-home .hero-float-mail-copy {
   margin: 3px 0 0;
   font-size: 13px;
   color: #6b7280;
   line-height: 1.35;
 }
 
-.stella-home .hero-float--notion {
+.gemini-home .hero-float--notion {
   right: 8%;
   bottom: 28%;
   --hero-rot: -14deg;
@@ -682,35 +682,35 @@
   }
 }
 
-.stella-home .hero-bg {
+.gemini-home .hero-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.stella-home .hero-bg .dots {
+.gemini-home .hero-bg .dots {
   display: none;
 }
 
-.stella-home #net {
+.gemini-home #net {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.stella-home .hero-veil {
+.gemini-home .hero-veil {
   position: absolute;
   inset: 0;
   background: transparent;
 }
 
-.stella-home .hero .shell {
+.gemini-home .hero .shell {
   position: relative;
   z-index: 3;
 }
 
-.stella-home .pill {
+.gemini-home .pill {
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -727,17 +727,17 @@
     box-shadow 0.18s;
 }
 
-.stella-home .pill:hover {
+.gemini-home .pill:hover {
   transform: translateY(-1.5px);
   box-shadow: var(--sh);
 }
 
-.stella-home .pill b {
+.gemini-home .pill b {
   font-weight: 500;
   color: var(--ink);
 }
 
-.stella-home .pill .tag {
+.gemini-home .pill .tag {
   font-family: var(--mono);
   font-size: 9.5px;
   letter-spacing: 0.12em;
@@ -747,41 +747,41 @@
   border-radius: 20px;
 }
 
-.stella-home .hero h1 {
+.gemini-home .hero h1 {
   margin: 26px auto 0;
   max-width: 15ch;
 }
 
-.stella-home .hero h1 .w {
+.gemini-home .hero h1 .w {
   display: inline-block;
   opacity: 0;
   transform: translateY(20px);
-  animation: stella-word-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: gemini-word-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes stella-word-in {
+@keyframes gemini-word-in {
   to {
     opacity: 1;
     transform: none;
   }
 }
 
-.stella-home .hero h1 i {
+.gemini-home .hero h1 i {
   font-style: normal;
   color: var(--ink-3);
 }
 
-.stella-home .hero-lede {
+.gemini-home .hero-lede {
   font-size: 18.5px;
   color: var(--ink-2);
   margin: 24px auto 0;
   max-width: 56ch;
   letter-spacing: -0.015em;
   opacity: 0;
-  animation: stella-word-in 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: gemini-word-in 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.stella-home .rot {
+.gemini-home .rot {
   display: inline-block;
   position: relative;
   color: var(--ac);
@@ -790,7 +790,7 @@
   text-align: start;
 }
 
-.stella-home .rot span {
+.gemini-home .rot span {
   position: absolute;
   left: 0;
   top: 0;
@@ -802,18 +802,18 @@
     transform 0.4s;
 }
 
-.stella-home .rot span.on {
+.gemini-home .rot span.on {
   opacity: 1;
   transform: none;
   position: relative;
 }
 
-.stella-home .searchwrap {
+.gemini-home .searchwrap {
   opacity: 0;
-  animation: stella-word-in 0.8s 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: gemini-word-in 0.8s 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.stella-home .searchbar {
+.gemini-home .searchbar {
   display: flex;
   align-items: stretch;
   background: #fff;
@@ -829,14 +829,14 @@
     border-color 0.2s;
 }
 
-.stella-home .searchbar:focus-within {
+.gemini-home .searchbar:focus-within {
   border-color: var(--ac-line);
   box-shadow:
     var(--sh-lg),
     0 0 0 4px var(--ac-soft);
 }
 
-.stella-home .sfield {
+.gemini-home .sfield {
   flex: 1;
   display: flex;
   align-items: center;
@@ -845,17 +845,17 @@
   min-width: 0;
 }
 
-.stella-home .sfield + .sfield {
+.gemini-home .sfield + .sfield {
   border-inline-start: 1px solid var(--line);
   flex: 0.82;
 }
 
-.stella-home .sfield svg {
+.gemini-home .sfield svg {
   flex: none;
   color: var(--ink-4);
 }
 
-.stella-home .sfield input {
+.gemini-home .sfield input {
   border: 0;
   outline: 0;
   width: 100%;
@@ -867,11 +867,11 @@
   letter-spacing: -0.01em;
 }
 
-.stella-home .sfield input::placeholder {
+.gemini-home .sfield input::placeholder {
   color: var(--ink-4);
 }
 
-.stella-home .searchbar button {
+.gemini-home .searchbar button {
   border: 0;
   background: var(--grad-btn);
   color: #fff;
@@ -885,11 +885,11 @@
   transition: filter 0.18s;
 }
 
-.stella-home .searchbar button:hover {
+.gemini-home .searchbar button:hover {
   filter: brightness(1.06);
 }
 
-.stella-home .qrow {
+.gemini-home .qrow {
   display: flex;
   gap: 7px;
   flex-wrap: wrap;
@@ -897,7 +897,7 @@
   margin-top: 16px;
 }
 
-.stella-home .qchip {
+.gemini-home .qchip {
   font-size: 12.5px;
   padding: 6px 13px;
   border-radius: 20px;
@@ -909,13 +909,13 @@
   transition: all 0.16s;
 }
 
-.stella-home .qchip:hover {
+.gemini-home .qchip:hover {
   border-color: var(--ac-line);
   color: var(--ac);
   background: var(--ac-soft);
 }
 
-.stella-home .strip {
+.gemini-home .strip {
   position: relative;
   z-index: 3;
   margin-top: 74px;
@@ -924,32 +924,32 @@
   background: #fff;
 }
 
-.stella-home .strip-in {
+.gemini-home .strip-in {
   display: grid;
   grid-template-columns: 1fr 190px 1fr;
   align-items: center;
 }
 
-.stella-home .mcard {
+.gemini-home .mcard {
   padding: 24px 0;
   text-align: start;
 }
 
-.stella-home .mcard.b {
+.gemini-home .mcard.b {
   text-align: end;
 }
 
-.stella-home .mtop {
+.gemini-home .mtop {
   display: flex;
   align-items: center;
   gap: 11px;
 }
 
-.stella-home .mcard.b .mtop {
+.gemini-home .mcard.b .mtop {
   justify-content: flex-end;
 }
 
-.stella-home .av {
+.gemini-home .av {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -964,30 +964,30 @@
   flex: none;
 }
 
-.stella-home .mcard .nm {
+.gemini-home .mcard .nm {
   font-size: 14.5px;
   font-weight: 500;
   line-height: 1.25;
 }
 
-.stella-home .mcard .sb {
+.gemini-home .mcard .sb {
   font-size: 12.5px;
   color: var(--ink-3);
   line-height: 1.3;
 }
 
-.stella-home .tags {
+.gemini-home .tags {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
   margin-top: 11px;
 }
 
-.stella-home .mcard.b .tags {
+.gemini-home .mcard.b .tags {
   justify-content: flex-end;
 }
 
-.stella-home .tags i {
+.gemini-home .tags i {
   font-style: normal;
   font-family: var(--mono);
   font-size: 9.5px;
@@ -999,19 +999,19 @@
   color: var(--ink-3);
 }
 
-.stella-home .tags i.ok {
+.gemini-home .tags i.ok {
   background: var(--ac-soft);
   border-color: transparent;
   color: var(--ac);
 }
 
-.stella-home .tags i.wt {
+.gemini-home .tags i.wt {
   background: var(--wait-soft);
   border-color: transparent;
   color: var(--wait);
 }
 
-.stella-home .mmid {
+.gemini-home .mmid {
   text-align: center;
   border-inline: 1px solid var(--line);
   padding: 24px 10px;
@@ -1023,7 +1023,7 @@
   position: relative;
 }
 
-.stella-home .mmid b {
+.gemini-home .mmid b {
   display: block;
   font-family: var(--mono);
   font-size: 27px;
@@ -1032,7 +1032,7 @@
   color: var(--ac);
 }
 
-.stella-home .mmid span {
+.gemini-home .mmid span {
   font-family: var(--mono);
   font-size: 9.5px;
   letter-spacing: 0.13em;
@@ -1041,8 +1041,8 @@
   margin-top: 5px;
 }
 
-.stella-home .mmid::before,
-.stella-home .mmid::after {
+.gemini-home .mmid::before,
+.gemini-home .mmid::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -1051,15 +1051,15 @@
   background: var(--ac-line);
 }
 
-.stella-home .mmid::before {
+.gemini-home .mmid::before {
   left: -26px;
 }
 
-.stella-home .mmid::after {
+.gemini-home .mmid::after {
   right: -26px;
 }
 
-.stella-home .marq {
+.gemini-home .marq {
   overflow: hidden;
   padding: 11px 0;
   border-top: 1px solid #c5d0e0;
@@ -1081,24 +1081,24 @@
   );
 }
 
-.stella-home .marq-t {
+.gemini-home .marq-t {
   display: flex;
   align-items: center;
   width: max-content;
-  animation: stella-slide 42s linear infinite;
+  animation: gemini-slide 42s linear infinite;
 }
 
-.stella-home .marq:hover .marq-t {
+.gemini-home .marq:hover .marq-t {
   animation-play-state: paused;
 }
 
-@keyframes stella-slide {
+@keyframes gemini-slide {
   to {
     transform: translateX(-50%);
   }
 }
 
-.stella-home .marq-t span {
+.gemini-home .marq-t span {
   display: inline-flex;
   align-items: center;
   gap: 18px;
@@ -1110,7 +1110,7 @@
   letter-spacing: -0.01em;
 }
 
-.stella-home .marq-t span i {
+.gemini-home .marq-t span i {
   width: 4px;
   height: 4px;
   border-radius: 50%;
@@ -1119,50 +1119,50 @@
   font-style: normal;
 }
 
-.stella-home section:not(.hero-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
+.gemini-home section:not(.hero-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
   padding: 104px 0;
 }
 
-.stella-home .hero-section {
+.gemini-home .hero-section {
   padding: 0 !important;
   min-height: 0 !important;
 }
 
-.stella-home .trusted-by-section {
+.gemini-home .trusted-by-section {
   padding: 0 !important;
 }
 
-.stella-home .trusted-by-header,
-.stella-home .trusted-by-title,
-.stella-home .trusted-by-sub {
+.gemini-home .trusted-by-header,
+.gemini-home .trusted-by-title,
+.gemini-home .trusted-by-sub {
   text-align: center;
 }
 
-.stella-home .levels-section {
+.gemini-home .levels-section {
   padding: 0 !important;
 }
 
-.stella-home .levels-hero-visual,
-.stella-home .levels-hero-visual img {
+.gemini-home .levels-hero-visual,
+.gemini-home .levels-hero-visual img {
   border: none !important;
   outline: none;
 }
 
-.stella-home .levels-hero-avatar {
+.gemini-home .levels-hero-avatar {
   box-shadow: none;
 }
 
-.stella-home .newcomers-section,
-.stella-home .cta-section {
+.gemini-home .newcomers-section,
+.gemini-home .cta-section {
   padding: 0 !important;
 }
 
-.stella-home .newcomers-section a.newcomers-card {
+.gemini-home .newcomers-section a.newcomers-card {
   color: inherit;
   text-decoration: none;
 }
 
-.stella-home .newcomers-section .newcomers-btn {
+.gemini-home .newcomers-section .newcomers-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1178,35 +1178,35 @@
     color 0.15s ease;
 }
 
-.stella-home .newcomers-section .newcomers-btn-primary {
+.gemini-home .newcomers-section .newcomers-btn-primary {
   background: #0c2440;
   border: 1px solid #0c2440;
   color: #ffffff !important;
 }
 
-.stella-home .newcomers-section .newcomers-btn-primary:hover {
+.gemini-home .newcomers-section .newcomers-btn-primary:hover {
   background: #13325e;
   border-color: #13325e;
   color: #ffffff !important;
 }
 
-.stella-home .newcomers-section .newcomers-btn-ghost {
+.gemini-home .newcomers-section .newcomers-btn-ghost {
   background: #ffffff;
   border: 1px solid #cbd5e1;
   color: #0c2440 !important;
 }
 
-.stella-home .newcomers-section .newcomers-btn-ghost:hover {
+.gemini-home .newcomers-section .newcomers-btn-ghost:hover {
   border-color: #0c2440;
   background: #f8fafc;
   color: #0c2440 !important;
 }
 
-.stella-home .cta-section .cta-section-copy {
+.gemini-home .cta-section .cta-section-copy {
   color: rgba(255, 255, 255, 0.82);
 }
 
-.stella-home .cta-section .cta-section-meta {
+.gemini-home .cta-section .cta-section-meta {
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -1214,7 +1214,7 @@
   color: rgba(255, 255, 255, 0.62);
 }
 
-.stella-home .cta-section .cta-btn {
+.gemini-home .cta-section .cta-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1230,49 +1230,49 @@
     color 0.15s ease;
 }
 
-.stella-home .cta-section .cta-btn-primary {
+.gemini-home .cta-section .cta-btn-primary {
   background: #ffffff;
   border: 1px solid #ffffff;
   color: #0c2440 !important;
 }
 
-.stella-home .cta-section .cta-btn-primary:hover {
+.gemini-home .cta-section .cta-btn-primary:hover {
   background: #eef2f7;
   border-color: #eef2f7;
   color: #0f2744 !important;
 }
 
-.stella-home .cta-section .cta-btn-ghost {
+.gemini-home .cta-section .cta-btn-ghost {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.55);
   color: #ffffff !important;
 }
 
-.stella-home .cta-section .cta-btn-ghost:hover {
+.gemini-home .cta-section .cta-btn-ghost:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: #ffffff;
   color: #ffffff !important;
 }
 
-.stella-home .support-section {
+.gemini-home .support-section {
   padding: 0 !important;
 }
 
-.stella-home .paths-section {
+.gemini-home .paths-section {
   padding: 0 !important;
 }
 
-.stella-home .four-things-section {
+.gemini-home .four-things-section {
   padding: 0 !important;
 }
 
-.stella-home .four-things-header,
-.stella-home .four-things-title,
-.stella-home .four-things-sub {
+.gemini-home .four-things-header,
+.gemini-home .four-things-title,
+.gemini-home .four-things-sub {
   text-align: center;
 }
 
-.stella-home .trusted-logo-scroll {
+.gemini-home .trusted-logo-scroll {
   overflow: hidden;
   mask-image: linear-gradient(
     90deg,
@@ -1290,51 +1290,51 @@
   );
 }
 
-.stella-home .trusted-logo-marquee {
+.gemini-home .trusted-logo-marquee {
   display: flex;
   align-items: center;
   gap: 12px;
   width: max-content;
-  animation: stella-slide 38s linear infinite;
+  animation: gemini-slide 38s linear infinite;
 }
 
-.stella-home .trusted-logo-scroll:hover .trusted-logo-marquee {
+.gemini-home .trusted-logo-scroll:hover .trusted-logo-marquee {
   animation-play-state: paused;
 }
 
-.stella-home #difference {
+.gemini-home #difference {
   background: #fff;
 }
 
-.stella-home #difference .bx {
+.gemini-home #difference .bx {
   box-shadow: none;
 }
 
-.stella-home #difference .bx:hover {
+.gemini-home #difference .bx:hover {
   transform: none;
   box-shadow: none;
 }
 
-.stella-home #difference .bstack:hover {
+.gemini-home #difference .bstack:hover {
   transform: none;
   box-shadow: none;
 }
 
-.stella-home #difference .langgrid i,
-.stella-home #difference .langgrid i:hover {
+.gemini-home #difference .langgrid i,
+.gemini-home #difference .langgrid i:hover {
   transform: none;
   box-shadow: none;
 }
 
-.stella-home #difference .screening-avatar {
+.gemini-home #difference .screening-avatar {
   box-shadow: none;
 }
 
-.stella-home #difference .diff-intro {
+.gemini-home #difference .diff-intro {
   max-width: 54ch;
 }
 
-.stella-home #difference .diff-intro h2 {
+.gemini-home #difference .diff-intro h2 {
   margin: 0;
   font-size: clamp(2rem, 3.8vw, 2.7rem);
   font-weight: 700;
@@ -1343,7 +1343,7 @@
   color: #0f172a;
 }
 
-.stella-home #difference .diff-intro p {
+.gemini-home #difference .diff-intro p {
   margin-top: 12px;
   font-size: 1.05rem;
   line-height: 1.55;
@@ -1351,7 +1351,7 @@
   letter-spacing: -0.015em;
 }
 
-.stella-home #difference .diff-panel {
+.gemini-home #difference .diff-panel {
   margin-top: 32px;
   display: grid;
   grid-template-columns: 1.35fr 1fr;
@@ -1363,13 +1363,13 @@
   overflow: hidden;
 }
 
-.stella-home #difference .diff-cell {
+.gemini-home #difference .diff-cell {
   background: #fff;
   padding: 24px 22px;
   min-height: 0;
 }
 
-.stella-home #difference .diff-cell-top {
+.gemini-home #difference .diff-cell-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1378,7 +1378,7 @@
   margin-bottom: 10px;
 }
 
-.stella-home #difference .diff-lab {
+.gemini-home #difference .diff-lab {
   font-family: var(--mono);
   font-size: 10.5px;
   font-weight: 700;
@@ -1387,7 +1387,7 @@
   color: #0f2744;
 }
 
-.stella-home #difference .diff-chip {
+.gemini-home #difference .diff-chip {
   font-family: var(--mono);
   font-size: 10.5px;
   font-weight: 600;
@@ -1397,7 +1397,7 @@
   border-radius: 5px;
 }
 
-.stella-home #difference .diff-cell h3 {
+.gemini-home #difference .diff-cell h3 {
   margin: 0;
   font-size: 1.12rem;
   font-weight: 600;
@@ -1406,20 +1406,20 @@
   color: #0f172a;
 }
 
-.stella-home #difference .diff-cell > p {
+.gemini-home #difference .diff-cell > p {
   margin-top: 8px;
   font-size: 13.5px;
   line-height: 1.5;
   color: #64748b;
 }
 
-.stella-home #difference .diff-bars {
+.gemini-home #difference .diff-bars {
   margin-top: 16px;
   display: grid;
   gap: 10px;
 }
 
-.stella-home #difference .diff-bar-top {
+.gemini-home #difference .diff-bar-top {
   display: flex;
   justify-content: space-between;
   gap: 10px;
@@ -1428,20 +1428,20 @@
   color: #475569;
 }
 
-.stella-home #difference .diff-bar-top b {
+.gemini-home #difference .diff-bar-top b {
   font-family: var(--mono);
   font-weight: 600;
   color: #0f172a;
 }
 
-.stella-home #difference .diff-bar-track {
+.gemini-home #difference .diff-bar-track {
   height: 5px;
   background: #f1f5f9;
   border-radius: 999px;
   overflow: hidden;
 }
 
-.stella-home #difference .diff-bar-track i {
+.gemini-home #difference .diff-bar-track i {
   display: block;
   height: 100%;
   background: #1e3a5f;
@@ -1449,7 +1449,7 @@
   font-style: normal;
 }
 
-.stella-home #difference .diff-checks {
+.gemini-home #difference .diff-checks {
   list-style: none;
   margin: 14px 0 0;
   padding: 0;
@@ -1457,7 +1457,7 @@
   gap: 10px;
 }
 
-.stella-home #difference .diff-checks strong {
+.gemini-home #difference .diff-checks strong {
   display: block;
   font-size: 13.5px;
   font-weight: 600;
@@ -1465,14 +1465,14 @@
   letter-spacing: -0.015em;
 }
 
-.stella-home #difference .diff-checks span {
+.gemini-home #difference .diff-checks span {
   display: block;
   margin-top: 2px;
   font-size: 12px;
   color: #64748b;
 }
 
-.stella-home #difference .diff-langs {
+.gemini-home #difference .diff-langs {
   list-style: none;
   margin: 14px 0 0;
   padding: 0;
@@ -1481,7 +1481,7 @@
   gap: 6px;
 }
 
-.stella-home #difference .diff-langs li {
+.gemini-home #difference .diff-langs li {
   font-size: 12px;
   color: #334155;
   border: 1px solid #e2e8f0;
@@ -1489,7 +1489,7 @@
   border-radius: 6px;
 }
 
-.stella-home #difference .diff-note {
+.gemini-home #difference .diff-note {
   margin: 14px 0 0;
   padding: 12px 14px;
   border: 1px solid #e2e8f0;
@@ -1497,7 +1497,7 @@
   background: #f8fafc;
 }
 
-.stella-home #difference .diff-note cite {
+.gemini-home #difference .diff-note cite {
   display: block;
   font-style: normal;
   font-family: var(--mono);
@@ -1508,29 +1508,29 @@
   color: #64748b;
 }
 
-.stella-home #difference .diff-note p {
+.gemini-home #difference .diff-note p {
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.45;
   color: #334155;
 }
 
-.stella-home #paths {
+.gemini-home #paths {
   background: #1e3a5f;
   color: #ffffff;
   position: relative;
 }
 
-.stella-home #paths > .shell {
+.gemini-home #paths > .shell {
   position: relative;
   z-index: 1;
 }
 
-.stella-home #paths .paths-head {
+.gemini-home #paths .paths-head {
   max-width: 720px;
 }
 
-.stella-home #paths .paths-head h2 {
+.gemini-home #paths .paths-head h2 {
   margin: 0;
   color: #ffffff;
   font-size: clamp(2.1rem, 4vw, 2.9rem);
@@ -1539,14 +1539,14 @@
   line-height: 1.08;
 }
 
-.stella-home #paths .paths-switch {
+.gemini-home #paths .paths-switch {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 28px;
 }
 
-.stella-home #paths .paths-switch-btn {
+.gemini-home #paths .paths-switch-btn {
   appearance: none;
   border: 1px solid rgba(255, 255, 255, 0.45);
   background: transparent;
@@ -1564,19 +1564,19 @@
     background 0.18s ease;
 }
 
-.stella-home #paths .paths-switch-btn:hover {
+.gemini-home #paths .paths-switch-btn:hover {
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.75);
   background: rgba(255, 255, 255, 0.08);
 }
 
-.stella-home #paths .paths-switch-btn[aria-selected="true"] {
+.gemini-home #paths .paths-switch-btn[aria-selected="true"] {
   color: #1e3a5f;
   background: #ffffff;
   border-color: #ffffff;
 }
 
-.stella-home #paths .paths-lead {
+.gemini-home #paths .paths-lead {
   margin: 18px 0 0;
   font-size: 1.08rem;
   line-height: 1.5;
@@ -1585,11 +1585,11 @@
   max-width: 42ch;
 }
 
-.stella-home #paths .path {
+.gemini-home #paths .path {
   margin-top: 48px;
 }
 
-.stella-home #paths .paths-rail {
+.gemini-home #paths .paths-rail {
   --paths-count: 4;
   list-style: none;
   margin: 0;
@@ -1600,7 +1600,7 @@
   position: relative;
 }
 
-.stella-home #paths .paths-rail::before {
+.gemini-home #paths .paths-rail::before {
   content: "";
   position: absolute;
   top: 11px;
@@ -1610,16 +1610,16 @@
   background: rgba(255, 255, 255, 0.35);
 }
 
-.stella-home #paths .paths-rail li {
+.gemini-home #paths .paths-rail li {
   position: relative;
   padding: 0 28px 0 0;
 }
 
-.stella-home #paths .paths-rail li:last-child {
+.gemini-home #paths .paths-rail li:last-child {
   padding-inline-end: 0;
 }
 
-.stella-home #paths .paths-rail-n {
+.gemini-home #paths .paths-rail-n {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1638,7 +1638,7 @@
   z-index: 1;
 }
 
-.stella-home #paths .paths-rail b {
+.gemini-home #paths .paths-rail b {
   display: block;
   font-size: 1.02rem;
   font-weight: 600;
@@ -1648,7 +1648,7 @@
   max-width: 18ch;
 }
 
-.stella-home #paths .paths-rail span:not(.paths-rail-n) {
+.gemini-home #paths .paths-rail span:not(.paths-rail-n) {
   display: block;
   margin-top: 8px;
   font-size: 13.5px;
@@ -1657,7 +1657,7 @@
   max-width: 28ch;
 }
 
-.stella-home #paths .paths-contact {
+.gemini-home #paths .paths-contact {
   margin-top: 44px;
   padding-top: 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.35);
@@ -1667,7 +1667,7 @@
   align-items: end;
 }
 
-.stella-home #paths .paths-contact-who span {
+.gemini-home #paths .paths-contact-who span {
   display: block;
   font-family: var(--mono);
   font-size: 10.5px;
@@ -1677,7 +1677,7 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-.stella-home #paths .paths-contact-who strong {
+.gemini-home #paths .paths-contact-who strong {
   display: block;
   margin-top: 8px;
   font-size: 1.15rem;
@@ -1686,7 +1686,7 @@
   color: #ffffff;
 }
 
-.stella-home #paths .paths-contact-who em {
+.gemini-home #paths .paths-contact-who em {
   display: block;
   margin-top: 3px;
   font-style: normal;
@@ -1694,24 +1694,24 @@
   color: rgba(255, 255, 255, 0.82);
 }
 
-.stella-home #paths .paths-contact-meta {
+.gemini-home #paths .paths-contact-meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
-.stella-home #paths .paths-contact-meta p {
+.gemini-home #paths .paths-contact-meta p {
   margin: 0;
 }
 
-.stella-home #paths .paths-contact-meta span {
+.gemini-home #paths .paths-contact-meta span {
   display: block;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 4px;
 }
 
-.stella-home #paths .paths-contact-meta b {
+.gemini-home #paths .paths-contact-meta b {
   display: block;
   font-family: var(--mono);
   font-size: 13px;
@@ -1719,40 +1719,40 @@
   color: #ffffff;
 }
 
-.stella-home #paths .paths-contact-langs {
+.gemini-home #paths .paths-contact-langs {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   justify-content: flex-end;
 }
 
-.stella-home #paths .paths-contact-langs span {
+.gemini-home #paths .paths-contact-langs span {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.88);
   border-bottom: 1px solid rgba(255, 255, 255, 0.35);
   padding-bottom: 1px;
 }
 
-.stella-home #demand {
+.gemini-home #demand {
   background: #fff;
 }
 
-.stella-home #support {
+.gemini-home #support {
   background: #ffffff;
   color: #0f172a;
   position: relative;
 }
 
-.stella-home #support > .shell {
+.gemini-home #support > .shell {
   position: relative;
   z-index: 1;
 }
 
-.stella-home #support .support-intro {
+.gemini-home #support .support-intro {
   max-width: 52ch;
 }
 
-.stella-home #support .support-intro h2 {
+.gemini-home #support .support-intro h2 {
   margin: 0;
   font-size: clamp(2.1rem, 4vw, 2.9rem);
   font-weight: 700;
@@ -1762,7 +1762,7 @@
   text-wrap: balance;
 }
 
-.stella-home #support .support-intro p {
+.gemini-home #support .support-intro p {
   margin-top: 18px;
   font-size: 1.12rem;
   line-height: 1.6;
@@ -1770,7 +1770,7 @@
   letter-spacing: -0.015em;
 }
 
-.stella-home #support .support-metrics {
+.gemini-home #support .support-metrics {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
@@ -1779,21 +1779,21 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-.stella-home #support .support-metric {
+.gemini-home #support .support-metric {
   padding: 28px 20px 28px 0;
   border-inline-end: 1px solid #e2e8f0;
 }
 
-.stella-home #support .support-metric:last-child {
+.gemini-home #support .support-metric:last-child {
   border-inline-end: 0;
   padding-inline-end: 0;
 }
 
-.stella-home #support .support-metric:not(:first-child) {
+.gemini-home #support .support-metric:not(:first-child) {
   padding-inline-start: 24px;
 }
 
-.stella-home #support .support-metric b {
+.gemini-home #support .support-metric b {
   display: block;
   font-family: var(--mono);
   font-size: clamp(1.9rem, 3vw, 2.55rem);
@@ -1803,7 +1803,7 @@
   line-height: 1;
 }
 
-.stella-home #support .support-metric span {
+.gemini-home #support .support-metric span {
   display: block;
   margin-top: 10px;
   font-size: 13.5px;
@@ -1812,11 +1812,11 @@
   max-width: 16ch;
 }
 
-.stella-home #support .support-desks {
+.gemini-home #support .support-desks {
   margin-top: 8px;
 }
 
-.stella-home #support .support-desk {
+.gemini-home #support .support-desk {
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 40px;
@@ -1825,12 +1825,12 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-.stella-home #support .support-desk:last-child {
+.gemini-home #support .support-desk:last-child {
   border-bottom: 0;
   padding-bottom: 0;
 }
 
-.stella-home #support .support-desk-label {
+.gemini-home #support .support-desk-label {
   margin: 0;
   font-family: var(--mono);
   font-size: 11px;
@@ -1841,7 +1841,7 @@
   padding-top: 6px;
 }
 
-.stella-home #support .support-desk-body h3 {
+.gemini-home #support .support-desk-body h3 {
   margin: 0;
   font-size: clamp(1.35rem, 2vw, 1.7rem);
   font-weight: 600;
@@ -1851,7 +1851,7 @@
   max-width: 28ch;
 }
 
-.stella-home #support .support-desk-body > p {
+.gemini-home #support .support-desk-body > p {
   margin-top: 12px;
   font-size: 15.5px;
   line-height: 1.55;
@@ -1859,7 +1859,7 @@
   max-width: 58ch;
 }
 
-.stella-home #support .support-desk-body ul {
+.gemini-home #support .support-desk-body ul {
   list-style: none;
   margin: 28px 0 0;
   padding: 0;
@@ -1868,7 +1868,7 @@
   gap: 0 28px;
 }
 
-.stella-home #support .support-desk-body li {
+.gemini-home #support .support-desk-body li {
   padding: 14px 0;
   border-top: 1px solid #e2e8f0;
   font-size: 14.5px;
@@ -1876,21 +1876,21 @@
   color: #334155;
 }
 
-.stella-home #support .support-desk-body li:nth-child(1),
-.stella-home #support .support-desk-body li:nth-child(2) {
+.gemini-home #support .support-desk-body li:nth-child(1),
+.gemini-home #support .support-desk-body li:nth-child(2) {
   border-top: 0;
   padding-top: 0;
 }
 
-.stella-home #levels {
+.gemini-home #levels {
   background: #ffffff;
 }
 
-.stella-home #levels .levels-intro {
+.gemini-home #levels .levels-intro {
   max-width: 54ch;
 }
 
-.stella-home #levels .levels-kicker {
+.gemini-home #levels .levels-kicker {
   margin: 0;
   font-family: var(--mono);
   font-size: 11px;
@@ -1900,7 +1900,7 @@
   color: #0f2744;
 }
 
-.stella-home #levels .levels-intro h2 {
+.gemini-home #levels .levels-intro h2 {
   margin: 14px 0 0;
   font-size: clamp(2.1rem, 4vw, 2.9rem);
   font-weight: 700;
@@ -1909,7 +1909,7 @@
   color: #0f172a;
 }
 
-.stella-home #levels .levels-intro p {
+.gemini-home #levels .levels-intro p {
   margin-top: 14px;
   font-size: 1.08rem;
   line-height: 1.55;
@@ -1917,11 +1917,11 @@
   letter-spacing: -0.015em;
 }
 
-.stella-home #levels .levels-board {
+.gemini-home #levels .levels-board {
   margin-top: 36px;
 }
 
-.stella-home #levels .levels-steps {
+.gemini-home #levels .levels-steps {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
@@ -1931,18 +1931,18 @@
   overflow: hidden;
 }
 
-.stella-home #levels .levels-step {
+.gemini-home #levels .levels-step {
   padding: 24px 20px 26px;
   background: #fff;
   border-inline-end: 1px solid #e2e8f0;
   position: relative;
 }
 
-.stella-home #levels .levels-step:last-child {
+.gemini-home #levels .levels-step:last-child {
   border-inline-end: 0;
 }
 
-.stella-home #levels .levels-step::after {
+.gemini-home #levels .levels-step::after {
   content: "";
   position: absolute;
   top: 30px;
@@ -1953,11 +1953,11 @@
   z-index: 1;
 }
 
-.stella-home #levels .levels-step:last-child::after {
+.gemini-home #levels .levels-step:last-child::after {
   display: none;
 }
 
-.stella-home #levels .levels-n {
+.gemini-home #levels .levels-n {
   display: inline-block;
   font-family: var(--mono);
   font-size: 11px;
@@ -1966,7 +1966,7 @@
   color: #94a3b8;
 }
 
-.stella-home #levels .levels-step h3 {
+.gemini-home #levels .levels-step h3 {
   margin: 14px 0 0;
   font-size: 1.02rem;
   font-weight: 600;
@@ -1975,14 +1975,14 @@
   color: #0f172a;
 }
 
-.stella-home #levels .levels-step p {
+.gemini-home #levels .levels-step p {
   margin: 8px 0 0;
   font-size: 13.5px;
   line-height: 1.45;
   color: #64748b;
 }
 
-.stella-home #levels .levels-gate {
+.gemini-home #levels .levels-gate {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1995,7 +1995,7 @@
   overflow: hidden;
 }
 
-.stella-home #levels .levels-gate::before {
+.gemini-home #levels .levels-gate::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -2004,11 +2004,11 @@
   transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stella-home #levels .levels-gate.on::before {
+.gemini-home #levels .levels-gate.on::before {
   transform: translateX(0);
 }
 
-.stella-home #levels .levels-gate-in {
+.gemini-home #levels .levels-gate-in {
   display: flex;
   align-items: flex-start;
   gap: 18px;
@@ -2016,12 +2016,12 @@
   z-index: 1;
 }
 
-.stella-home #levels .levels-gate .levels-n {
+.gemini-home #levels .levels-gate .levels-n {
   color: rgba(255, 255, 255, 0.75);
   padding-top: 3px;
 }
 
-.stella-home #levels .levels-gate h3 {
+.gemini-home #levels .levels-gate h3 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
@@ -2029,14 +2029,14 @@
   color: #fff;
 }
 
-.stella-home #levels .levels-gate p {
+.gemini-home #levels .levels-gate p {
   margin: 6px 0 0;
   font-size: 14.5px;
   line-height: 1.45;
   color: rgba(255, 255, 255, 0.88);
 }
 
-.stella-home #levels .levels-gate-mark {
+.gemini-home #levels .levels-gate-mark {
   position: relative;
   z-index: 1;
   flex: none;
@@ -2051,43 +2051,43 @@
   border-radius: 999px;
 }
 
-.stella-home .sec-quote {
+.gemini-home .sec-quote {
   background: var(--grad-cta);
   color: #fff;
 }
 
-.stella-home .sec-quote .quote p {
+.gemini-home .sec-quote .quote p {
   color: #fff;
 }
 
-.stella-home .sec-quote .quote .who {
+.gemini-home .sec-quote .quote .who {
   color: rgba(255, 255, 255, 0.65);
 }
 
-.stella-home .sec-quote .stats {
+.gemini-home .sec-quote .stats {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-.stella-home .sec-quote .stat {
+.gemini-home .sec-quote .stat {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.stella-home .sec-quote .stat b {
+.gemini-home .sec-quote .stat b {
   color: #fff;
   font-weight: 600;
 }
 
-.stella-home .sec-quote .stat span {
+.gemini-home .sec-quote .stat span {
   color: rgba(255, 255, 255, 0.82);
 }
 
-.stella-home #newcomers {
+.gemini-home #newcomers {
   background: #ffffff;
   padding: 72px 0;
 }
 
-.stella-home #newcomers .new-panel {
+.gemini-home #newcomers .new-panel {
   display: grid;
   grid-template-columns: minmax(260px, 0.92fr) 1.08fr;
   border: 1px solid #e2e8f0;
@@ -2095,7 +2095,7 @@
   overflow: hidden;
 }
 
-.stella-home #newcomers .new-main {
+.gemini-home #newcomers .new-main {
   padding: 28px 26px;
   border-inline-end: 1px solid #e2e8f0;
   display: flex;
@@ -2103,7 +2103,7 @@
   justify-content: center;
 }
 
-.stella-home #newcomers .new-kicker {
+.gemini-home #newcomers .new-kicker {
   margin: 0;
   font-family: var(--mono);
   font-size: 10.5px;
@@ -2113,7 +2113,7 @@
   color: #0f2744;
 }
 
-.stella-home #newcomers .new-main h2 {
+.gemini-home #newcomers .new-main h2 {
   margin: 10px 0 0;
   font-size: clamp(1.65rem, 2.8vw, 2.15rem);
   font-weight: 700;
@@ -2122,7 +2122,7 @@
   color: #0f172a;
 }
 
-.stella-home #newcomers .new-main > p {
+.gemini-home #newcomers .new-main > p {
   margin-top: 10px;
   font-size: 14px;
   line-height: 1.5;
@@ -2130,21 +2130,21 @@
   letter-spacing: -0.01em;
 }
 
-.stella-home #newcomers .new-actions {
+.gemini-home #newcomers .new-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 18px;
 }
 
-.stella-home #newcomers .new-grid {
+.gemini-home #newcomers .new-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   background: #e2e8f0;
   gap: 1px;
 }
 
-.stella-home #newcomers .new-cell {
+.gemini-home #newcomers .new-cell {
   background: #fff;
   padding: 18px 16px;
   text-decoration: none;
@@ -2152,11 +2152,11 @@
   transition: background 0.15s ease;
 }
 
-.stella-home #newcomers .new-cell:hover {
+.gemini-home #newcomers .new-cell:hover {
   background: #f8fafc;
 }
 
-.stella-home #newcomers .new-cell h3 {
+.gemini-home #newcomers .new-cell h3 {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
@@ -2165,18 +2165,18 @@
   color: #0f172a;
 }
 
-.stella-home #newcomers .new-cell p {
+.gemini-home #newcomers .new-cell p {
   margin: 6px 0 0;
   font-size: 12.5px;
   line-height: 1.4;
   color: #64748b;
 }
 
-.stella-home .head {
+.gemini-home .head {
   max-width: 62ch;
 }
 
-.stella-home .head .mono {
+.gemini-home .head .mono {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -2193,7 +2193,7 @@
   box-shadow: 0 2px 8px rgba(225, 29, 72, 0.06);
 }
 
-.stella-home .head .mono::before {
+.gemini-home .head .mono::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -2203,7 +2203,7 @@
   box-shadow: 0 0 8px rgba(225, 29, 72, 0.8);
 }
 
-.stella-home .head h2 {
+.gemini-home .head h2 {
   margin-top: 18px;
   font-size: clamp(2.2rem, 4.2vw, 2.85rem);
   font-weight: 700;
@@ -2212,7 +2212,7 @@
   color: var(--ink);
 }
 
-.stella-home .head .sub {
+.gemini-home .head .sub {
   margin-top: 16px;
   font-size: 1.15rem;
   line-height: 1.6;
@@ -2221,14 +2221,14 @@
   max-width: 58ch;
 }
 
-.stella-home .doors {
+.gemini-home .doors {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-top: 44px;
 }
 
-.stella-home .door {
+.gemini-home .door {
   appearance: none;
   background: #fff;
   border: 1px solid var(--line);
@@ -2246,7 +2246,7 @@
   overflow: hidden;
 }
 
-.stella-home .door::before {
+.gemini-home .door::before {
   content: "";
   position: absolute;
   top: 0;
@@ -2259,22 +2259,22 @@
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stella-home .door:hover {
+.gemini-home .door:hover {
   transform: translateY(-3px);
   box-shadow: var(--sh);
   border-color: var(--line-2);
 }
 
-.stella-home .door[aria-selected="true"] {
+.gemini-home .door[aria-selected="true"] {
   border-color: var(--line-2);
   box-shadow: var(--sh);
 }
 
-.stella-home .door[aria-selected="true"]::before {
+.gemini-home .door[aria-selected="true"]::before {
   transform: scaleX(1);
 }
 
-.stella-home .door-t {
+.gemini-home .door-t {
   display: block;
   font-size: 1.24rem;
   font-weight: 500;
@@ -2283,7 +2283,7 @@
   line-height: 1.15;
 }
 
-.stella-home .door-sub {
+.gemini-home .door-sub {
   display: block;
   font-size: 13.5px;
   margin-top: 7px;
@@ -2291,18 +2291,18 @@
   letter-spacing: -0.01em;
 }
 
-.stella-home .path {
-  animation: stella-fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+.gemini-home .path {
+  animation: gemini-fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes stella-fade-up {
+@keyframes gemini-fade-up {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
 }
 
-.stella-home .path-grid {
+.gemini-home .path-grid {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: 56px;
@@ -2310,32 +2310,32 @@
   margin-top: 52px;
 }
 
-.stella-home .steps {
+.gemini-home .steps {
   list-style: none;
   margin: 0;
   padding: 0;
-  counter-reset: stella-step;
+  counter-reset: gemini-step;
 }
 
-.stella-home .steps li {
-  counter-increment: stella-step;
+.gemini-home .steps li {
+  counter-increment: gemini-step;
   position: relative;
   padding: 18px 0 18px 54px;
   border-top: 1px solid var(--line);
   transition: padding-inline-start 0.25s;
 }
 
-.stella-home .steps li:first-child {
+.gemini-home .steps li:first-child {
   border-top: 0;
   padding-top: 0;
 }
 
-.stella-home .steps li:first-child::before {
+.gemini-home .steps li:first-child::before {
   top: 2px;
 }
 
-.stella-home .steps li::before {
-  content: counter(stella-step, decimal-leading-zero);
+.gemini-home .steps li::before {
+  content: counter(gemini-step, decimal-leading-zero);
   position: absolute;
   inset-inline-start: 0;
   top: 20px;
@@ -2346,24 +2346,24 @@
   transition: color 0.25s;
 }
 
-.stella-home .steps li:hover::before {
+.gemini-home .steps li:hover::before {
   color: var(--ac);
 }
 
-.stella-home .steps b {
+.gemini-home .steps b {
   display: block;
   font-weight: 500;
   font-size: 16px;
   letter-spacing: -0.024em;
 }
 
-.stella-home .steps span {
+.gemini-home .steps span {
   color: var(--ink-2);
   font-size: 14.5px;
   letter-spacing: -0.01em;
 }
 
-.stella-home .human {
+.gemini-home .human {
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -2371,7 +2371,7 @@
   box-shadow: var(--sh);
 }
 
-.stella-home .human-h {
+.gemini-home .human-h {
   padding: 12px 18px;
   border-bottom: 1px solid var(--line);
   display: flex;
@@ -2385,14 +2385,14 @@
   background: var(--bg-1);
 }
 
-.stella-home .human-b {
+.gemini-home .human-b {
   padding: 20px 18px;
   display: flex;
   gap: 13px;
   align-items: center;
 }
 
-.stella-home .av-lg {
+.gemini-home .av-lg {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -2406,49 +2406,49 @@
   flex: none;
 }
 
-.stella-home .human-b .nm {
+.gemini-home .human-b .nm {
   font-weight: 500;
   font-size: 15.5px;
   letter-spacing: -0.024em;
 }
 
-.stella-home .human-b .rl {
+.gemini-home .human-b .rl {
   font-size: 13px;
   color: var(--ink-3);
 }
 
-.stella-home .human-f {
+.gemini-home .human-f {
   border-top: 1px solid var(--line);
   padding: 15px 18px;
   display: grid;
   gap: 10px;
 }
 
-.stella-home .hrow {
+.gemini-home .hrow {
   display: flex;
   justify-content: space-between;
   gap: 14px;
   font-size: 13.5px;
 }
 
-.stella-home .hrow span:first-child {
+.gemini-home .hrow span:first-child {
   color: var(--ink-3);
 }
 
-.stella-home .hrow span:last-child {
+.gemini-home .hrow span:last-child {
   font-family: var(--mono);
   font-size: 12px;
   text-align: end;
 }
 
-.stella-home .speaks {
+.gemini-home .speaks {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
   padding: 0 18px 18px;
 }
 
-.stella-home .speaks i {
+.gemini-home .speaks i {
   font-style: normal;
   font-size: 11.5px;
   padding: 4px 9px;
@@ -2457,14 +2457,14 @@
   color: var(--ink-2);
 }
 
-.stella-home .bento {
+.gemini-home .bento {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 20px;
   margin-top: 48px;
 }
 
-.stella-home .bx {
+.gemini-home .bx {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 18px;
@@ -2478,13 +2478,13 @@
   flex-direction: column;
 }
 
-.stella-home .bx:hover {
+.gemini-home .bx:hover {
   transform: none;
   box-shadow: none;
   border-color: #cbd5e1;
 }
 
-.stella-home .bx h3 {
+.gemini-home .bx h3 {
   margin-top: 10px;
   font-size: 1.25rem;
   font-weight: 600;
@@ -2492,31 +2492,31 @@
   color: var(--ink);
 }
 
-.stella-home .bx p {
+.gemini-home .bx p {
   margin-top: 8px;
   font-size: 14.5px;
   color: var(--ink-2);
   line-height: 1.55;
 }
 
-.stella-home .b-lg {
+.gemini-home .b-lg {
   grid-column: span 4;
 }
 
-.stella-home .b-sm {
+.gemini-home .b-sm {
   grid-column: span 2;
 }
 
-.stella-home .b-md {
+.gemini-home .b-md {
   grid-column: span 3;
 }
 
-.stella-home .bx .glow {
+.gemini-home .bx .glow {
   display: none;
 }
 
 /* Stylish Card Components */
-.stella-home .bx-header {
+.gemini-home .bx-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2524,7 +2524,7 @@
   margin-bottom: 6px;
 }
 
-.stella-home .mono-pill {
+.gemini-home .mono-pill {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -2540,25 +2540,25 @@
   border: 1px solid #e2e8f0;
 }
 
-.stella-home .pill-dot {
+.gemini-home .pill-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
 }
-.stella-home .pill-dot.red {
+.gemini-home .pill-dot.red {
   background: #1e3a5f;
   box-shadow: none;
 }
-.stella-home .pill-dot.green {
+.gemini-home .pill-dot.green {
   background: #16a34a;
   box-shadow: none;
 }
-.stella-home .pill-dot.blue {
+.gemini-home .pill-dot.blue {
   background: #2563eb;
   box-shadow: none;
 }
 
-.stella-home .match-confidence-badge {
+.gemini-home .match-confidence-badge {
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 600;
@@ -2569,7 +2569,7 @@
   border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
-.stella-home .matching-demo {
+.gemini-home .matching-demo {
   margin-top: 22px;
   display: flex;
   flex-direction: column;
@@ -2580,7 +2580,7 @@
   border: 1px solid #e2e8f0;
 }
 
-.stella-home .matching-bar-item .bar-info {
+.gemini-home .matching-bar-item .bar-info {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
@@ -2589,33 +2589,33 @@
   font-weight: 500;
 }
 
-.stella-home .matching-bar-item .bar-info b {
+.gemini-home .matching-bar-item .bar-info b {
   color: #334155;
   font-family: var(--mono);
 }
 
-.stella-home .bar-track {
+.gemini-home .bar-track {
   height: 7px;
   background: #e2e8f0;
   border-radius: 4px;
   overflow: hidden;
 }
 
-.stella-home .bar-fill {
+.gemini-home .bar-fill {
   height: 100%;
   background: #e11d48;
   border-radius: 4px;
   transition: width 1s ease-out;
 }
 
-.stella-home .badgestack {
+.gemini-home .badgestack {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-top: 18px;
 }
 
-.stella-home .bstack {
+.gemini-home .bstack {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -2631,27 +2631,27 @@
     box-shadow 0.2s;
 }
 
-.stella-home .bstack:hover {
+.gemini-home .bstack:hover {
   transform: none;
   border-color: #cbd5e1;
   box-shadow: none;
 }
 
-.stella-home .bstack strong {
+.gemini-home .bstack strong {
   display: block;
   font-weight: 600;
   font-size: 13px;
   line-height: 1.2;
 }
 
-.stella-home .bstack small {
+.gemini-home .bstack small {
   display: block;
   font-size: 11px;
   color: var(--ink-3);
   margin-top: 2px;
 }
 
-.stella-home .bstack .tick {
+.gemini-home .bstack .tick {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -2665,14 +2665,14 @@
   flex: none;
 }
 
-.stella-home .langgrid {
+.gemini-home .langgrid {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 18px;
 }
 
-.stella-home .langgrid i {
+.gemini-home .langgrid i {
   font-style: normal;
   font-size: 12.5px;
   padding: 6px 12px;
@@ -2687,14 +2687,14 @@
   transition: border-color 0.2s, color 0.2s;
 }
 
-.stella-home .langgrid i:hover {
+.gemini-home .langgrid i:hover {
   border-color: #cbd5e1;
   color: var(--ink);
   transform: none;
   box-shadow: none;
 }
 
-.stella-home .human-verified-pill {
+.gemini-home .human-verified-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -2707,7 +2707,7 @@
   border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
-.stella-home .screening-preview-box {
+.gemini-home .screening-preview-box {
   margin-top: 20px;
   display: flex;
   align-items: flex-start;
@@ -2718,7 +2718,7 @@
   border-radius: 12px;
 }
 
-.stella-home .screening-avatar {
+.gemini-home .screening-avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -2733,7 +2733,7 @@
   box-shadow: none;
 }
 
-.stella-home .screening-note .note-title {
+.gemini-home .screening-note .note-title {
   font-size: 11px;
   font-weight: 700;
   color: #334155;
@@ -2742,7 +2742,7 @@
   letter-spacing: 0.05em;
 }
 
-.stella-home .screening-note .note-body {
+.gemini-home .screening-note .note-body {
   font-size: 13px;
   color: var(--ink-2);
   margin: 0;
@@ -2750,7 +2750,7 @@
   line-height: 1.45;
 }
 
-.stella-home .board-top {
+.gemini-home .board-top {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -2758,7 +2758,7 @@
   flex-wrap: wrap;
 }
 
-.stella-home .filters {
+.gemini-home .filters {
   display: flex;
   gap: 4px;
   background: #f1f5f9;
@@ -2767,7 +2767,7 @@
   border: 1px solid #e2e8f0;
 }
 
-.stella-home .filt {
+.gemini-home .filt {
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 600;
@@ -2781,17 +2781,17 @@
   transition: all 0.2s ease;
 }
 
-.stella-home .filt:hover {
+.gemini-home .filt:hover {
   color: #0f172a;
 }
 
-.stella-home .filt[aria-pressed="true"] {
+.gemini-home .filt[aria-pressed="true"] {
   background: #ffffff;
   color: #0f172a;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.stella-home .board-card-wrapper {
+.gemini-home .board-card-wrapper {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 16px;
@@ -2800,19 +2800,19 @@
   margin-top: 28px;
 }
 
-.stella-home .board {
+.gemini-home .board {
   width: 100%;
   border-collapse: collapse;
   margin-top: 0;
   font-size: 14.5px;
 }
 
-.stella-home .board thead tr {
+.gemini-home .board thead tr {
   background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
 }
 
-.stella-home .board thead th {
+.gemini-home .board thead th {
   font-family: var(--mono);
   font-size: 10.5px;
   font-weight: 700;
@@ -2823,41 +2823,41 @@
   padding: 14px 20px;
 }
 
-.stella-home .board th.num,
-.stella-home .board td.num {
+.gemini-home .board th.num,
+.gemini-home .board td.num {
   text-align: end;
 }
 
-.stella-home .board tbody tr {
+.gemini-home .board tbody tr {
   border-bottom: 1px solid #f1f5f9;
   transition: background 0.15s ease;
 }
 
-.stella-home .board tbody tr:last-child {
+.gemini-home .board tbody tr:last-child {
   border-bottom: none;
 }
 
-.stella-home .board tbody tr:hover {
+.gemini-home .board tbody tr:hover {
   background: #f8fafc;
 }
 
-.stella-home .board td {
+.gemini-home .board td {
   padding: 16px 20px;
   vertical-align: middle;
 }
 
-.stella-home .board .role-title {
+.gemini-home .board .role-title {
   font-weight: 600;
   color: #0f172a;
   font-size: 14.5px;
 }
 
-.stella-home .board .loc-text {
+.gemini-home .board .loc-text {
   color: #475569;
   font-size: 13.5px;
 }
 
-.stella-home .board .pay-pill {
+.gemini-home .board .pay-pill {
   display: inline-block;
   font-family: var(--mono);
   font-size: 12.5px;
@@ -2869,14 +2869,14 @@
   border-radius: 6px;
 }
 
-.stella-home .board .open-count-tag {
+.gemini-home .board .open-count-tag {
   font-family: var(--mono);
   font-size: 14px;
   font-weight: 700;
   color: #0f172a;
 }
 
-.stella-home .spark {
+.gemini-home .spark {
   display: inline-flex;
   align-items: flex-end;
   gap: 2px;
@@ -2885,21 +2885,21 @@
   margin-inline-end: 10px;
 }
 
-.stella-home .spark i {
+.gemini-home .spark i {
   width: 3px;
   background: #cbd5e1;
   border-radius: 1px;
 }
 
-.stella-home .spark.up i {
+.gemini-home .spark.up i {
   background: #cbd5e1;
 }
 
-.stella-home .spark.up i:last-child {
+.gemini-home .spark.up i:last-child {
   background: #16a34a;
 }
 
-.stella-home .trend-pill {
+.gemini-home .trend-pill {
   font-family: var(--mono);
   font-size: 11.5px;
   font-weight: 600;
@@ -2909,14 +2909,14 @@
   background: #f1f5f9;
 }
 
-.stella-home .trend-pill.up,
-.stella-home .trend-pill.hot {
+.gemini-home .trend-pill.up,
+.gemini-home .trend-pill.hot {
   color: #16a34a;
   background: rgba(22, 163, 74, 0.1);
   border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
-.stella-home .board-note {
+.gemini-home .board-note {
   margin-top: 14px;
   font-family: var(--mono);
   font-size: 10.5px;
@@ -2925,7 +2925,7 @@
   color: #64748b;
 }
 
-.stella-home .tick-wrap {
+.gemini-home .tick-wrap {
   --tick-h: 52px;
   display: flex;
   align-items: center;
@@ -2940,7 +2940,7 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
-.stella-home .tick-lab {
+.gemini-home .tick-lab {
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 700;
@@ -2958,7 +2958,7 @@
   white-space: nowrap;
 }
 
-.stella-home .pulse-green-dot {
+.gemini-home .pulse-green-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -2967,7 +2967,7 @@
   flex: none;
 }
 
-.stella-home .tick-view {
+.gemini-home .tick-view {
   position: relative;
   height: var(--tick-h);
   max-height: var(--tick-h);
@@ -2977,14 +2977,14 @@
   overflow: hidden;
 }
 
-.stella-home .tick-view ul {
+.gemini-home .tick-view ul {
   list-style: none;
   margin: 0;
   padding: 0;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stella-home .tick-view li {
+.gemini-home .tick-view li {
   height: var(--tick-h);
   max-height: var(--tick-h);
   box-sizing: border-box;
@@ -2997,14 +2997,14 @@
   overflow: hidden;
 }
 
-.stella-home .tick-view .tick-who {
+.gemini-home .tick-view .tick-who {
   font-weight: 600;
   color: #0f172a;
   flex: none;
   white-space: nowrap;
 }
 
-.stella-home .tick-view .tick-what {
+.gemini-home .tick-view .tick-what {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -3012,7 +3012,7 @@
   white-space: nowrap;
 }
 
-.stella-home .tick-view .tick-when {
+.gemini-home .tick-view .tick-when {
   font-style: normal;
   font-family: var(--mono);
   font-size: 11.5px;
@@ -3022,7 +3022,7 @@
   margin-inline-start: auto;
 }
 
-.stella-home .split {
+.gemini-home .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
   margin-top: 50px;
@@ -3033,34 +3033,34 @@
   box-shadow: var(--sh);
 }
 
-.stella-home .half {
+.gemini-home .half {
   padding: 34px;
 }
 
-.stella-home .half + .half {
+.gemini-home .half + .half {
   border-inline-start: 1px solid var(--line);
   background: #fff;
 }
 
-.stella-home .half h3 {
+.gemini-home .half h3 {
   margin-top: 14px;
   font-size: 1.4rem;
   letter-spacing: -0.036em;
 }
 
-.stella-home .half p.d {
+.gemini-home .half p.d {
   color: var(--ink-2);
   margin-top: 11px;
   font-size: 15px;
 }
 
-.stella-home .tk {
+.gemini-home .tk {
   list-style: none;
   margin: 24px 0 0;
   padding: 0;
 }
 
-.stella-home .tk li {
+.gemini-home .tk li {
   padding: 12px 0 12px 24px;
   border-top: 1px solid var(--line);
   position: relative;
@@ -3068,7 +3068,7 @@
   color: var(--ink-2);
 }
 
-.stella-home .tk li::before {
+.gemini-home .tk li::before {
   content: "";
   position: absolute;
   inset-inline-start: 0;
@@ -3079,7 +3079,7 @@
   border: 1.5px solid var(--ac-line);
 }
 
-.stella-home .stats {
+.gemini-home .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
@@ -3090,12 +3090,12 @@
   overflow: hidden;
 }
 
-.stella-home .stat {
+.gemini-home .stat {
   background: #fff;
   padding: 28px 22px;
 }
 
-.stella-home .stat b {
+.gemini-home .stat b {
   display: block;
   font-family: var(--mono);
   font-size: 30px;
@@ -3103,14 +3103,14 @@
   letter-spacing: -0.04em;
 }
 
-.stella-home .stat span {
+.gemini-home .stat span {
   font-size: 13.5px;
   color: var(--ink-3);
   margin-top: 6px;
   display: block;
 }
 
-.stella-home .rungs {
+.gemini-home .rungs {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 1px;
@@ -3121,7 +3121,7 @@
   overflow: hidden;
 }
 
-.stella-home .rung {
+.gemini-home .rung {
   background: #fff;
   padding: 26px 20px 30px;
   transition: background 0.25s;
@@ -3129,45 +3129,45 @@
   position: relative;
 }
 
-.stella-home .rung:hover {
+.gemini-home .rung:hover {
   background: var(--bg-1);
 }
 
-.stella-home .rung.gate {
+.gemini-home .rung.gate {
   background: var(--grad-btn);
 }
 
-.stella-home .rung .n {
+.gemini-home .rung .n {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--ink-4);
   letter-spacing: 0.12em;
 }
 
-.stella-home .rung.gate .n {
+.gemini-home .rung.gate .n {
   color: rgba(255, 255, 255, 0.75);
 }
 
-.stella-home .rung h3 {
+.gemini-home .rung h3 {
   margin-top: 14px;
 }
 
-.stella-home .rung p {
+.gemini-home .rung p {
   margin-top: 9px;
   font-size: 13.5px;
   color: var(--ink-3);
   line-height: 1.45;
 }
 
-.stella-home .rung.gate p {
+.gemini-home .rung.gate p {
   color: rgba(255, 255, 255, 0.88);
 }
 
-.stella-home .rung.gate h3 {
+.gemini-home .rung.gate h3 {
   color: #fff;
 }
 
-.stella-home .ladder {
+.gemini-home .ladder {
   height: 3px;
   background: var(--line);
   border-radius: 2px;
@@ -3175,7 +3175,7 @@
   overflow: hidden;
 }
 
-.stella-home .ladder i {
+.gemini-home .ladder i {
   display: block;
   height: 100%;
   width: 0;
@@ -3183,50 +3183,50 @@
   transition: width 1.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stella-home .ladder i.fill {
+.gemini-home .ladder i.fill {
   width: 100%;
 }
 
-.stella-home .quote {
+.gemini-home .quote {
   border-inline-start: 2px solid var(--ac);
   padding-inline-start: 34px;
   max-width: 34ch;
 }
 
-.stella-home .quote p {
+.gemini-home .quote p {
   font-size: clamp(1.35rem, 2.4vw, 1.9rem);
   line-height: 1.28;
   letter-spacing: -0.032em;
 }
 
-.stella-home .quote .who {
+.gemini-home .quote .who {
   margin-top: 22px;
   font-size: 14px;
   color: var(--ink-3);
   letter-spacing: -0.01em;
 }
 
-.stella-home .qgrid {
+.gemini-home .qgrid {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 64px;
   align-items: center;
 }
 
-.stella-home .new-grid {
+.gemini-home .new-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 64px;
   align-items: center;
 }
 
-.stella-home .cards {
+.gemini-home .cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-.stella-home .mini {
+.gemini-home .mini {
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -3237,25 +3237,25 @@
     transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stella-home .mini:hover {
+.gemini-home .mini:hover {
   border-color: var(--line-2);
   box-shadow: var(--sh);
   transform: translateY(-3px);
 }
 
-.stella-home .mini h3 {
+.gemini-home .mini h3 {
   margin-top: 12px;
   font-size: 0.99rem;
 }
 
-.stella-home .mini p {
+.gemini-home .mini p {
   margin-top: 8px;
   font-size: 13.5px;
   color: var(--ink-3);
   line-height: 1.45;
 }
 
-.stella-home .mini .arw {
+.gemini-home .mini .arw {
   margin-top: 14px;
   font-size: 13px;
   color: var(--ac);
@@ -3264,7 +3264,7 @@
   gap: 6px;
 }
 
-.stella-home .cta {
+.gemini-home .cta {
   border: 1px solid #1e3a5f;
   border-radius: 20px;
   background: #1e3a5f;
@@ -3276,32 +3276,32 @@
   box-shadow: none;
 }
 
-.stella-home .cta .glow {
+.gemini-home .cta .glow {
   display: none;
 }
 
-.stella-home .cta::before {
+.gemini-home .cta::before {
   display: none;
 }
 
-.stella-home .cta > * {
+.gemini-home .cta > * {
   position: relative;
 }
 
-.stella-home .cta h2 {
+.gemini-home .cta h2 {
   max-width: 19ch;
   margin: 0 auto;
   color: #ffffff;
   font-weight: 800;
 }
 
-.stella-home .cta p {
+.gemini-home .cta p {
   color: rgba(255, 255, 255, 0.88);
   max-width: 48ch;
   margin: 18px auto 0;
 }
 
-.stella-home .cta .row {
+.gemini-home .cta .row {
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -3309,32 +3309,32 @@
   margin-top: 32px;
 }
 
-.stella-home .cta .btn.ac {
+.gemini-home .cta .btn.ac {
   background: #ffffff;
   border-color: #ffffff;
   color: #1e3a5f;
 }
 
-.stella-home .cta .btn.ac:hover {
+.gemini-home .cta .btn.ac:hover {
   background: #eef2f7;
   border-color: #eef2f7;
   color: #0f2744;
 }
 
-.stella-home .cta .btn.ghost {
+.gemini-home .cta .btn.ghost {
   background: transparent;
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.45);
   box-shadow: none;
 }
 
-.stella-home .cta .btn.ghost:hover {
+.gemini-home .cta .btn.ghost:hover {
   border-color: #ffffff;
   color: #ffffff;
   background: rgba(255, 255, 255, 0.1);
 }
 
-.stella-home .cta .callout {
+.gemini-home .cta .callout {
   margin-top: 26px;
   font-family: var(--mono);
   font-size: 10.5px;
@@ -3343,50 +3343,50 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.stella-home footer {
+.gemini-home footer {
   border-top: 1px solid #e2e8f0;
   padding: 46px 0 60px;
   color: #64748b;
   background: #ffffff;
 }
 
-.stella-home .foot {
+.gemini-home .foot {
   display: flex;
   flex-wrap: wrap;
   gap: 22px;
   align-items: center;
 }
 
-.stella-home .foot .logo {
+.gemini-home .foot .logo {
   color: #0f172a;
 }
 
-.stella-home .foot .logo i {
+.gemini-home .foot .logo i {
   color: #64748b;
 }
 
-.stella-home .foot nav {
+.gemini-home .foot nav {
   display: flex;
   gap: 22px;
   margin-inline-start: auto;
   font-size: 13.5px;
 }
 
-.stella-home .foot a {
+.gemini-home .foot a {
   text-decoration: none;
   color: #64748b;
   transition: color 0.2s;
 }
 
-.stella-home .foot a:hover {
+.gemini-home .foot a:hover {
   color: #0f172a;
 }
 
-.stella-home .foot a:hover {
+.gemini-home .foot a:hover {
   color: #fff;
 }
 
-.stella-home .fine {
+.gemini-home .fine {
   margin-top: 28px;
   font-size: 12.5px;
   line-height: 1.6;
@@ -3394,33 +3394,33 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
-.stella-home :focus-visible {
+.gemini-home :focus-visible {
   outline: 2px solid var(--ac);
   outline-offset: 2px;
   border-radius: 5px;
 }
 
 @media (max-width: 1000px) {
-  .stella-home .nav-links {
+  .gemini-home .nav-links {
     display: none;
   }
 
-  .stella-home .strip-in {
+  .gemini-home .strip-in {
     grid-template-columns: 1fr;
   }
 
-  .stella-home .mcard,
-  .stella-home .mcard.b {
+  .gemini-home .mcard,
+  .gemini-home .mcard.b {
     text-align: start;
     padding: 22px 0;
   }
 
-  .stella-home .mcard.b .mtop,
-  .stella-home .mcard.b .tags {
+  .gemini-home .mcard.b .mtop,
+  .gemini-home .mcard.b .tags {
     justify-content: flex-start;
   }
 
-  .stella-home .mmid {
+  .gemini-home .mmid {
     border-inline: 0;
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
@@ -3432,274 +3432,274 @@
     background: transparent;
   }
 
-  .stella-home .mmid::before,
-  .stella-home .mmid::after {
+  .gemini-home .mmid::before,
+  .gemini-home .mmid::after {
     display: none;
   }
 
-  .stella-home .path-grid,
-  .stella-home .new-grid,
-  .stella-home .split,
-  .stella-home .qgrid {
+  .gemini-home .path-grid,
+  .gemini-home .new-grid,
+  .gemini-home .split,
+  .gemini-home .qgrid {
     grid-template-columns: 1fr;
     gap: 40px;
   }
 
-  .stella-home #difference .diff-panel {
+  .gemini-home #difference .diff-panel {
     grid-template-columns: 1fr;
   }
 
-  .stella-home #newcomers .new-panel {
+  .gemini-home #newcomers .new-panel {
     grid-template-columns: 1fr;
   }
 
-  .stella-home #newcomers .new-main {
+  .gemini-home #newcomers .new-main {
     border-inline-end: 0;
     border-bottom: 1px solid #e2e8f0;
   }
 
-  .stella-home #paths .paths-rail {
+  .gemini-home #paths .paths-rail {
     grid-template-columns: 1fr 1fr;
     gap: 28px 24px;
   }
 
-  .stella-home #paths .paths-rail::before {
+  .gemini-home #paths .paths-rail::before {
     display: none;
   }
 
-  .stella-home #paths .paths-rail li {
+  .gemini-home #paths .paths-rail li {
     padding: 0;
     border-top: 1px solid #e2e8f0;
     padding-top: 18px;
   }
 
-  .stella-home #paths .paths-contact {
+  .gemini-home #paths .paths-contact {
     grid-template-columns: 1fr;
     gap: 20px;
     align-items: start;
   }
 
-  .stella-home #paths .paths-contact-meta {
+  .gemini-home #paths .paths-contact-meta {
     grid-template-columns: 1fr;
     gap: 12px;
   }
 
-  .stella-home #paths .paths-contact-langs {
+  .gemini-home #paths .paths-contact-langs {
     justify-content: flex-start;
   }
 
-  .stella-home .half + .half {
+  .gemini-home .half + .half {
     border-inline-start: 0;
     border-top: 1px solid var(--line);
   }
 
-  .stella-home #support .support-metrics {
+  .gemini-home #support .support-metrics {
     grid-template-columns: 1fr 1fr;
   }
 
-  .stella-home #support .support-metric {
+  .gemini-home #support .support-metric {
     border-inline-end: 0;
     padding: 22px 0;
   }
 
-  .stella-home #support .support-metric:nth-child(odd) {
+  .gemini-home #support .support-metric:nth-child(odd) {
     padding-inline-end: 18px;
     border-inline-end: 1px solid #e2e8f0;
   }
 
-  .stella-home #support .support-metric:nth-child(even) {
+  .gemini-home #support .support-metric:nth-child(even) {
     padding-inline-start: 18px;
   }
 
-  .stella-home #support .support-metric:nth-child(-n + 2) {
+  .gemini-home #support .support-metric:nth-child(-n + 2) {
     border-bottom: 1px solid #e2e8f0;
   }
 
-  .stella-home #support .support-desk {
+  .gemini-home #support .support-desk {
     grid-template-columns: 1fr;
     gap: 14px;
     padding: 32px 0;
   }
 
-  .stella-home #support .support-desk-body ul {
+  .gemini-home #support .support-desk-body ul {
     grid-template-columns: 1fr;
   }
 
-  .stella-home #support .support-desk-body li:nth-child(2) {
+  .gemini-home #support .support-desk-body li:nth-child(2) {
     border-top: 1px solid #e2e8f0;
     padding-top: 14px;
   }
 
-  .stella-home .doors {
+  .gemini-home .doors {
     grid-template-columns: 1fr;
   }
 
-  .stella-home .bento {
+  .gemini-home .bento {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .stella-home .b-lg,
-  .stella-home .b-md,
-  .stella-home .b-sm {
+  .gemini-home .b-lg,
+  .gemini-home .b-md,
+  .gemini-home .b-sm {
     grid-column: span 2;
   }
 
-  .stella-home .rungs,
-  .stella-home .stats {
+  .gemini-home .rungs,
+  .gemini-home .stats {
     grid-template-columns: 1fr 1fr;
   }
 
-  .stella-home #levels .levels-steps {
+  .gemini-home #levels .levels-steps {
     grid-template-columns: 1fr 1fr;
   }
 
-  .stella-home #levels .levels-step:nth-child(2n) {
+  .gemini-home #levels .levels-step:nth-child(2n) {
     border-inline-end: 0;
   }
 
-  .stella-home #levels .levels-step:nth-child(-n + 2) {
+  .gemini-home #levels .levels-step:nth-child(-n + 2) {
     border-bottom: 1px solid #e2e8f0;
   }
 
-  .stella-home #levels .levels-step::after {
+  .gemini-home #levels .levels-step::after {
     display: none;
   }
 
-  .stella-home #levels .levels-gate {
+  .gemini-home #levels .levels-gate {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .stella-home section:not(.hero-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
+  .gemini-home section:not(.hero-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
     padding: 70px 0;
   }
 
-  .stella-home .searchbar {
+  .gemini-home .searchbar {
     flex-wrap: wrap;
   }
 
-  .stella-home .hero-floats {
+  .gemini-home .hero-floats {
     display: none;
   }
 
-  .stella-home .hero-next {
+  .gemini-home .hero-next {
     min-height: auto;
     padding: 44px 0 52px;
   }
 
-  .stella-home .hero-next-in {
+  .gemini-home .hero-next-in {
     max-width: 100%;
   }
 
-  .stella-home .hero-search-pill {
+  .gemini-home .hero-search-pill {
     flex-wrap: wrap;
     border-radius: 20px;
     padding: 10px;
   }
 
-  .stella-home .hero-search-field,
-  .stella-home .hero-search-field--loc {
+  .gemini-home .hero-search-field,
+  .gemini-home .hero-search-field--loc {
     flex: 1 1 100%;
   }
 
-  .stella-home .hero-search-divider {
+  .gemini-home .hero-search-divider {
     display: none;
   }
 
-  .stella-home .hero-search-btn {
+  .gemini-home .hero-search-btn {
     flex: 1 1 100%;
     width: 100%;
     margin-top: 4px;
   }
 
-  .stella-home .sfield + .sfield {
+  .gemini-home .sfield + .sfield {
     border-inline-start: 0;
     border-top: 1px solid var(--line);
     flex: 1 1 100%;
   }
 
-  .stella-home .searchbar button {
+  .gemini-home .searchbar button {
     flex: 1 1 100%;
     padding: 16px 26px;
   }
 
-  .stella-home .hero {
+  .gemini-home .hero {
     padding-top: 56px;
   }
 
-  .stella-home .hero-next-title {
+  .gemini-home .hero-next-title {
     font-size: clamp(2.1rem, 9vw, 2.8rem);
   }
 
-  .stella-home .board .dim {
+  .gemini-home .board .dim {
     display: none;
   }
 }
 
 @media (max-width: 620px) {
-  .stella-home .shell {
+  .gemini-home .shell {
     padding: 0 20px;
   }
 
-  .stella-home .cards,
-  .stella-home .bento {
+  .gemini-home .cards,
+  .gemini-home .bento {
     grid-template-columns: 1fr;
   }
 
-  .stella-home .rungs,
-  .stella-home .stats {
+  .gemini-home .rungs,
+  .gemini-home .stats {
     grid-template-columns: 1fr;
   }
 
-  .stella-home #levels .levels-steps {
+  .gemini-home #levels .levels-steps {
     grid-template-columns: 1fr;
   }
 
-  .stella-home #levels .levels-step {
+  .gemini-home #levels .levels-step {
     border-inline-end: 0;
     border-bottom: 1px solid #e2e8f0;
   }
 
-  .stella-home #levels .levels-step:nth-child(-n + 2) {
+  .gemini-home #levels .levels-step:nth-child(-n + 2) {
     border-bottom: 1px solid #e2e8f0;
   }
 
-  .stella-home #levels .levels-step:last-child {
+  .gemini-home #levels .levels-step:last-child {
     border-bottom: 0;
   }
 
-  .stella-home #support .support-metrics {
+  .gemini-home #support .support-metrics {
     grid-template-columns: 1fr;
   }
 
-  .stella-home #support .support-metric,
-  .stella-home #support .support-metric:nth-child(odd),
-  .stella-home #support .support-metric:nth-child(even) {
+  .gemini-home #support .support-metric,
+  .gemini-home #support .support-metric:nth-child(odd),
+  .gemini-home #support .support-metric:nth-child(even) {
     border-inline-end: 0;
     padding: 18px 0;
   }
 
-  .stella-home #support .support-metric:not(:last-child) {
+  .gemini-home #support .support-metric:not(:last-child) {
     border-bottom: 1px solid #e2e8f0;
   }
 
-  .stella-home #support .support-metric:nth-child(-n + 2) {
+  .gemini-home #support .support-metric:nth-child(-n + 2) {
     border-bottom: 1px solid #e2e8f0;
   }
 
-  .stella-home #paths .paths-rail {
+  .gemini-home #paths .paths-rail {
     grid-template-columns: 1fr;
   }
 
-  .stella-home .cta {
+  .gemini-home .cta {
     padding: 52px 22px;
   }
 
-  .stella-home .quote {
+  .gemini-home .quote {
     padding-inline-start: 22px;
   }
 
-  .stella-home .tick-wrap {
+  .gemini-home .tick-wrap {
     --tick-h: 44px;
     flex-direction: column;
     align-items: stretch;
@@ -3708,11 +3708,11 @@
     gap: 8px;
   }
 
-  .stella-home .tick-lab {
+  .gemini-home .tick-lab {
     align-self: flex-start;
   }
 
-  .stella-home .tick-view {
+  .gemini-home .tick-view {
     flex: none;
     width: 100%;
     height: var(--tick-h);
@@ -3720,7 +3720,7 @@
     overflow: hidden;
   }
 
-  .stella-home .tick-view li {
+  .gemini-home .tick-view li {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
@@ -3732,19 +3732,19 @@
     line-height: 1.2;
   }
 
-  .stella-home .tick-view .tick-who {
+  .gemini-home .tick-view .tick-who {
     flex: none;
     max-width: 38%;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .stella-home .tick-view .tick-what {
+  .gemini-home .tick-view .tick-what {
     flex: 1 1 auto;
     min-width: 0;
   }
 
-  .stella-home .tick-view .tick-when {
+  .gemini-home .tick-view .tick-when {
     flex: none;
     margin-inline-start: 0;
     font-size: 10.5px;
@@ -3752,22 +3752,22 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stella-home * {
+  .gemini-home * {
     animation: none !important;
     transition: none !important;
   }
 
-  .stella-home .rv {
+  .gemini-home .rv {
     opacity: 1;
     transform: none;
   }
 
-  .stella-home .hero-float {
+  .gemini-home .hero-float {
     transform: rotate(var(--hero-rot, 0deg)) !important;
   }
 
-  .stella-home .hero-next-title,
-  .stella-home .hero-search-pill {
+  .gemini-home .hero-next-title,
+  .gemini-home .hero-search-pill {
     opacity: 1;
   }
 }

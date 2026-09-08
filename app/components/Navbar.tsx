@@ -48,10 +48,10 @@ export default function Navbar() {
     <header
       className={`w-full sticky top-0 z-50 ${isJobsPage ? "" : "transition-all duration-300"}`}
       style={{
-        background: isJobsPage ? "#0000B8" : "rgba(255,255,255,0.97)",
+        background: isJobsPage ? "#0B1F3A" : "rgba(255,255,255,0.97)",
         backdropFilter: "blur(16px)",
         borderBottom: isJobsPage
-          ? "1px solid #0000B8"
+          ? "1px solid #0B1F3A"
           : scrolled
             ? "1px solid rgba(226,232,240,0.9)"
             : "1px solid rgba(226,232,240,0.5)",
@@ -89,15 +89,15 @@ export default function Navbar() {
                       isJobsPage
                         ? { color: "#ffffff" }
                         : isActive
-                          ? { color: "#0000FF" }
+                          ? { color: "#0B1F3A" }
                           : undefined
                     }
                     className={`relative flex items-center h-full px-3.5 text-sm font-medium transition-colors duration-150 ${
                       isJobsPage
                         ? "text-white hover:text-white"
                         : isActive
-                        ? "text-[#0000FF]"
-                        : "text-slate-500 hover:text-[#0000FF]"
+                        ? "text-[#0B1F3A]"
+                        : "text-slate-500 hover:text-[#0B1F3A]"
                     }`}
                   >
                     {link.name}
@@ -111,10 +111,10 @@ export default function Navbar() {
                 href="/dashboard/recruiter/jobs/new"
                 style={
                   isJobsPage
-                    ? { background: "#ffffff", color: "#0000FF" }
-                    : { background: "#0000FF" }
+                    ? { background: "#ffffff", color: "#0B1F3A" }
+                    : { background: "#0B1F3A" }
                 }
-                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#0000FF] hover:bg-[#0000CC] transition-colors"
+                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#0B1F3A] hover:bg-[#071628] transition-colors"
               >
                 Post a job
               </Link>
@@ -158,8 +158,8 @@ export default function Navbar() {
                 onClick={() => setIsMobileOpen(false)}
                 className={`flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-[#f0f4ff] text-[#0000FF] font-semibold"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-[#0000FF]"
+                    ? "bg-[#f0f4ff] text-[#0B1F3A] font-semibold"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-[#0B1F3A]"
                 }`}
               >
                 {link.name}

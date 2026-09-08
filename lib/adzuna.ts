@@ -225,6 +225,29 @@ export function normalizeAdzunaListingUrl(
   return listingUrl;
 }
 
+/**
+ * KeyCDN mirror of Adzuna detail pages — often reachable from cloud hosts
+ * when www.adzuna.* is blocked by CloudFront/WAF.
+ * e.g. https://www.adzuna.com.au/details/123 →
+ *      https://zunadyn-abf.kxcdn.com/com.au/details/123
+ */
+export function adzunaCdnMirrorUrl(detailsUrl: string): string | null {
+  try {
+    const url = new URL(detailsUrl);
+    const jobMatch = url.pathname.match(/\/details\/(\d+)/i);
+    if (!jobMatch) return null;
+
+    const host = url.hostname.replace(/^www\./i, "").toLowerCase();
+    if (!host.startsWith("adzuna.")) return null;
+    const tldPath = host.slice("adzuna.".length);
+    if (!tldPath) return null;
+
+    return `https://zunadyn-abf.kxcdn.com/${tldPath}/details/${jobMatch[1]}`;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchAdzunaJobByAdref(
   countryCode: string,
   adref: string,

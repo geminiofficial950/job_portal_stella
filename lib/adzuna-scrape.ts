@@ -2,11 +2,16 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import {
   decodeHtmlEntities,
+  formatAdzunaDescriptionPreview,
   stripHtmlToText,
 } from "@/lib/adzuna-description";
-import { normalizeAdzunaListingUrl } from "@/lib/adzuna";
+import {
+  adzunaCdnMirrorUrl,
+  normalizeAdzunaListingUrl,
+} from "@/lib/adzuna";
 
 const CACHE_DIR = path.join(process.cwd(), ".cache", "adzuna-descriptions");
+const TMP_CACHE_DIR = path.join("/tmp", "adzuna-descriptions");
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export type AdzunaListingContent = {
@@ -22,35 +27,42 @@ type CacheEntry = {
   isFull: boolean;
 };
 
-function cacheFile(jobId: string) {
-  return path.join(CACHE_DIR, `${jobId.replace(/[^a-zA-Z0-9_-]/g, "_")}.json`);
+function cacheFile(jobId: string, dir = CACHE_DIR) {
+  return path.join(dir, `${jobId.replace(/[^a-zA-Z0-9_-]/g, "_")}.json`);
 }
 
 async function readCached(jobId: string): Promise<AdzunaListingContent | null> {
-  try {
-    const raw = await readFile(cacheFile(jobId), "utf8");
-    const parsed = JSON.parse(raw) as CacheEntry;
-    if (Date.now() - parsed.fetchedAt > CACHE_TTL_MS) return null;
-    return {
-      description: parsed.description,
-      descriptionHtml: parsed.descriptionHtml,
-      isFull: parsed.isFull,
-    };
-  } catch {
-    return null;
+  for (const dir of [CACHE_DIR, TMP_CACHE_DIR]) {
+    try {
+      const raw = await readFile(cacheFile(jobId, dir), "utf8");
+      const parsed = JSON.parse(raw) as CacheEntry;
+      if (Date.now() - parsed.fetchedAt > CACHE_TTL_MS) continue;
+      return {
+        description: parsed.description,
+        descriptionHtml: parsed.descriptionHtml,
+        isFull: parsed.isFull,
+      };
+    } catch {
+      /* try next dir */
+    }
   }
+  return null;
 }
 
 async function writeCached(jobId: string, content: AdzunaListingContent) {
-  try {
-    await mkdir(CACHE_DIR, { recursive: true });
-    const entry: CacheEntry = {
-      fetchedAt: Date.now(),
-      ...content,
-    };
-    await writeFile(cacheFile(jobId), JSON.stringify(entry), "utf8");
-  } catch {
-    /* ignore cache write errors */
+  const entry: CacheEntry = {
+    fetchedAt: Date.now(),
+    ...content,
+  };
+  const payload = JSON.stringify(entry);
+  for (const dir of [CACHE_DIR, TMP_CACHE_DIR]) {
+    try {
+      await mkdir(dir, { recursive: true });
+      await writeFile(cacheFile(jobId, dir), payload, "utf8");
+      return;
+    } catch {
+      /* try /tmp on serverless */
+    }
   }
 }
 
@@ -165,34 +177,48 @@ async function fetchListingHtml(listingUrl: string): Promise<string | null> {
   const headers = {
     Accept:
       "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-    "Accept-Language": "en-AU,en;q=0.9",
+    "Accept-Language": "en-AU,en-GB,en;q=0.9",
     "Cache-Control": "no-cache",
     Pragma: "no-cache",
     "Upgrade-Insecure-Requests": "1",
-    Referer: "https://www.adzuna.com.au/",
     "User-Agent":
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
   };
 
-  for (let attempt = 0; attempt < 4; attempt++) {
-    if (attempt > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 1200 * attempt));
-    }
+  const cdnUrl = adzunaCdnMirrorUrl(listingUrl);
+  // Prefer KeyCDN mirror first — cloud hosts often get blocked on www.adzuna.*
+  const candidates = [cdnUrl, listingUrl].filter(
+    (u, i, arr): u is string => Boolean(u) && arr.indexOf(u) === i,
+  );
 
-    try {
-      const res = await fetch(listingUrl, {
-        signal: AbortSignal.timeout(15000),
-        headers,
-        redirect: "follow",
-      });
+  for (const target of candidates) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      if (attempt > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 800 * attempt));
+      }
 
-      if (res.status === 429 || res.status === 403) continue;
-      if (!res.ok) return null;
+      try {
+        const res = await fetch(target, {
+          signal: AbortSignal.timeout(12000),
+          headers: {
+            ...headers,
+            Referer: listingUrl,
+          },
+          redirect: "follow",
+        });
 
-      const html = await res.text();
-      if (html.length > 500) return html;
-    } catch {
-      /* retry */
+        // CloudFront rate-limit / hard block — try next candidate
+        if (res.status === 429 || res.status === 403) continue;
+
+        const html = await res.text();
+        // Soft-404 / odd statuses still sometimes include full JobPosting HTML
+        if (html.length > 500 && /JobPosting|__NEXT_DATA__|description/i.test(html)) {
+          return html;
+        }
+        if (res.ok && html.length > 500) return html;
+      } catch {
+        /* retry / next candidate */
+      }
     }
   }
 
@@ -219,6 +245,18 @@ export async function fetchAdzunaListingContent(
 
   await writeCached(jobId, extracted);
   return extracted;
+}
+
+/** Turn Adzuna API snippet into HTML when full listing scrape is unavailable. */
+export function descriptionHtmlFromApiPreview(text: string): string {
+  const preview = formatAdzunaDescriptionPreview(text);
+  if (!preview) return "";
+  return preview
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
+    .join("");
 }
 
 export function buildEmbedHtml(options: {

@@ -4,7 +4,12 @@ import {
   isAdzunaConfigured,
   parseAdzunaJobId,
 } from "@/lib/adzuna";
-import { fetchAdzunaListingContent } from "@/lib/adzuna-scrape";
+import {
+  descriptionHtmlFromApiPreview,
+  fetchAdzunaListingContent,
+} from "@/lib/adzuna-scrape";
+
+export const maxDuration = 30;
 
 export async function GET(request: Request) {
   try {
@@ -92,10 +97,15 @@ export async function GET(request: Request) {
       );
     }
 
+    const apiPreviewHtml = descriptionHtmlFromApiPreview(job.description || "");
+    const descriptionHtml = listing?.isFull
+      ? listing.descriptionHtml
+      : listing?.descriptionHtml || apiPreviewHtml;
+
     return NextResponse.json({
       success: true,
       job,
-      descriptionHtml: listing?.descriptionHtml || "",
+      descriptionHtml,
       descriptionSource: listing?.isFull ? "listing" : "api-preview",
     });
   } catch (error) {

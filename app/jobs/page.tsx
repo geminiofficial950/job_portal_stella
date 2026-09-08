@@ -1116,7 +1116,7 @@ function JobSearchInner() {
 
   const adzunaEmbedSrc =
     displayJobDetail?.source === "adzuna" && displayJobDetail.applyUrl
-      ? `/api/jobs/adzuna-embed?id=${encodeURIComponent(displayJobDetail.id)}&url=${encodeURIComponent(displayJobDetail.applyUrl)}&title=${encodeURIComponent(displayJobDetail.title)}`
+      ? `/api/jobs/adzuna-embed?id=${encodeURIComponent(displayJobDetail.id)}&url=${encodeURIComponent(displayJobDetail.applyUrl)}&title=${encodeURIComponent(displayJobDetail.title)}&preview=${encodeURIComponent(displayJobDetail.description || "")}`
       : "";
 
   useEffect(() => {
@@ -1314,13 +1314,15 @@ function JobSearchInner() {
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Loading full job description…
                 </div>
-              ) : descriptionHtml && !descriptionIsPreview ? (
+              ) : descriptionHtml ? (
                 <div
                   className="job-detail-prose"
                   dangerouslySetInnerHTML={{
                     __html: normalizeJobDescriptionHtml(descriptionHtml),
                   }}
                 />
+              ) : displayJobDetail.description ? (
+                renderJobDescription(displayJobDetail)
               ) : displayJobDetail.source === "adzuna" && adzunaEmbedSrc ? (
                 <div className="job-detail-iframe-wrap">
                   <iframe
@@ -1329,11 +1331,27 @@ function JobSearchInner() {
                     className="job-detail-iframe"
                   />
                 </div>
-              ) : displayJobDetail.description ? (
-                renderJobDescription(displayJobDetail)
               ) : (
                 <p className="job-detail-empty">No description provided.</p>
               )}
+              {displayJobDetail.source === "adzuna" &&
+              descriptionIsPreview &&
+              displayJobDetail.applyUrl ? (
+                <div className="job-detail-external-cta">
+                  <p>
+                    Showing the Adzuna preview. Open the original listing for
+                    the complete posting if needed.
+                  </p>
+                  <a
+                    href={displayJobDetail.applyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="job-detail-external-cta__btn"
+                  >
+                    Open full job on Adzuna
+                  </a>
+                </div>
+              ) : null}
               {displayJobDetail.source === "jooble" &&
               displayJobDetail.applyUrl ? (
                 <div className="job-detail-external-cta">
@@ -1470,15 +1488,15 @@ function JobSearchInner() {
       className="jobs-page font-inter"
       style={
         {
-          "--jobs-primary": "#0000B8",
-          "--jobs-primary-hover": "#00009A",
+          "--jobs-primary": "#0B1F3A",
+          "--jobs-primary-hover": "#071628",
           fontFamily: "var(--font-inter)",
         } as React.CSSProperties
       }
     >
       <div
         className="jobs-search-fixed"
-        style={{ background: "#0000B8" }}
+        style={{ background: "#0B1F3A" }}
       >
         <div className="jobs-search-fixed-inner">
           <div className="jobs-search-bar">
@@ -1510,7 +1528,7 @@ function JobSearchInner() {
               type="button"
               className="jobs-search-btn"
               tabIndex={-1}
-              style={{ background: "#0000B8" }}
+              style={{ background: "#0B1F3A" }}
             >
               Search
             </button>
@@ -1521,8 +1539,8 @@ function JobSearchInner() {
       <section
         className="jobs-hero"
         style={{
-          background: "#0000B8",
-          borderBottom: "1px solid #0000B8",
+          background: "#0B1F3A",
+          borderBottom: "1px solid #0B1F3A",
         }}
       >
         <div className="jobs-hero-inner">
@@ -1565,7 +1583,7 @@ function JobSearchInner() {
             <button
               type="button"
               className="jobs-search-btn"
-              style={{ background: "#0000B8" }}
+              style={{ background: "#0B1F3A" }}
             >
               Search
             </button>
@@ -1596,7 +1614,7 @@ function JobSearchInner() {
             <button
               type="button"
               onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-              className="inline-flex items-center gap-2 rounded-lg border border-[#0000FF]/30 bg-[#0000FF]/10 px-3 py-1.5 text-xs font-bold text-[#0000FF]"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#0B1F3A]/30 bg-[#0B1F3A]/10 px-3 py-1.5 text-xs font-bold text-[#0B1F3A]"
             >
               <SlidersHorizontal className="h-4 w-4" />
               Filters
@@ -1825,7 +1843,7 @@ function JobSearchInner() {
                 type="button"
                 onClick={() => void loadJobs()}
                 className="rounded-xl px-4 py-2 text-xs font-bold text-white"
-                style={{ background: "#0000FF" }}
+                style={{ background: "#0B1F3A" }}
               >
                 Try again
               </button>
@@ -2040,7 +2058,7 @@ function JobSearchInner() {
                       type="button"
                       onClick={resetFilters}
                       className="rounded-xl px-4 py-2 text-xs font-bold text-white"
-                      style={{ background: "#0000FF" }}
+                      style={{ background: "#0B1F3A" }}
                     >
                       Reset All Filters
                     </button>

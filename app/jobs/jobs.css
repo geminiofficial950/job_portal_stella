@@ -1,8 +1,8 @@
 /* Jobs browse — professional list layout */
 
 .jobs-page {
-  --jobs-primary: #0000b8;
-  --jobs-primary-hover: #00009a;
+  --jobs-primary: #0B1F3A;
+  --jobs-primary-hover: #071628;
   --jobs-surface: #ffffff;
   --jobs-bg: #f5f8ff;
   --jobs-border: #e5e7eb;
@@ -19,8 +19,8 @@
   z-index: 1;
   overflow: hidden;
   padding: 0.55rem 1.25rem 0.75rem;
-  background: #0000b8;
-  border-bottom: 1px solid #0000b8;
+  background: #0B1F3A;
+  border-bottom: 1px solid #0B1F3A;
 }
 
 @media (min-width: 1280px) {
@@ -36,7 +36,7 @@
   right: 0;
   z-index: 60;
   padding: 0.65rem 1.25rem;
-  background: #0000b8;
+  background: #0B1F3A;
   box-shadow: 0 10px 28px rgba(0, 0, 80, 0.22);
   transform: translate3d(0, -110%, 0);
   opacity: 0;
@@ -852,7 +852,7 @@ html.jobs-search-compact .jobs-search-fixed {
   font-weight: 800;
   font-size: 1rem;
   color: #fff;
-  background: linear-gradient(135deg, #0000ff, #3333ff);
+  background: linear-gradient(135deg, #0B1F3A, #1A3A66);
   overflow: hidden;
 }
 
@@ -915,7 +915,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-tag--purple {
-  color: #0000ff;
+  color: #0B1F3A;
   border-color: #b3b3ff;
   background: #f0f4ff;
 }
@@ -1104,7 +1104,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-card-match-ring--good {
-  --ring-color: #0000ff;
+  --ring-color: #0B1F3A;
 }
 
 .jobs-card-match-ring--wildcard {
@@ -1146,7 +1146,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-card-match--good .jobs-card-match-title {
-  color: #0000ff;
+  color: #0B1F3A;
 }
 
 .jobs-card-match--wildcard .jobs-card-match-title {
@@ -1633,7 +1633,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .job-skill-match-ring--good {
-  --ring-color: #0000ff;
+  --ring-color: #0B1F3A;
 }
 
 .job-skill-match-ring--wildcard {

@@ -1,8 +1,8 @@
 /* Jobs browse — professional list layout */
 
 .jobs-page {
-  --jobs-primary: #0B1F3A;
-  --jobs-primary-hover: #071628;
+  --jobs-primary: #00082C;
+  --jobs-primary-hover: #00061F;
   --jobs-surface: #ffffff;
   --jobs-bg: #f5f8ff;
   --jobs-border: #e5e7eb;
@@ -19,8 +19,8 @@
   z-index: 1;
   overflow: hidden;
   padding: 0.55rem 1.25rem 0.75rem;
-  background: #0B1F3A;
-  border-bottom: 1px solid #0B1F3A;
+  background: #00082C;
+  border-bottom: none;
 }
 
 @media (min-width: 1280px) {
@@ -36,7 +36,7 @@
   right: 0;
   z-index: 60;
   padding: 0.65rem 1.25rem;
-  background: #0B1F3A;
+  background: #00082C;
   box-shadow: 0 10px 28px rgba(0, 0, 80, 0.22);
   transform: translate3d(0, -110%, 0);
   opacity: 0;
@@ -95,27 +95,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(
-      135deg,
-      transparent 48%,
-      rgba(255, 255, 255, 0.14) 49%,
-      rgba(255, 255, 255, 0.14) 51%,
-      transparent 52%
-    ),
-    linear-gradient(
-      45deg,
-      transparent 48%,
-      rgba(255, 255, 255, 0.1) 49%,
-      rgba(255, 255, 255, 0.1) 51%,
-      transparent 52%
-    );
-  background-size: 60px 60px;
-  opacity: 0.6;
-  pointer-events: none;
+  content: none;
 }
 
 .jobs-hero-inner {
@@ -852,7 +832,7 @@ html.jobs-search-compact .jobs-search-fixed {
   font-weight: 800;
   font-size: 1rem;
   color: #fff;
-  background: linear-gradient(135deg, #0B1F3A, #1A3A66);
+  background: linear-gradient(135deg, #00082C, #1A3A6B);
   overflow: hidden;
 }
 
@@ -915,7 +895,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-tag--purple {
-  color: #0B1F3A;
+  color: #00082C;
   border-color: #b3b3ff;
   background: #f0f4ff;
 }
@@ -1104,7 +1084,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-card-match-ring--good {
-  --ring-color: #0B1F3A;
+  --ring-color: #00082C;
 }
 
 .jobs-card-match-ring--wildcard {
@@ -1146,7 +1126,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-card-match--good .jobs-card-match-title {
-  color: #0B1F3A;
+  color: #00082C;
 }
 
 .jobs-card-match--wildcard .jobs-card-match-title {
@@ -1633,7 +1613,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .job-skill-match-ring--good {
-  --ring-color: #0B1F3A;
+  --ring-color: #00082C;
 }
 
 .job-skill-match-ring--wildcard {

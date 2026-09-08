@@ -106,6 +106,9 @@ const PERIOD_LABELS: Record<string, string> = {
   year: "year",
 };
 
+/** First paint + infinite scroll chunk size */
+const JOBS_PAGE_SIZE = 24;
+
 function hasSalary(job: JobItem) {
   return job.salaryMin > 0 || job.salaryMax > 0;
 }
@@ -554,6 +557,8 @@ function CompanyLogo({
       <img
         src={logoUrl}
         alt={`${name} logo`}
+        loading="lazy"
+        decoding="async"
         className={`${box} shrink-0 rounded-2xl border border-slate-100 bg-white object-cover shadow-xs`}
       />
     );
@@ -580,6 +585,8 @@ function JobSearchInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adzunaWarning, setAdzunaWarning] = useState("");
+  const [visibleCount, setVisibleCount] = useState(JOBS_PAGE_SIZE);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -715,13 +722,15 @@ function JobSearchInner() {
   const loadJobs = useCallback(async () => {
     setLoading(true);
     setError("");
+    setVisibleCount(JOBS_PAGE_SIZE);
 
-    try {
-      const res = await fetch("/api/jobs/browse");
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Failed to load jobs");
-      }
+    const applyBrowsePayload = (data: {
+      jobs?: JobItem[];
+      companies?: CompanyOption[];
+      categories?: string[];
+      countries?: CountryOption[];
+      adzuna?: { configured?: boolean; error?: string };
+    }) => {
       setJobs(data.jobs ?? []);
       setCompanyOptions(data.companies ?? []);
       setCategories(["All", ...((data.categories as string[]) ?? [])]);
@@ -735,10 +744,31 @@ function JobSearchInner() {
       } else {
         setAdzunaWarning("");
       }
+    };
+
+    try {
+      // Phase 1: fast sources for quick first paint
+      const fastRes = await fetch("/api/jobs/browse?fast=1");
+      const fastData = await fastRes.json();
+      if (!fastRes.ok || !fastData.success) {
+        throw new Error(fastData.message || "Failed to load jobs");
+      }
+      applyBrowsePayload(fastData);
+      setLoading(false);
+
+      // Phase 2: full enrich in background (fallbacks + remaining sources)
+      void fetch("/api/jobs/browse")
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok || !data.success) return;
+          applyBrowsePayload(data);
+        })
+        .catch((err) => {
+          console.warn("Background jobs enrich failed:", err);
+        });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load jobs");
       setJobs([]);
-    } finally {
       setLoading(false);
     }
   }, []);
@@ -980,6 +1010,43 @@ function JobSearchInner() {
     return list;
   }, [filteredJobs, sortBy]);
 
+  const visibleJobs = useMemo(
+    () => sortedJobs.slice(0, visibleCount),
+    [sortedJobs, visibleCount],
+  );
+
+  useEffect(() => {
+    setVisibleCount(JOBS_PAGE_SIZE);
+  }, [
+    searchQuery,
+    locationQuery,
+    selectedCategory,
+    selectedLevel,
+    selectedTypes,
+    selectedModels,
+    selectedCompanyId,
+    selectedCountry,
+    sortBy,
+  ]);
+
+  useEffect(() => {
+    const node = loadMoreRef.current;
+    if (!node) return;
+    if (visibleCount >= sortedJobs.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        setVisibleCount((prev) =>
+          Math.min(prev + JOBS_PAGE_SIZE, sortedJobs.length),
+        );
+      },
+      { root: null, rootMargin: "400px 0px", threshold: 0 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [visibleCount, sortedJobs.length, loading]);
+
   const toggleFilterSection = (key: keyof typeof openFilters) => {
     setOpenFilters((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -1022,7 +1089,7 @@ function JobSearchInner() {
   const cardSkillMatches = useMemo(() => {
     const map = new Map<string, SkillMatchResult>();
     if (!user || user.role !== "user" || !profileSkills.length) return map;
-    for (const job of sortedJobs) {
+    for (const job of visibleJobs) {
       map.set(
         job.id,
         rateSkillMatch(profileSkills, {
@@ -1035,7 +1102,7 @@ function JobSearchInner() {
       );
     }
     return map;
-  }, [sortedJobs, user, profileSkills]);
+  }, [visibleJobs, user, profileSkills]);
 
   useEffect(() => {
     const job = activeJobDetail;
@@ -1488,15 +1555,15 @@ function JobSearchInner() {
       className="jobs-page font-inter"
       style={
         {
-          "--jobs-primary": "#0B1F3A",
-          "--jobs-primary-hover": "#071628",
+          "--jobs-primary": "#00082C",
+          "--jobs-primary-hover": "#00061F",
           fontFamily: "var(--font-inter)",
         } as React.CSSProperties
       }
     >
       <div
         className="jobs-search-fixed"
-        style={{ background: "#0B1F3A" }}
+        style={{ background: "#00082C" }}
       >
         <div className="jobs-search-fixed-inner">
           <div className="jobs-search-bar">
@@ -1528,7 +1595,7 @@ function JobSearchInner() {
               type="button"
               className="jobs-search-btn"
               tabIndex={-1}
-              style={{ background: "#0B1F3A" }}
+              style={{ background: "#00082C" }}
             >
               Search
             </button>
@@ -1539,8 +1606,8 @@ function JobSearchInner() {
       <section
         className="jobs-hero"
         style={{
-          background: "#0B1F3A",
-          borderBottom: "1px solid #0B1F3A",
+          background: "#00082C",
+          borderBottom: "none",
         }}
       >
         <div className="jobs-hero-inner">
@@ -1583,7 +1650,7 @@ function JobSearchInner() {
             <button
               type="button"
               className="jobs-search-btn"
-              style={{ background: "#0B1F3A" }}
+              style={{ background: "#00082C" }}
             >
               Search
             </button>
@@ -1614,7 +1681,7 @@ function JobSearchInner() {
             <button
               type="button"
               onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-              className="inline-flex items-center gap-2 rounded-lg border border-[#0B1F3A]/30 bg-[#0B1F3A]/10 px-3 py-1.5 text-xs font-bold text-[#0B1F3A]"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#00082C]/30 bg-[#00082C]/10 px-3 py-1.5 text-xs font-bold text-[#00082C]"
             >
               <SlidersHorizontal className="h-4 w-4" />
               Filters
@@ -1843,7 +1910,7 @@ function JobSearchInner() {
                 type="button"
                 onClick={() => void loadJobs()}
                 className="rounded-xl px-4 py-2 text-xs font-bold text-white"
-                style={{ background: "#0B1F3A" }}
+                style={{ background: "#00082C" }}
               >
                 Try again
               </button>
@@ -1902,7 +1969,7 @@ function JobSearchInner() {
 
                 {sortedJobs.length > 0 ? (
                   <div className="jobs-list">
-                    {sortedJobs.map((job) => {
+                    {visibleJobs.map((job) => {
                       const isBookmarked = savedJobs.includes(job.id);
                       const companyName = job.company?.name || "Company";
                       const snippet = jobCardSnippet(job);
@@ -1933,6 +2000,8 @@ function JobSearchInner() {
                                 <img
                                   src={job.company.logoUrl}
                                   alt={`${companyName} logo`}
+                                  loading="lazy"
+                                  decoding="async"
                                 />
                               ) : (
                                 companyName.trim().charAt(0).toUpperCase() ||
@@ -2043,6 +2112,16 @@ function JobSearchInner() {
                         </article>
                       );
                     })}
+                    {visibleCount < sortedJobs.length ? (
+                      <div
+                        ref={loadMoreRef}
+                        className="flex items-center justify-center gap-2 py-6 text-sm text-slate-500"
+                        aria-hidden="true"
+                      >
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Loading more jobs…
+                      </div>
+                    ) : null}
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-xs">
@@ -2058,7 +2137,7 @@ function JobSearchInner() {
                       type="button"
                       onClick={resetFilters}
                       className="rounded-xl px-4 py-2 text-xs font-bold text-white"
-                      style={{ background: "#0B1F3A" }}
+                      style={{ background: "#00082C" }}
                     >
                       Reset All Filters
                     </button>

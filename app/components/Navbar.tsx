@@ -48,10 +48,10 @@ export default function Navbar() {
     <header
       className={`w-full sticky top-0 z-50 ${isJobsPage ? "" : "transition-all duration-300"}`}
       style={{
-        background: isJobsPage ? "#0B1F3A" : "rgba(255,255,255,0.97)",
-        backdropFilter: "blur(16px)",
+        background: isJobsPage ? "#00082C" : "rgba(255,255,255,0.97)",
+        backdropFilter: isJobsPage ? "none" : "blur(16px)",
         borderBottom: isJobsPage
-          ? "1px solid #0B1F3A"
+          ? "none"
           : scrolled
             ? "1px solid rgba(226,232,240,0.9)"
             : "1px solid rgba(226,232,240,0.5)",
@@ -70,9 +70,9 @@ export default function Navbar() {
             className="relative z-10 flex items-center select-none group shrink-0"
           >
             <img
-              src="/logo.webp"
-              alt="Gemini Education and Careers logo"
-              className="h-7 sm:h-8 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.04]"
+              src="/logonew.jpeg"
+              alt="Stella Careers"
+              className="h-8 sm:h-9 w-auto max-w-[200px] sm:max-w-[240px] object-contain object-left transition-transform duration-200 group-hover:scale-[1.03]"
             />
           </Link>
 
@@ -89,15 +89,15 @@ export default function Navbar() {
                       isJobsPage
                         ? { color: "#ffffff" }
                         : isActive
-                          ? { color: "#0B1F3A" }
+                          ? { color: "#00082C" }
                           : undefined
                     }
                     className={`relative flex items-center h-full px-3.5 text-sm font-medium transition-colors duration-150 ${
                       isJobsPage
                         ? "text-white hover:text-white"
                         : isActive
-                        ? "text-[#0B1F3A]"
-                        : "text-slate-500 hover:text-[#0B1F3A]"
+                        ? "text-[#00082C]"
+                        : "text-slate-500 hover:text-[#00082C]"
                     }`}
                   >
                     {link.name}
@@ -111,10 +111,10 @@ export default function Navbar() {
                 href="/dashboard/recruiter/jobs/new"
                 style={
                   isJobsPage
-                    ? { background: "#ffffff", color: "#0B1F3A" }
-                    : { background: "#0B1F3A" }
+                    ? { background: "#ffffff", color: "#00082C" }
+                    : { background: "#00082C" }
                 }
-                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#0B1F3A] hover:bg-[#071628] transition-colors"
+                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#00082C] hover:bg-[#00061F] transition-colors"
               >
                 Post a job
               </Link>
@@ -133,7 +133,11 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+              className={`md:hidden w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${
+                isJobsPage
+                  ? "text-white hover:bg-white/10"
+                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+              }`}
               aria-label="Toggle menu"
             >
               {isMobileOpen ? (
@@ -158,8 +162,8 @@ export default function Navbar() {
                 onClick={() => setIsMobileOpen(false)}
                 className={`flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-[#f0f4ff] text-[#0B1F3A] font-semibold"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-[#0B1F3A]"
+                    ? "bg-[#f0f4ff] text-[#00082C] font-semibold"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-[#00082C]"
                 }`}
               >
                 {link.name}

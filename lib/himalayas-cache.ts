@@ -17,12 +17,21 @@ function cacheTtlMs() {
   return Math.max(1, hours) * 60 * 60 * 1000;
 }
 
+function staleTtlMs() {
+  const hours = Number(process.env.HIMALAYAS_STALE_HOURS || "48");
+  return Math.max(hours, 1) * 60 * 60 * 1000;
+}
+
 function cacheFile(countryCode: string) {
   return path.join(CACHE_DIR, `${countryCode}.json`);
 }
 
 function isFresh(entry: CountryCacheEntry) {
   return Date.now() - entry.fetchedAt < cacheTtlMs();
+}
+
+function isUsableStale(entry: CountryCacheEntry) {
+  return Date.now() - entry.fetchedAt < staleTtlMs();
 }
 
 async function readDiskCache(
@@ -53,19 +62,34 @@ async function writeDiskCache(
 export async function getCachedCountryJobs(
   countryCode: string,
   fetchFresh: () => Promise<HimalayasJobNormalized[]>,
-  options?: { minJobs?: number },
+  options?: { minJobs?: number; preferStale?: boolean },
 ): Promise<{ jobs: HimalayasJobNormalized[]; fromCache: boolean }> {
   const minJobs = options?.minJobs ?? 0;
+  const preferStale = options?.preferStale !== false;
+  const need = Math.max(minJobs, 1);
 
   const mem = memory.get(countryCode);
-  if (mem && isFresh(mem) && mem.jobs.length >= Math.max(minJobs, 1)) {
+  if (mem && isFresh(mem) && mem.jobs.length >= need) {
     return { jobs: mem.jobs, fromCache: true };
   }
 
   const disk = await readDiskCache(countryCode);
-  if (disk && isFresh(disk) && disk.jobs.length >= Math.max(minJobs, 1)) {
+  if (disk && isFresh(disk) && disk.jobs.length >= need) {
     memory.set(countryCode, disk);
     return { jobs: disk.jobs, fromCache: true };
+  }
+
+  if (preferStale) {
+    const stale =
+      mem && isUsableStale(mem) && mem.jobs.length >= need
+        ? mem
+        : disk && isUsableStale(disk) && disk.jobs.length >= need
+          ? disk
+          : null;
+    if (stale) {
+      memory.set(countryCode, stale);
+      return { jobs: stale.jobs, fromCache: true };
+    }
   }
 
   const pending = inflight.get(countryCode);

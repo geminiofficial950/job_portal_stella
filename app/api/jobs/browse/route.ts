@@ -5,10 +5,8 @@ import { Company } from "@/models/Company";
 import { ADZUNA_COUNTRIES, fetchAdzunaJobs } from "@/lib/adzuna";
 import { fetchHimalayasJobs } from "@/lib/himalayas";
 import { fetchJoobleJobs } from "@/lib/jooble";
-import { fetchCoresignalJobs } from "@/lib/coresignal";
 
-// Cold Coresignal collects can take a while — allow longer on Node runtime
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
   try {
@@ -22,12 +20,15 @@ export async function GET(request: Request) {
     const experienceLevel = searchParams.get("experienceLevel")?.trim() || "";
     const country = searchParams.get("country")?.trim().toLowerCase() || "all";
     const source = searchParams.get("source")?.trim().toLowerCase() || "all";
+    // fast=1 → skip Himalayas fallback loops (first paint)
+    const fastMode =
+      searchParams.get("fast") === "1" || searchParams.get("fast") === "true";
 
     const includeGemini = source === "all" || source === "gemini";
     const includeAdzuna = source === "all" || source === "adzuna";
     const includeHimalayas = source === "all" || source === "himalayas";
     const includeJooble = source === "all" || source === "jooble";
-    const includeCoresignal = source === "all" || source === "coresignal";
+    const allowHeavyFallback = !fastMode;
 
     let geminiJobs: Array<Record<string, unknown>> = [];
     let filterCompanies: Array<{ id: string; name: string }> = [];
@@ -167,7 +168,6 @@ export async function GET(request: Request) {
     let adzunaJobs: Array<Record<string, unknown>> = [];
     let himalayasJobs: Array<Record<string, unknown>> = [];
     let joobleJobs: Array<Record<string, unknown>> = [];
-    let coresignalJobs: Array<Record<string, unknown>> = [];
     let adzunaMeta: {
       configured: boolean;
       error?: string;
@@ -190,15 +190,6 @@ export async function GET(request: Request) {
       fromCache?: boolean;
       cacheTtlHours?: number;
     } = { configured: false, countriesFetched: [] };
-    let coresignalMeta: {
-      configured: boolean;
-      error?: string;
-      countriesFetched: string[];
-      fromCache?: boolean;
-      cacheTtlHours?: number;
-      totalAvailable?: number;
-      totalsByCountry?: Record<string, number>;
-    } = { configured: false, countriesFetched: [], totalAvailable: 0 };
 
     // External APIs run independently — one failure must not block the others.
     // If Himalayas fails for a country, Adzuna (then Jooble) fills that gap.
@@ -266,7 +257,7 @@ export async function GET(request: Request) {
       );
     };
 
-    const [adzunaResult, himalayasResult, joobleResult, coresignalResult] =
+    const [adzunaResult, himalayasResult, joobleResult] =
       await Promise.allSettled([
         includeAdzuna
           ? fetchAdzunaJobs({
@@ -285,15 +276,6 @@ export async function GET(request: Request) {
           ? fetchJoobleJobs({
               country: "all",
               q: q || undefined,
-            })
-          : Promise.resolve(null),
-        includeCoresignal
-          ? fetchCoresignalJobs({
-              country: "all",
-              q: q || undefined,
-              jobsPerCountry: Number(
-                process.env.CORESIGNAL_JOBS_PER_COUNTRY || "40",
-              ),
             })
           : Promise.resolve(null),
       ]);
@@ -354,7 +336,8 @@ export async function GET(request: Request) {
     }
 
     // Fallback: countries Himalayas missed → pull extra from Adzuna (then Jooble)
-    if (himalayasFailedCountries.length > 0) {
+    // Skipped in fast mode so first paint stays quick
+    if (allowHeavyFallback && himalayasFailedCountries.length > 0) {
       console.warn(
         "Himalayas failed for countries, falling back:",
         himalayasFailedCountries.join(", "),
@@ -440,35 +423,7 @@ export async function GET(request: Request) {
       }
     }
 
-    if (coresignalResult.status === "fulfilled" && coresignalResult.value) {
-      const coresignal = coresignalResult.value;
-      coresignalMeta = {
-        configured: coresignal.configured,
-        error: coresignal.error,
-        countriesFetched: coresignal.countriesFetched,
-        fromCache: coresignal.fromCache,
-        cacheTtlHours: coresignal.cacheTtlHours,
-        totalAvailable: coresignal.totalAvailable,
-        totalsByCountry: coresignal.totalsByCountry,
-      };
-      coresignalJobs = coresignal.jobs
-        .filter(matchesBrowseFilters)
-        .map((job) => ({ ...job }));
-      mergeCompanyCategoryMeta(coresignal.jobs);
-    } else if (coresignalResult.status === "rejected") {
-      console.warn("Coresignal browse failed:", coresignalResult.reason);
-      coresignalMeta = {
-        configured: true,
-        error:
-          coresignalResult.reason instanceof Error
-            ? coresignalResult.reason.message
-            : "Coresignal failed",
-        countriesFetched: [],
-        totalAvailable: 0,
-      };
-    }
-
-    // Primary sources first; Jooble then Coresignal always appended last
+    // Primary sources first; Jooble merged in, then one sort for AU / salary / detail
     const primaryJobs = [...geminiJobs, ...adzunaJobs, ...himalayasJobs];
     const seenIds = new Set<string>();
     const uniquePrimary = primaryJobs.filter((job) => {
@@ -478,28 +433,6 @@ export async function GET(request: Request) {
       return true;
     });
 
-    uniquePrimary.sort((a, b) => {
-      const hasPay = (job: Record<string, unknown>) =>
-        Number(job.salaryMin) > 0 || Number(job.salaryMax) > 0;
-
-      // Salary / payout first, then jobs without pay — all categories/countries
-      const rankDiff = Number(hasPay(b)) - Number(hasPay(a));
-      if (rankDiff !== 0) return rankDiff;
-
-      const isAu = (job: Record<string, unknown>) => {
-        if (job.country === "au") return true;
-        return `${job.location || ""} ${job.countryLabel || ""}`
-          .toLowerCase()
-          .includes("australia");
-      };
-      const auDiff = Number(isAu(b)) - Number(isAu(a));
-      if (auDiff !== 0) return auDiff;
-
-      const ta = a.createdAt ? new Date(String(a.createdAt)).getTime() : 0;
-      const tb = b.createdAt ? new Date(String(b.createdAt)).getTime() : 0;
-      return tb - ta;
-    });
-
     const uniqueJooble = joobleJobs.filter((job) => {
       const id = String(job.id);
       if (seenIds.has(id)) return false;
@@ -507,41 +440,51 @@ export async function GET(request: Request) {
       return true;
     });
 
-    uniqueJooble.sort((a, b) => {
+    const isAu = (job: Record<string, unknown>) => {
+      if (job.country === "au") return true;
+      const hay = `${job.location || ""} ${job.countryLabel || ""}`.toLowerCase();
+      return (
+        hay.includes("australia") ||
+        /\b(nsw|vic|qld|sa|wa|tas|act|nt)\b/.test(hay) ||
+        hay.includes("sydney") ||
+        hay.includes("melbourne") ||
+        hay.includes("brisbane") ||
+        hay.includes("perth") ||
+        hay.includes("adelaide")
+      );
+    };
+    const hasPay = (job: Record<string, unknown>) =>
+      Number(job.salaryMin) > 0 || Number(job.salaryMax) > 0;
+    const infoScore = (job: Record<string, unknown>) => {
+      const strip = (v: unknown) =>
+        String(v || "")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+      let score = 0;
+      score += Math.min(strip(job.description).length, 3500);
+      score += Math.min(strip(job.requirements).length, 1200);
+      score += Math.min(strip(job.responsibilities).length, 1200);
+      const skills = Array.isArray(job.skills) ? job.skills : [];
+      score += Math.min(skills.length, 20) * 60;
+      if (strip(job.benefits)) score += 180;
+      if (job.category) score += 40;
+      if (job.experienceLevel) score += 30;
+      return score;
+    };
+
+    const uniqueJobs = [...uniquePrimary, ...uniqueJooble].sort((a, b) => {
+      // Australia → salary → richer detail → newer
+      const auDiff = Number(isAu(b)) - Number(isAu(a));
+      if (auDiff !== 0) return auDiff;
+      const rankDiff = Number(hasPay(b)) - Number(hasPay(a));
+      if (rankDiff !== 0) return rankDiff;
+      const infoDiff = infoScore(b) - infoScore(a);
+      if (infoDiff !== 0) return infoDiff;
       const ta = a.createdAt ? new Date(String(a.createdAt)).getTime() : 0;
       const tb = b.createdAt ? new Date(String(b.createdAt)).getTime() : 0;
       return tb - ta;
     });
-
-    const uniqueCoresignal = coresignalJobs.filter((job) => {
-      const id = String(job.id);
-      if (seenIds.has(id)) return false;
-      seenIds.add(id);
-      return true;
-    });
-
-    uniqueCoresignal.sort((a, b) => {
-      const ta = a.createdAt ? new Date(String(a.createdAt)).getTime() : 0;
-      const tb = b.createdAt ? new Date(String(b.createdAt)).getTime() : 0;
-      return tb - ta;
-    });
-
-    const uniqueJobs = [
-      ...uniquePrimary,
-      ...uniqueJooble,
-      ...uniqueCoresignal,
-    ];
-
-    const coresignalAvailable =
-      country !== "all"
-        ? Number(coresignalMeta.totalsByCountry?.[country] || 0)
-        : Number(coresignalMeta.totalAvailable || 0);
-
-    // True marketplace size from Coresignal + currently loaded jobs from other sources
-    const otherLoaded = uniqueJobs.filter(
-      (job) => job.source !== "coresignal",
-    ).length;
-    const availableTotal = coresignalAvailable + otherLoaded;
 
     return NextResponse.json(
       {
@@ -556,14 +499,11 @@ export async function GET(request: Request) {
         })),
         jobCounts: {
           loaded: uniqueJobs.length,
-          available: availableTotal,
-          coresignalAvailable,
-          byCountry: coresignalMeta.totalsByCountry || {},
+          available: uniqueJobs.length,
         },
         adzuna: adzunaMeta,
         himalayas: himalayasMeta,
         jooble: joobleMeta,
-        coresignal: coresignalMeta,
       },
       {
         headers: {

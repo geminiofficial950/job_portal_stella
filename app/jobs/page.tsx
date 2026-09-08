@@ -69,7 +69,7 @@ type JobItem = {
   benefits: string;
   createdAt: string | null;
   company: CompanyInfo | null;
-  source?: "gemini" | "adzuna" | "himalayas" | "jooble" | "coresignal" | string;
+  source?: "gemini" | "adzuna" | "himalayas" | "jooble" | string;
   applyUrl?: string;
   adref?: string;
   country?: string;
@@ -108,6 +108,49 @@ const PERIOD_LABELS: Record<string, string> = {
 
 function hasSalary(job: JobItem) {
   return job.salaryMin > 0 || job.salaryMax > 0;
+}
+
+function isAustraliaJob(job: JobItem) {
+  if (job.country === "au") return true;
+  const hay = `${job.location || ""} ${job.countryLabel || ""}`.toLowerCase();
+  return (
+    hay.includes("australia") ||
+    /\b(nsw|vic|qld|sa|wa|tas|act|nt)\b/.test(hay) ||
+    hay.includes("sydney") ||
+    hay.includes("melbourne") ||
+    hay.includes("brisbane") ||
+    hay.includes("perth") ||
+    hay.includes("adelaide")
+  );
+}
+
+/** Prefer jobs with fuller posting content (description, skills, etc.) */
+function jobInfoScore(job: JobItem): number {
+  let score = 0;
+  const desc = stripHtmlToText(job.description || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  score += Math.min(desc.length, 3500);
+
+  const requirements = stripHtmlToText(job.requirements || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  score += Math.min(requirements.length, 1200);
+
+  const responsibilities = stripHtmlToText(job.responsibilities || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  score += Math.min(responsibilities.length, 1200);
+
+  if (Array.isArray(job.skills) && job.skills.length > 0) {
+    score += Math.min(job.skills.length, 20) * 60;
+  }
+  if ((job.benefits || "").trim()) score += 180;
+  if (job.category) score += 40;
+  if (job.experienceLevel) score += 30;
+  if (job.company?.about) score += 80;
+  if (job.applyUrl) score += 20;
+  return score;
 }
 
 function formatSalaryAmount(amount: number) {
@@ -151,16 +194,7 @@ function formatSalaryDetail(job: JobItem): string | null {
   return `${fmt(lo)} – ${fmt(hi)} ${period}`;
 }
 
-function formatJobCount(n: number): string {
-  if (!Number.isFinite(n) || n <= 0) return "0";
-  if (n >= 1_000_000) {
-    const m = n / 1_000_000;
-    const text = m >= 10 ? String(Math.round(m)) : m.toFixed(1).replace(/\.0$/, "");
-    return `${text}M+`;
-  }
-  if (n >= 10_000) return `${Math.round(n / 1000)}k+`;
-  return Math.round(n).toLocaleString();
-}
+
 
 /** Keep card location inside column — max 2 lines */
 function formatCardLocation(location: string): React.ReactNode {
@@ -206,7 +240,6 @@ function jobSourceLabel(source?: string) {
   if (source === "adzuna") return "Adzuna";
   if (source === "himalayas") return "Himalayas";
   if (source === "jooble") return "Jooble";
-  if (source === "coresignal") return "Coresignal";
   return "Gemini";
 }
 
@@ -227,10 +260,7 @@ function jobCardSnippet(job: JobItem, maxLen = 140): string | null {
 
 function isExternalJobSource(source?: string) {
   return (
-    source === "adzuna" ||
-    source === "himalayas" ||
-    source === "jooble" ||
-    source === "coresignal"
+    source === "adzuna" || source === "himalayas" || source === "jooble"
   );
 }
 
@@ -263,7 +293,6 @@ function renderJobDescription(job: JobItem) {
   if (
     job.source === "himalayas" ||
     job.source === "jooble" ||
-    job.source === "coresignal" ||
     looksLikeHtml(raw)
   ) {
     return (
@@ -288,17 +317,6 @@ function renderJobDescription(job: JobItem) {
 
 function looksLikeHtml(text: string) {
   return /<\/?[a-z][\s\S]*>/i.test(text);
-}
-
-function jobBrowseSortRank(job: JobItem): number {
-  // Salary / payout first, then jobs without pay — every category/country
-  return hasSalary(job) ? 0 : 1;
-}
-
-function australiaJobPriority(job: JobItem): number {
-  if (job.country === "au") return 0;
-  const hay = `${job.location || ""} ${job.countryLabel || ""}`.toLowerCase();
-  return hay.includes("australia") ? 0 : 1;
 }
 
 function timeAgo(iso: string | null) {
@@ -562,17 +580,6 @@ function JobSearchInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adzunaWarning, setAdzunaWarning] = useState("");
-  const [jobCounts, setJobCounts] = useState<{
-    loaded: number;
-    available: number;
-    coresignalAvailable: number;
-    byCountry: Record<string, number>;
-  }>({
-    loaded: 0,
-    available: 0,
-    coresignalAvailable: 0,
-    byCountry: {},
-  });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -708,6 +715,7 @@ function JobSearchInner() {
   const loadJobs = useCallback(async () => {
     setLoading(true);
     setError("");
+
     try {
       const res = await fetch("/api/jobs/browse");
       const data = await res.json();
@@ -718,12 +726,6 @@ function JobSearchInner() {
       setCompanyOptions(data.companies ?? []);
       setCategories(["All", ...((data.categories as string[]) ?? [])]);
       setCountryOptions(data.countries ?? []);
-      setJobCounts({
-        loaded: Number(data.jobCounts?.loaded ?? data.jobs?.length ?? 0),
-        available: Number(data.jobCounts?.available ?? data.jobs?.length ?? 0),
-        coresignalAvailable: Number(data.jobCounts?.coresignalAvailable ?? 0),
-        byCountry: (data.jobCounts?.byCountry as Record<string, number>) || {},
-      });
       if (
         data.adzuna &&
         data.adzuna.configured === false &&
@@ -736,12 +738,6 @@ function JobSearchInner() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load jobs");
       setJobs([]);
-      setJobCounts({
-        loaded: 0,
-        available: 0,
-        coresignalAvailable: 0,
-        byCountry: {},
-      });
     } finally {
       setLoading(false);
     }
@@ -877,8 +873,7 @@ function JobSearchInner() {
       if (
         job.source === "adzuna" ||
         job.source === "himalayas" ||
-        job.source === "jooble" ||
-        job.source === "coresignal"
+        job.source === "jooble"
       ) {
         return job.country === selectedCountry;
       }
@@ -956,75 +951,34 @@ function JobSearchInner() {
     locationQuery,
   ]);
 
-  const displayAvailableCount = useMemo(() => {
-    if (selectedCountry === "all") {
-      return Math.max(jobCounts.available, filteredJobs.length);
-    }
-    const coresignalForCountry = Number(
-      jobCounts.byCountry[selectedCountry] || 0,
-    );
-    const otherLoaded = filteredJobs.filter(
-      (job) => job.source !== "coresignal",
-    ).length;
-    return Math.max(coresignalForCountry + otherLoaded, filteredJobs.length);
-  }, [selectedCountry, jobCounts, filteredJobs]);
-
   const sortedJobs = useMemo(() => {
     const list = [...filteredJobs];
     list.sort((a, b) => {
-      // Jooble + Coresignal always stay at the end of the list
-      const tailRank = (source?: string) => {
-        if (source === "jooble") return 1;
-        if (source === "coresignal") return 2;
-        return 0;
-      };
-      const aTail = tailRank(a.source);
-      const bTail = tailRank(b.source);
-      if (aTail !== bTail) return aTail - bTail;
-
       const dateDiff = () => {
         const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return tb - ta;
       };
 
-      // Newest first = pure date order (user-selected sort wins)
+      // Newest first = pure date order
       if (sortBy === "newest") {
         return dateDiff();
       }
 
-      // Most relevant = salary jobs first, then AU priority, then newer
-      const rankDiff = jobBrowseSortRank(a) - jobBrowseSortRank(b);
-      if (rankDiff !== 0) return rankDiff;
-
-      const auDiff = australiaJobPriority(a) - australiaJobPriority(b);
+      // Most relevant: Australia → salary → richer detail → newer
+      const auDiff = Number(isAustraliaJob(b)) - Number(isAustraliaJob(a));
       if (auDiff !== 0) return auDiff;
+
+      const payDiff = Number(hasSalary(b)) - Number(hasSalary(a));
+      if (payDiff !== 0) return payDiff;
+
+      const infoDiff = jobInfoScore(b) - jobInfoScore(a);
+      if (infoDiff !== 0) return infoDiff;
 
       return dateDiff();
     });
     return list;
   }, [filteredJobs, sortBy]);
-
-  const jobsForCounts = useMemo(
-    () => jobs.filter((job) => matchesSelectedCountry(job)),
-    [jobs, matchesSelectedCountry],
-  );
-
-  const employmentCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const job of jobsForCounts) {
-      counts[job.employmentType] = (counts[job.employmentType] || 0) + 1;
-    }
-    return counts;
-  }, [jobsForCounts]);
-
-  const workModeCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const job of jobsForCounts) {
-      counts[job.workMode] = (counts[job.workMode] || 0) + 1;
-    }
-    return counts;
-  }, [jobsForCounts]);
 
   const toggleFilterSection = (key: keyof typeof openFilters) => {
     setOpenFilters((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -1191,11 +1145,7 @@ function JobSearchInner() {
   const renderApplyAction = () => {
     if (!displayJobDetail) return null;
 
-    if (
-      (displayJobDetail.source === "jooble" ||
-        displayJobDetail.source === "coresignal") &&
-      displayJobDetail.applyUrl
-    ) {
+    if (displayJobDetail.source === "jooble" && displayJobDetail.applyUrl) {
       return (
         <a
           href={displayJobDetail.applyUrl}
@@ -1203,9 +1153,7 @@ function JobSearchInner() {
           rel="noreferrer"
           className="job-detail-apply-btn"
         >
-          {displayJobDetail.source === "coresignal"
-            ? "Apply on listing"
-            : "Apply on Jooble"}
+          Apply on Jooble
         </a>
       );
     }
@@ -1403,23 +1351,6 @@ function JobSearchInner() {
                   </a>
                 </div>
               ) : null}
-              {displayJobDetail.source === "coresignal" &&
-              displayJobDetail.applyUrl ? (
-                <div className="job-detail-external-cta">
-                  <p>
-                    Full posting is on the original job board. Open it for
-                    application details.
-                  </p>
-                  <a
-                    href={displayJobDetail.applyUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="job-detail-external-cta__btn"
-                  >
-                    View original listing
-                  </a>
-                </div>
-              ) : null}
               {displayJobDetail.source === "himalayas" ? (
                 <p className="job-detail-source-note">
                   Originally posted on{" "}
@@ -1444,24 +1375,11 @@ function JobSearchInner() {
                   </a>
                 </p>
               ) : null}
-              {displayJobDetail.source === "coresignal" ? (
-                <p className="job-detail-source-note">
-                  Aggregated via{" "}
-                  <a
-                    href="https://coresignal.com"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Coresignal
-                  </a>
-                </p>
-              ) : null}
             </section>
 
             {displayJobDetail.source !== "adzuna" &&
             displayJobDetail.source !== "himalayas" &&
-            displayJobDetail.source !== "jooble" &&
-            displayJobDetail.source !== "coresignal" ? (
+            displayJobDetail.source !== "jooble" ? (
               <>
                 <section className="job-detail-section">
                   <h3 className="job-detail-section-title">
@@ -1674,9 +1592,7 @@ function JobSearchInner() {
       <div className="jobs-layout">
         {!displayJobDetail ? (
           <div className="jobs-mobile-filter-bar lg:hidden">
-            <span className="text-sm font-bold text-slate-900">
-              {formatJobCount(displayAvailableCount)} jobs found
-            </span>
+            <span className="text-sm font-bold text-slate-900">Jobs</span>
             <button
               type="button"
               onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
@@ -1780,9 +1696,6 @@ function JobSearchInner() {
                       onChange={() => toggleTypeFilter(type)}
                     />
                     {TYPE_LABELS[type] || type}
-                    <span className="jobs-filter-count">
-                      ({employmentCounts[type] || 0})
-                    </span>
                   </label>
                 ))}
               </div>
@@ -1842,9 +1755,6 @@ function JobSearchInner() {
                       onChange={() => toggleModelFilter(model)}
                     />
                     {WORK_MODE_LABELS[model] || model}
-                    <span className="jobs-filter-count">
-                      ({workModeCounts[model] || 0})
-                    </span>
                   </label>
                 ))}
               </div>
@@ -1957,9 +1867,6 @@ function JobSearchInner() {
                     <h2 className="jobs-results-title font-manrope">
                       All Jobs
                     </h2>
-                    <p className="jobs-results-meta">
-                      {formatJobCount(displayAvailableCount)} jobs available
-                    </p>
                   </div>
                   <div className="jobs-sort">
                     <span>Sort by:</span>

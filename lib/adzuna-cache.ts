@@ -17,12 +17,21 @@ function cacheTtlMs() {
   return Math.max(1, hours) * 60 * 60 * 1000;
 }
 
+function staleTtlMs() {
+  const hours = Number(process.env.ADZUNA_STALE_HOURS || "48");
+  return Math.max(hours, 1) * 60 * 60 * 1000;
+}
+
 function cacheFile(countryCode: string) {
   return path.join(CACHE_DIR, `${countryCode}.json`);
 }
 
 function isFresh(entry: CountryCacheEntry) {
   return Date.now() - entry.fetchedAt < cacheTtlMs();
+}
+
+function isUsableStale(entry: CountryCacheEntry) {
+  return Date.now() - entry.fetchedAt < staleTtlMs();
 }
 
 async function readDiskCache(
@@ -53,9 +62,10 @@ async function writeDiskCache(
 export async function getCachedCountryJobs(
   countryCode: string,
   fetchFresh: () => Promise<AdzunaJobNormalized[]>,
-  options?: { minJobs?: number },
+  options?: { minJobs?: number; preferStale?: boolean },
 ): Promise<{ jobs: AdzunaJobNormalized[]; fromCache: boolean }> {
   const minJobs = options?.minJobs ?? 0;
+  const preferStale = options?.preferStale !== false;
 
   const mem = memory.get(countryCode);
   if (mem && isFresh(mem) && mem.jobs.length >= minJobs) {
@@ -66,6 +76,19 @@ export async function getCachedCountryJobs(
   if (disk && isFresh(disk) && disk.jobs.length >= minJobs) {
     memory.set(countryCode, disk);
     return { jobs: disk.jobs, fromCache: true };
+  }
+
+  if (preferStale) {
+    const stale =
+      mem && isUsableStale(mem) && mem.jobs.length >= minJobs
+        ? mem
+        : disk && isUsableStale(disk) && disk.jobs.length >= minJobs
+          ? disk
+          : null;
+    if (stale) {
+      memory.set(countryCode, stale);
+      return { jobs: stale.jobs, fromCache: true };
+    }
   }
 
   const pending = inflight.get(countryCode);

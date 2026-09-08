@@ -1165,7 +1165,7 @@ html.jobs-search-compact .jobs-search-fixed {
   padding: 0.6rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
-  background: var(--jobs-primary);
+  background: #2563eb;
   color: #fff;
   font-size: 0.85rem;
   font-weight: 700;
@@ -1175,7 +1175,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-apply-btn:hover {
-  background: var(--jobs-primary-hover);
+  background: #1d4ed8;
 }
 
 .jobs-save-btn {
@@ -2034,7 +2034,7 @@ html.jobs-search-compact .jobs-search-fixed {
   justify-content: center;
   padding: 0.85rem 1.5rem;
   border-radius: 0.65rem;
-  background: var(--jobs-primary);
+  background: #2563eb;
   color: #fff;
   font-size: 0.95rem;
   font-weight: 800;
@@ -2045,7 +2045,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .job-detail-apply-btn:hover {
-  background: var(--jobs-primary-hover);
+  background: #1d4ed8;
 }
 
 @media (min-width: 1024px) {

@@ -236,7 +236,27 @@ async function fetchSearchPage(options: {
   } catch (err) {
     const message = err instanceof Error ? err.message : "request failed";
     console.warn(`Himalayas ${options.country.code} error:`, message);
-    return { jobs: [], error: `${options.country.code}: ${message}` };
+    // One quick retry on transient network failures
+    try {
+      await sleep(600);
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(20000),
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "GeminiEducationCareers/1.0",
+        },
+      });
+      if (!res.ok) {
+        return { jobs: [], error: `${options.country.code}: ${message}` };
+      }
+      const data = (await res.json()) as HimalayasSearchResponse;
+      const jobs = (data.jobs || [])
+        .map((job) => normalizeJob(job, options.country))
+        .filter((job): job is HimalayasJobNormalized => Boolean(job));
+      return { jobs };
+    } catch {
+      return { jobs: [], error: `${options.country.code}: ${message}` };
+    }
   }
 }
 
@@ -289,6 +309,7 @@ export async function fetchHimalayasJobs(options?: {
   configured: boolean;
   error?: string;
   countriesFetched: string[];
+  failedCountries: string[];
   fromCache?: boolean;
   cacheTtlHours?: number;
 }> {
@@ -304,6 +325,7 @@ export async function fetchHimalayasJobs(options?: {
       configured: true,
       error: `Unsupported country: ${countryParam}`,
       countriesFetched: [],
+      failedCountries: [],
     };
   }
 
@@ -320,6 +342,7 @@ export async function fetchHimalayasJobs(options?: {
 
   const jobs: HimalayasJobNormalized[] = [];
   const countriesFetched: string[] = [];
+  const failedCountries: string[] = [];
   const errors: string[] = [];
   let servedFromCache = true;
 
@@ -330,13 +353,17 @@ export async function fetchHimalayasJobs(options?: {
         ? Math.max(jobsPerCountry, countryParam === "all" ? 100 : jobsPerCountry)
         : jobsPerCountry;
 
+    let countryHadError = false;
     const loadCountry = async () => {
       const result = await fetchCountryJobs({
         country,
         q: options?.q,
         total,
       });
-      if (result.error) errors.push(result.error);
+      if (result.error) {
+        countryHadError = true;
+        errors.push(result.error);
+      }
       return result.jobs;
     };
 
@@ -345,8 +372,17 @@ export async function fetchHimalayasJobs(options?: {
     });
 
     if (!cached.fromCache) servedFromCache = false;
-    countriesFetched.push(country.code);
-    jobs.push(...cached.jobs);
+
+    if (cached.jobs.length > 0) {
+      countriesFetched.push(country.code);
+      jobs.push(...cached.jobs);
+      // Thin / partial country results → browse tops up from Adzuna/Jooble
+      if (cached.jobs.length < Math.max(10, Math.floor(total * 0.4))) {
+        failedCountries.push(country.code);
+      }
+    } else if (countryHadError || !cached.fromCache) {
+      failedCountries.push(country.code);
+    }
 
     if (i < targets.length - 1) {
       await sleep(400);
@@ -360,6 +396,7 @@ export async function fetchHimalayasJobs(options?: {
     configured: true,
     error: errors.length ? errors.join("; ") : undefined,
     countriesFetched,
+    failedCountries,
     fromCache: servedFromCache,
     cacheTtlHours: cacheMeta.ttlHours,
   };

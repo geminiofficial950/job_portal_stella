@@ -69,7 +69,7 @@ type JobItem = {
   benefits: string;
   createdAt: string | null;
   company: CompanyInfo | null;
-  source?: "gemini" | "adzuna" | "himalayas" | string;
+  source?: "gemini" | "adzuna" | "himalayas" | "jooble" | "coresignal" | string;
   applyUrl?: string;
   adref?: string;
   country?: string;
@@ -151,10 +151,62 @@ function formatSalaryDetail(job: JobItem): string | null {
   return `${fmt(lo)} – ${fmt(hi)} ${period}`;
 }
 
+function formatJobCount(n: number): string {
+  if (!Number.isFinite(n) || n <= 0) return "0";
+  if (n >= 1_000_000) {
+    const m = n / 1_000_000;
+    const text = m >= 10 ? String(Math.round(m)) : m.toFixed(1).replace(/\.0$/, "");
+    return `${text}M+`;
+  }
+  if (n >= 10_000) return `${Math.round(n / 1000)}k+`;
+  return Math.round(n).toLocaleString();
+}
+
+/** Keep card location inside column — max 2 lines */
+function formatCardLocation(location: string): React.ReactNode {
+  const raw = location.trim().replace(/\s+/g, " ");
+  if (!raw) return "Location not listed";
+
+  let line1 = raw;
+  let line2 = "";
+
+  const commaIdx = raw.indexOf(",");
+  if (commaIdx > 0 && commaIdx < raw.length - 1) {
+    line1 = raw.slice(0, commaIdx).trim();
+    line2 = raw.slice(commaIdx + 1).trim();
+  } else {
+    const sep = raw.match(/\s*[·•|]\s*/);
+    if (sep && sep.index != null && sep.index > 0) {
+      line1 = raw.slice(0, sep.index).trim();
+      line2 = raw.slice(sep.index + sep[0].length).trim();
+    } else {
+      // Long single string: wrap near midpoint at a space
+      if (raw.length > 28) {
+        const mid = Math.floor(raw.length / 2);
+        const space = raw.lastIndexOf(" ", mid + 8);
+        const at = space > 8 ? space : mid;
+        line1 = raw.slice(0, at).trim();
+        line2 = raw.slice(at).trim();
+      }
+    }
+  }
+
+  if (!line2) return line1;
+
+  return (
+    <>
+      {line1}
+      <br />
+      {line2}
+    </>
+  );
+}
+
 function jobSourceLabel(source?: string) {
   if (source === "adzuna") return "Adzuna";
   if (source === "himalayas") return "Himalayas";
   if (source === "jooble") return "Jooble";
+  if (source === "coresignal") return "Coresignal";
   return "Gemini";
 }
 
@@ -174,7 +226,12 @@ function jobCardSnippet(job: JobItem, maxLen = 140): string | null {
 }
 
 function isExternalJobSource(source?: string) {
-  return source === "adzuna" || source === "himalayas" || source === "jooble";
+  return (
+    source === "adzuna" ||
+    source === "himalayas" ||
+    source === "jooble" ||
+    source === "coresignal"
+  );
 }
 
 function renderJobDescription(job: JobItem) {
@@ -203,7 +260,12 @@ function renderJobDescription(job: JobItem) {
     );
   }
 
-  if (job.source === "himalayas" || looksLikeHtml(raw)) {
+  if (
+    job.source === "himalayas" ||
+    job.source === "jooble" ||
+    job.source === "coresignal" ||
+    looksLikeHtml(raw)
+  ) {
     return (
       <div
         className="job-detail-prose"
@@ -423,7 +485,6 @@ function SkillMatchMini({
   if (!signedIn) {
     return (
       <div className="jobs-card-match jobs-card-match--muted">
-        <span className="jobs-card-match-label">Skill match</span>
         <span className="jobs-card-match-title">Sign in to see rating</span>
       </div>
     );
@@ -432,7 +493,6 @@ function SkillMatchMini({
   if (!hasProfileSkills) {
     return (
       <div className="jobs-card-match jobs-card-match--muted">
-        <span className="jobs-card-match-label">Skill match</span>
         <span className="jobs-card-match-title">Add skills to unlock</span>
       </div>
     );
@@ -452,7 +512,6 @@ function SkillMatchMini({
         <span>{match.score}%</span>
       </div>
       <div className="jobs-card-match-copy">
-        <span className="jobs-card-match-label">Skill match</span>
         <span className="jobs-card-match-title">{match.title}</span>
       </div>
     </div>
@@ -503,6 +562,17 @@ function JobSearchInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adzunaWarning, setAdzunaWarning] = useState("");
+  const [jobCounts, setJobCounts] = useState<{
+    loaded: number;
+    available: number;
+    coresignalAvailable: number;
+    byCountry: Record<string, number>;
+  }>({
+    loaded: 0,
+    available: 0,
+    coresignalAvailable: 0,
+    byCountry: {},
+  });
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -648,6 +718,12 @@ function JobSearchInner() {
       setCompanyOptions(data.companies ?? []);
       setCategories(["All", ...((data.categories as string[]) ?? [])]);
       setCountryOptions(data.countries ?? []);
+      setJobCounts({
+        loaded: Number(data.jobCounts?.loaded ?? data.jobs?.length ?? 0),
+        available: Number(data.jobCounts?.available ?? data.jobs?.length ?? 0),
+        coresignalAvailable: Number(data.jobCounts?.coresignalAvailable ?? 0),
+        byCountry: (data.jobCounts?.byCountry as Record<string, number>) || {},
+      });
       if (
         data.adzuna &&
         data.adzuna.configured === false &&
@@ -660,6 +736,12 @@ function JobSearchInner() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load jobs");
       setJobs([]);
+      setJobCounts({
+        loaded: 0,
+        available: 0,
+        coresignalAvailable: 0,
+        byCountry: {},
+      });
     } finally {
       setLoading(false);
     }
@@ -792,7 +874,12 @@ function JobSearchInner() {
   const matchesSelectedCountry = useCallback(
     (job: JobItem) => {
       if (selectedCountry === "all") return true;
-      if (job.source === "adzuna" || job.source === "himalayas") {
+      if (
+        job.source === "adzuna" ||
+        job.source === "himalayas" ||
+        job.source === "jooble" ||
+        job.source === "coresignal"
+      ) {
         return job.country === selectedCountry;
       }
       const loc = job.location.toLowerCase();
@@ -869,9 +956,32 @@ function JobSearchInner() {
     locationQuery,
   ]);
 
+  const displayAvailableCount = useMemo(() => {
+    if (selectedCountry === "all") {
+      return Math.max(jobCounts.available, filteredJobs.length);
+    }
+    const coresignalForCountry = Number(
+      jobCounts.byCountry[selectedCountry] || 0,
+    );
+    const otherLoaded = filteredJobs.filter(
+      (job) => job.source !== "coresignal",
+    ).length;
+    return Math.max(coresignalForCountry + otherLoaded, filteredJobs.length);
+  }, [selectedCountry, jobCounts, filteredJobs]);
+
   const sortedJobs = useMemo(() => {
     const list = [...filteredJobs];
     list.sort((a, b) => {
+      // Jooble + Coresignal always stay at the end of the list
+      const tailRank = (source?: string) => {
+        if (source === "jooble") return 1;
+        if (source === "coresignal") return 2;
+        return 0;
+      };
+      const aTail = tailRank(a.source);
+      const bTail = tailRank(b.source);
+      if (aTail !== bTail) return aTail - bTail;
+
       const dateDiff = () => {
         const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -1080,6 +1190,26 @@ function JobSearchInner() {
 
   const renderApplyAction = () => {
     if (!displayJobDetail) return null;
+
+    if (
+      (displayJobDetail.source === "jooble" ||
+        displayJobDetail.source === "coresignal") &&
+      displayJobDetail.applyUrl
+    ) {
+      return (
+        <a
+          href={displayJobDetail.applyUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="job-detail-apply-btn"
+        >
+          {displayJobDetail.source === "coresignal"
+            ? "Apply on listing"
+            : "Apply on Jooble"}
+        </a>
+      );
+    }
+
     if (!authLoading && !user) {
       return (
         <button
@@ -1256,6 +1386,40 @@ function JobSearchInner() {
               ) : (
                 <p className="job-detail-empty">No description provided.</p>
               )}
+              {displayJobDetail.source === "jooble" &&
+              displayJobDetail.applyUrl ? (
+                <div className="job-detail-external-cta">
+                  <p>
+                    Jooble only shares a short preview here. Open the full
+                    posting for complete details.
+                  </p>
+                  <a
+                    href={displayJobDetail.applyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="job-detail-external-cta__btn"
+                  >
+                    View full description on Jooble
+                  </a>
+                </div>
+              ) : null}
+              {displayJobDetail.source === "coresignal" &&
+              displayJobDetail.applyUrl ? (
+                <div className="job-detail-external-cta">
+                  <p>
+                    Full posting is on the original job board. Open it for
+                    application details.
+                  </p>
+                  <a
+                    href={displayJobDetail.applyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="job-detail-external-cta__btn"
+                  >
+                    View original listing
+                  </a>
+                </div>
+              ) : null}
               {displayJobDetail.source === "himalayas" ? (
                 <p className="job-detail-source-note">
                   Originally posted on{" "}
@@ -1268,10 +1432,36 @@ function JobSearchInner() {
                   </a>
                 </p>
               ) : null}
+              {displayJobDetail.source === "jooble" ? (
+                <p className="job-detail-source-note">
+                  Aggregated via{" "}
+                  <a
+                    href="https://jooble.org"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Jooble
+                  </a>
+                </p>
+              ) : null}
+              {displayJobDetail.source === "coresignal" ? (
+                <p className="job-detail-source-note">
+                  Aggregated via{" "}
+                  <a
+                    href="https://coresignal.com"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Coresignal
+                  </a>
+                </p>
+              ) : null}
             </section>
 
             {displayJobDetail.source !== "adzuna" &&
-            displayJobDetail.source !== "himalayas" ? (
+            displayJobDetail.source !== "himalayas" &&
+            displayJobDetail.source !== "jooble" &&
+            displayJobDetail.source !== "coresignal" ? (
               <>
                 <section className="job-detail-section">
                   <h3 className="job-detail-section-title">
@@ -1485,7 +1675,7 @@ function JobSearchInner() {
         {!displayJobDetail ? (
           <div className="jobs-mobile-filter-bar lg:hidden">
             <span className="text-sm font-bold text-slate-900">
-              {filteredJobs.length} jobs found
+              {formatJobCount(displayAvailableCount)} jobs found
             </span>
             <button
               type="button"
@@ -1768,8 +1958,7 @@ function JobSearchInner() {
                       All Jobs
                     </h2>
                     <p className="jobs-results-meta">
-                      Showing {sortedJobs.length} result
-                      {sortedJobs.length === 1 ? "" : "s"}
+                      {formatJobCount(displayAvailableCount)} jobs available
                     </p>
                   </div>
                   <div className="jobs-sort">
@@ -1854,7 +2043,34 @@ function JobSearchInner() {
 
                           <div className="jobs-card-divider" aria-hidden="true" />
 
+                          <div className="jobs-card-meta jobs-card-location">
+                            <span className="jobs-card-meta-label">Location</span>
+                            <span className="jobs-card-meta-value">
+                              {formatCardLocation(
+                                job.location ||
+                                  job.countryLabel ||
+                                  "Location not listed",
+                              )}
+                            </span>
+                          </div>
+
+                          <div className="jobs-card-divider" aria-hidden="true" />
+
+                          <div className="jobs-card-meta jobs-card-pay">
+                            <span className="jobs-card-meta-label">Pay</span>
+                            <span
+                              className={`jobs-card-meta-value${
+                                formatSalary(job) ? "" : " is-empty"
+                              }`}
+                            >
+                              {formatSalary(job) || "Not listed"}
+                            </span>
+                          </div>
+
+                          <div className="jobs-card-divider" aria-hidden="true" />
+
                           <div className="jobs-card-center">
+                            <span className="jobs-card-meta-label">Rating</span>
                             <SkillMatchMini
                               match={cardSkillMatches.get(job.id) || null}
                               signedIn={Boolean(user?.role === "user")}
@@ -1880,20 +2096,14 @@ function JobSearchInner() {
                               title={
                                 canSaveJob ? "Save job" : "Sign in to save jobs"
                               }
-                              className={`jobs-bookmark-btn ${isBookmarked ? "is-saved" : ""}`}
+                              className={`jobs-save-btn ${isBookmarked ? "is-saved" : ""}`}
                               aria-label={
                                 canSaveJob ? "Save job" : "Sign in to save jobs"
                               }
                             >
-                              <Bookmark className="h-4 w-4 fill-current" />
+                              <Bookmark className="h-3.5 w-3.5 fill-current" />
+                              {isBookmarked ? "Saved" : "Save"}
                             </button>
-                            {formatSalary(job) ? (
-                              <p className="jobs-salary">{formatSalary(job)}</p>
-                            ) : (
-                              <p className="jobs-salary jobs-salary--empty">
-                                Salary not listed
-                              </p>
-                            )}
                             <button
                               type="button"
                               onClick={(e) => {

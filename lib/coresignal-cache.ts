@@ -1,19 +1,26 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
-import type { HimalayasJobNormalized } from "@/lib/himalayas";
+import type { CoresignalJobNormalized } from "@/lib/coresignal";
 
-type CountryCacheEntry = {
+export type CountryCacheEntry = {
   fetchedAt: number;
-  jobs: HimalayasJobNormalized[];
+  jobs: CoresignalJobNormalized[];
+  totalAvailable?: number;
+};
+
+export type CountryFetchResult = {
+  jobs: CoresignalJobNormalized[];
+  totalAvailable: number;
 };
 
 const memory = new Map<string, CountryCacheEntry>();
-const inflight = new Map<string, Promise<HimalayasJobNormalized[]>>();
+const inflight = new Map<string, Promise<CountryFetchResult>>();
 
-const CACHE_DIR = path.join(process.cwd(), ".cache", "himalayas-v2");
+const CACHE_DIR = path.join(process.cwd(), ".cache", "coresignal-v1");
 
 function cacheTtlMs() {
-  const hours = Number(process.env.HIMALAYAS_CACHE_HOURS || "6");
+  // Collect costs ~1 credit/job — cache aggressively
+  const hours = Number(process.env.CORESIGNAL_CACHE_HOURS || "24");
   return Math.max(1, hours) * 60 * 60 * 1000;
 }
 
@@ -46,59 +53,82 @@ async function writeDiskCache(
     await mkdir(CACHE_DIR, { recursive: true });
     await writeFile(cacheFile(countryCode), JSON.stringify(entry), "utf8");
   } catch (err) {
-    console.warn(`Himalayas cache write failed (${countryCode}):`, err);
+    console.warn(`Coresignal cache write failed (${countryCode}):`, err);
   }
+}
+
+export async function updateCachedTotalAvailable(
+  countryCode: string,
+  totalAvailable: number,
+): Promise<void> {
+  const existing =
+    memory.get(countryCode) || (await readDiskCache(countryCode));
+  if (!existing) return;
+  const entry: CountryCacheEntry = {
+    ...existing,
+    totalAvailable,
+  };
+  memory.set(countryCode, entry);
+  await writeDiskCache(countryCode, entry);
 }
 
 export async function getCachedCountryJobs(
   countryCode: string,
-  fetchFresh: () => Promise<HimalayasJobNormalized[]>,
+  fetchFresh: () => Promise<CountryFetchResult>,
   options?: { minJobs?: number },
-): Promise<{ jobs: HimalayasJobNormalized[]; fromCache: boolean }> {
+): Promise<CountryFetchResult & { fromCache: boolean }> {
   const minJobs = options?.minJobs ?? 0;
 
   const mem = memory.get(countryCode);
-  if (mem && isFresh(mem) && mem.jobs.length >= Math.max(minJobs, 1)) {
-    return { jobs: mem.jobs, fromCache: true };
+  if (mem && isFresh(mem) && mem.jobs.length >= minJobs) {
+    return {
+      jobs: mem.jobs,
+      totalAvailable: Number(mem.totalAvailable || 0),
+      fromCache: true,
+    };
   }
 
   const disk = await readDiskCache(countryCode);
-  if (disk && isFresh(disk) && disk.jobs.length >= Math.max(minJobs, 1)) {
+  if (disk && isFresh(disk) && disk.jobs.length >= minJobs) {
     memory.set(countryCode, disk);
-    return { jobs: disk.jobs, fromCache: true };
+    return {
+      jobs: disk.jobs,
+      totalAvailable: Number(disk.totalAvailable || 0),
+      fromCache: true,
+    };
   }
 
   const pending = inflight.get(countryCode);
   if (pending) {
-    const jobs = await pending;
-    return { jobs, fromCache: true };
+    const result = await pending;
+    return { ...result, fromCache: true };
   }
 
   const promise = (async () => {
-    const jobs = await fetchFresh();
-    // Don't poison cache with empty network failures — retry next request
-    if (jobs.length === 0) {
-      return jobs;
-    }
-    const entry: CountryCacheEntry = { fetchedAt: Date.now(), jobs };
+    const result = await fetchFresh();
+    const entry: CountryCacheEntry = {
+      fetchedAt: Date.now(),
+      jobs: result.jobs,
+      totalAvailable: result.totalAvailable,
+    };
     memory.set(countryCode, entry);
     await writeDiskCache(countryCode, entry);
-    return jobs;
+    return result;
   })();
 
   inflight.set(countryCode, promise);
   try {
-    const jobs = await promise;
-    return { jobs, fromCache: false };
+    const result = await promise;
+    return { ...result, fromCache: false };
   } finally {
     inflight.delete(countryCode);
   }
 }
 
-export function filterHimalayasJobs(
-  jobs: HimalayasJobNormalized[],
+export function filterCoresignalJobs(
+  jobs: CoresignalJobNormalized[],
   q?: string,
-): HimalayasJobNormalized[] {
+): CoresignalJobNormalized[] {
   const needle = q?.trim().toLowerCase();
   if (!needle) return jobs;
 
@@ -116,7 +146,7 @@ export function filterHimalayasJobs(
   });
 }
 
-export function getHimalayasCacheMeta() {
+export function getCoresignalCacheMeta() {
   const ttlMs = cacheTtlMs();
   const hours = Math.round(ttlMs / (60 * 60 * 1000));
   return {

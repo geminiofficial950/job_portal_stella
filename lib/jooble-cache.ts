@@ -1,19 +1,20 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
-import type { HimalayasJobNormalized } from "@/lib/himalayas";
+import type { JoobleJobNormalized } from "@/lib/jooble";
 
 type CountryCacheEntry = {
   fetchedAt: number;
-  jobs: HimalayasJobNormalized[];
+  jobs: JoobleJobNormalized[];
 };
 
 const memory = new Map<string, CountryCacheEntry>();
-const inflight = new Map<string, Promise<HimalayasJobNormalized[]>>();
+const inflight = new Map<string, Promise<JoobleJobNormalized[]>>();
 
-const CACHE_DIR = path.join(process.cwd(), ".cache", "himalayas-v2");
+const CACHE_DIR = path.join(process.cwd(), ".cache", "jooble-v1");
 
 function cacheTtlMs() {
-  const hours = Number(process.env.HIMALAYAS_CACHE_HOURS || "6");
+  // Jooble free keys are lifetime-capped (~500 requests) — cache aggressively
+  const hours = Number(process.env.JOOBLE_CACHE_HOURS || "24");
   return Math.max(1, hours) * 60 * 60 * 1000;
 }
 
@@ -46,24 +47,24 @@ async function writeDiskCache(
     await mkdir(CACHE_DIR, { recursive: true });
     await writeFile(cacheFile(countryCode), JSON.stringify(entry), "utf8");
   } catch (err) {
-    console.warn(`Himalayas cache write failed (${countryCode}):`, err);
+    console.warn(`Jooble cache write failed (${countryCode}):`, err);
   }
 }
 
 export async function getCachedCountryJobs(
   countryCode: string,
-  fetchFresh: () => Promise<HimalayasJobNormalized[]>,
+  fetchFresh: () => Promise<JoobleJobNormalized[]>,
   options?: { minJobs?: number },
-): Promise<{ jobs: HimalayasJobNormalized[]; fromCache: boolean }> {
+): Promise<{ jobs: JoobleJobNormalized[]; fromCache: boolean }> {
   const minJobs = options?.minJobs ?? 0;
 
   const mem = memory.get(countryCode);
-  if (mem && isFresh(mem) && mem.jobs.length >= Math.max(minJobs, 1)) {
+  if (mem && isFresh(mem) && mem.jobs.length >= minJobs) {
     return { jobs: mem.jobs, fromCache: true };
   }
 
   const disk = await readDiskCache(countryCode);
-  if (disk && isFresh(disk) && disk.jobs.length >= Math.max(minJobs, 1)) {
+  if (disk && isFresh(disk) && disk.jobs.length >= minJobs) {
     memory.set(countryCode, disk);
     return { jobs: disk.jobs, fromCache: true };
   }
@@ -76,10 +77,6 @@ export async function getCachedCountryJobs(
 
   const promise = (async () => {
     const jobs = await fetchFresh();
-    // Don't poison cache with empty network failures — retry next request
-    if (jobs.length === 0) {
-      return jobs;
-    }
     const entry: CountryCacheEntry = { fetchedAt: Date.now(), jobs };
     memory.set(countryCode, entry);
     await writeDiskCache(countryCode, entry);
@@ -95,10 +92,10 @@ export async function getCachedCountryJobs(
   }
 }
 
-export function filterHimalayasJobs(
-  jobs: HimalayasJobNormalized[],
+export function filterJoobleJobs(
+  jobs: JoobleJobNormalized[],
   q?: string,
-): HimalayasJobNormalized[] {
+): JoobleJobNormalized[] {
   const needle = q?.trim().toLowerCase();
   if (!needle) return jobs;
 
@@ -116,7 +113,7 @@ export function filterHimalayasJobs(
   });
 }
 
-export function getHimalayasCacheMeta() {
+export function getJoobleCacheMeta() {
   const ttlMs = cacheTtlMs();
   const hours = Math.round(ttlMs / (60 * 60 * 1000));
   return {

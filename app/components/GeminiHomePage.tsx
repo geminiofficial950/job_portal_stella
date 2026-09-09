@@ -14,6 +14,7 @@ import {
   HomeFaqStrip,
 } from "./StellaHomeExtras";
 import "../gemini-home.css";
+import { jobOffersVisaSponsorship } from "@/lib/visa-sponsorship";
 
 type HomeJob = {
   id: string;
@@ -280,6 +281,11 @@ function GenuineJobsStrip() {
                       </td>
                       <td className="px-4 py-4 align-middle sm:px-5">
                         <div className="flex flex-wrap gap-1.5">
+                          {jobOffersVisaSponsorship(job) ? (
+                            <span className="rounded-full border border-teal-300 bg-teal-50 px-2.5 py-0.5 text-[11px] font-extrabold text-teal-700">
+                              Visa Sponsorship
+                            </span>
+                          ) : null}
                           {job.workMode ? (
                             <span className="rounded-full bg-sky-50/90 px-2.5 py-0.5 text-[11px] font-semibold capitalize text-sky-700">
                               {job.workMode}

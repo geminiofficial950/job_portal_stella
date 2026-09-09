@@ -40,6 +40,7 @@ import {
   type SkillMatchResult,
   type SkillMatchTier,
 } from "@/lib/skill-match";
+import { jobOffersVisaSponsorship } from "@/lib/visa-sponsorship";
 import "./jobs.css";
 
 type CompanyInfo = {
@@ -1398,6 +1399,11 @@ function JobSearchInner() {
                 </span>
               </li>
             </ul>
+            {jobOffersVisaSponsorship(displayJobDetail) ? (
+              <p className="mt-3">
+                <span className="jobs-tag jobs-tag--visa">Visa Sponsorship</span>
+              </p>
+            ) : null}
 
             <p className="job-detail-posted">
               Posted {timeAgo(displayJobDetail.createdAt)}
@@ -2020,6 +2026,7 @@ function JobSearchInner() {
                         job.category !== "General" ? job.category : null,
                         WORK_MODE_LABELS[job.workMode] || job.workMode,
                       ].filter(Boolean) as string[];
+                      const hasVisaSponsorship = jobOffersVisaSponsorship(job);
 
                       return (
                         <article
@@ -2059,6 +2066,11 @@ function JobSearchInner() {
                                 <p className="jobs-card-snippet">{snippet}</p>
                               ) : null}
                               <div className="jobs-card-tags">
+                                {hasVisaSponsorship ? (
+                                  <span className="jobs-tag jobs-tag--visa">
+                                    Visa Sponsorship
+                                  </span>
+                                ) : null}
                                 {tags.map((tag, i) => (
                                   <span
                                     key={`${job.id}-${tag}`}

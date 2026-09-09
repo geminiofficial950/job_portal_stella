@@ -1066,8 +1066,17 @@ html.jobs-search-compact .jobs-search-fixed {
 
 .jobs-tag--slate {
   color: #475569;
-  border-color: #e2e8f0;
+  border-color: #cbd5e1;
   background: #f8fafc;
+}
+
+.jobs-tag--visa {
+  color: #0f766e;
+  border-color: #5eead4;
+  background: #ccfbf1;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  box-shadow: 0 0 0 1px rgba(15, 118, 110, 0.12);
 }
 
 .jobs-card-actions {

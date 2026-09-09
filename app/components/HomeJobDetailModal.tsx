@@ -25,6 +25,7 @@ import {
   type SkillMatchResult,
   type SkillMatchTier,
 } from "@/lib/skill-match";
+import { jobOffersVisaSponsorship } from "@/lib/visa-sponsorship";
 import "@/app/jobs/jobs.css";
 
 export type HomeModalJob = {
@@ -644,6 +645,13 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
                   </span>
                 </li>
               </ul>
+              {jobOffersVisaSponsorship(displayJob) ? (
+                <p className="mt-3">
+                  <span className="jobs-tag jobs-tag--visa">
+                    Visa Sponsorship
+                  </span>
+                </p>
+              ) : null}
 
               <p className="job-detail-posted">
                 Posted {timeAgo(displayJob.createdAt)}

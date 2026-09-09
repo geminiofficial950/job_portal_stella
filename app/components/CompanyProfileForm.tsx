@@ -241,18 +241,25 @@ export default function CompanyProfileForm() {
         )}
         {company?.status === "pending" ? (
           <p className="text-sm font-medium text-[#92400e]">
-            ⏳ Waiting for admin approval before this company goes live.
+            Profile submitted. Hiring tools unlock after an admin approves your
+            company.
           </p>
         ) : null}
         {company?.status === "rejected" ? (
           <p className="text-sm font-medium text-[#991b1b]">
-            ❌ {company.rejectionReason ||
-              "Rejected. Update details and resubmit."}
+            {company.rejectionReason ||
+              "Not approved. Update your details and resubmit for review."}
           </p>
         ) : null}
         {company?.status === "approved" ? (
           <p className="text-sm font-medium text-[#065f46]">
-            ✅ Company is active. Editing will send it back to pending review.
+            Company is active. Major edits may send it back for admin review.
+          </p>
+        ) : null}
+        {!company ? (
+          <p className="text-sm font-medium text-[#475569]">
+            Please fill your company profile and get approved to unlock the
+            recruiter panel.
           </p>
         ) : null}
       </div>

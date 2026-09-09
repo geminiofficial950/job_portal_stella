@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
-import { Company } from "@/models/Company";
+import { requireApprovedRecruiterCompany } from "@/lib/recruiterCompanyAccess";
 import { User } from "@/models/User";
 import { VerificationRequest } from "@/models/VerificationRequest";
 
@@ -13,20 +13,11 @@ export async function GET(request: Request) {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
 
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
+
   try {
     await connectDB();
-    const company = await Company.findOne({ ownerId: result.auth.sub }).lean();
-    if (!company || company.status !== "approved") {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Company must be approved before searching candidates. ABN alone does not grant access.",
-          code: "COMPANY_NOT_APPROVED",
-        },
-        { status: 403 },
-      );
-    }
 
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() || "";

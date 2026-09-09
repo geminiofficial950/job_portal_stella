@@ -8,8 +8,8 @@ export default function RecruiterCompanyPage() {
           Company Profile
         </h1>
         <p className="mt-1 text-sm text-[#64748b]">
-          Add your business details and logo. Profiles stay pending until an
-          admin approves them.
+          Complete your business details here. Hiring tools stay locked until an
+          admin reviews and approves your company profile.
         </p>
       </div>
 

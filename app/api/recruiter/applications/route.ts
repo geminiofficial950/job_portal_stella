@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
+import { requireApprovedRecruiterCompany } from "@/lib/recruiterCompanyAccess";
 import {
   Application,
   serializeApplication,
@@ -21,6 +22,9 @@ function badRequest(message: string, status = 400) {
 export async function GET() {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
+
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
 
   try {
     await connectDB();
@@ -95,6 +99,9 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
+
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
 
   try {
     const body = await request.json();

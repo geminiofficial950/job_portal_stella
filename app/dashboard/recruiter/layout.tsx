@@ -1,5 +1,7 @@
 import { requireAuth } from "@/lib/requireAuth";
+import { getRecruiterCompanyAccess } from "@/lib/recruiterCompanyAccess";
 import RecruiterSidebar from "@/app/components/RecruiterSidebar";
+import RecruiterAccessShell from "@/app/components/RecruiterAccessShell";
 import ApplicationNotifications from "@/app/components/ApplicationNotifications";
 import { DASH } from "@/app/lib/dashboardTheme";
 
@@ -8,7 +10,8 @@ export default async function RecruiterDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireAuth(["recruiter"]);
+  const auth = await requireAuth(["recruiter"]);
+  const access = await getRecruiterCompanyAccess(auth.sub);
 
   return (
     <div
@@ -16,10 +19,12 @@ export default async function RecruiterDashboardLayout({
       style={{ background: DASH.bg }}
     >
       <div className="flex min-h-screen">
-        <RecruiterSidebar />
-        <div className="min-w-0 flex-1 overflow-x-hidden">{children}</div>
+        <RecruiterSidebar access={access} />
+        <div className="min-w-0 flex-1 overflow-x-hidden">
+          <RecruiterAccessShell access={access}>{children}</RecruiterAccessShell>
+        </div>
       </div>
-      <ApplicationNotifications />
+      {access.approved ? <ApplicationNotifications /> : null}
     </div>
   );
 }

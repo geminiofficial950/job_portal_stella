@@ -12,8 +12,29 @@ import {
 } from "lucide-react";
 import DashboardSidebarShell from "./DashboardSidebarShell";
 import { DASH } from "@/app/lib/dashboardTheme";
+import type { RecruiterCompanyAccess } from "@/lib/recruiterCompanyAccess";
 
-export default function RecruiterSidebar() {
+export default function RecruiterSidebar({
+  access,
+}: {
+  access: RecruiterCompanyAccess;
+}) {
+  const footerTitle = access.approved
+    ? "Workspace Active"
+    : !access.hasCompany
+      ? "Profile required"
+      : access.status === "rejected"
+        ? "Approval needed"
+        : "Awaiting approval";
+
+  const footerCopy = access.approved
+    ? "Post jobs, review applications & manage candidates."
+    : !access.hasCompany
+      ? "Complete your company profile, then wait for admin approval."
+      : access.status === "rejected"
+        ? "Update your company details and resubmit for review."
+        : "Hiring tools unlock after an admin approves your company.";
+
   return (
     <DashboardSidebarShell
       brandEyebrow="Hiring Workspace"
@@ -85,13 +106,18 @@ export default function RecruiterSidebar() {
         >
           <div className="flex items-center gap-2">
             <span
-              className="h-2 w-2 rounded-full shadow-[0_0_8px_#5850ec]"
-              style={{ background: DASH.accent }}
+              className={`h-2 w-2 rounded-full ${
+                access.approved
+                  ? "bg-[#34d399] shadow-[0_0_8px_#34d399]"
+                  : access.status === "rejected"
+                    ? "bg-[#f87171] shadow-[0_0_8px_#f87171]"
+                    : "bg-[#fbbf24] shadow-[0_0_8px_#fbbf24]"
+              }`}
             />
-            <p className="text-xs font-bold text-white">Workspace Active</p>
+            <p className="text-xs font-bold text-white">{footerTitle}</p>
           </div>
           <p className="mt-1.5 text-[11px] leading-relaxed text-white/50">
-            Post jobs, review applications & manage candidates.
+            {footerCopy}
           </p>
         </div>
       }

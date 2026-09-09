@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
+import { requireApprovedRecruiterCompany } from "@/lib/recruiterCompanyAccess";
 import { parseJobBody } from "@/lib/jobValidation";
 import { Job, serializeJob } from "@/models/Job";
 
@@ -13,6 +14,9 @@ function badRequest(message: string, status = 400) {
 export async function GET(_request: Request, { params }: Params) {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
+
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
 
   try {
     const { id } = await params;
@@ -41,6 +45,9 @@ export async function GET(_request: Request, { params }: Params) {
 export async function PUT(request: Request, { params }: Params) {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
+
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
 
   try {
     const { id } = await params;
@@ -78,6 +85,9 @@ export async function PUT(request: Request, { params }: Params) {
 export async function DELETE(_request: Request, { params }: Params) {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
+
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
 
   try {
     const { id } = await params;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
+import { requireApprovedRecruiterCompany } from "@/lib/recruiterCompanyAccess";
 import { parseJobBody } from "@/lib/jobValidation";
 import { Company } from "@/models/Company";
 import { Job, serializeJob } from "@/models/Job";
@@ -12,6 +13,9 @@ function badRequest(message: string, status = 400) {
 export async function GET() {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
+
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
 
   try {
     await connectDB();
@@ -75,6 +79,9 @@ export async function POST(request: Request) {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
 
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
+
   try {
     const body = await request.json();
     const parsed = parseJobBody(body);
@@ -87,13 +94,7 @@ export async function POST(request: Request) {
     const company = await Company.findOne({ ownerId: result.auth.sub });
     if (!company) {
       return badRequest(
-        "Create and get your company profile approved before posting jobs",
-        403
-      );
-    }
-    if (company.status !== "approved") {
-      return badRequest(
-        "Your company must be approved before you can post jobs",
+        "Complete your company profile and wait for admin approval before posting jobs",
         403
       );
     }

@@ -8,7 +8,8 @@ export default function RecruiterSettingsPage() {
           Account Settings
         </h1>
         <p className="mt-1 text-sm text-[#64748b]">
-          Manage your profile, notifications, hiring defaults, and team access.
+          Manage your account preferences. Posting jobs and hiring tools stay
+          locked until your company profile is approved.
         </p>
       </div>
 

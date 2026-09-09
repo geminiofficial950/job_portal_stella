@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
 import { makeRef } from "@/lib/learningStore";
+import { requireApprovedRecruiterCompany } from "@/lib/recruiterCompanyAccess";
 import { Company } from "@/models/Company";
 import { User } from "@/models/User";
 import { InterviewInvitation } from "@/models/Recruitment";
@@ -10,6 +11,9 @@ import { InterviewInvitation } from "@/models/Recruitment";
 export async function POST(request: Request) {
   const result = await requireApiAuth(["recruiter"]);
   if (result.error) return result.error;
+
+  const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+  if (gate.error) return gate.error;
 
   try {
     const body = await request.json();
@@ -29,9 +33,9 @@ export async function POST(request: Request) {
 
     await connectDB();
     const company = await Company.findOne({ ownerId: result.auth.sub });
-    if (!company || company.status !== "approved") {
+    if (!company) {
       return NextResponse.json(
-        { success: false, message: "Approved company required" },
+        { success: false, message: "Complete your company profile first." },
         { status: 403 },
       );
     }
@@ -96,6 +100,11 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   const result = await requireApiAuth(["user", "recruiter"]);
   if (result.error) return result.error;
+
+  if (result.auth.role === "recruiter") {
+    const gate = await requireApprovedRecruiterCompany(result.auth.sub);
+    if (gate.error) return gate.error;
+  }
 
   try {
     const body = await request.json();

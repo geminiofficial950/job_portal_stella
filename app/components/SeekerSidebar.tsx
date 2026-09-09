@@ -31,7 +31,7 @@ export default function SeekerSidebar() {
             },
             {
               label: "Find Jobs",
-              href: "/dashboard/seeker/jobs",
+              href: "/jobs",
               icon: Search,
             },
           ],

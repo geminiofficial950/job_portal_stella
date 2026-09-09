@@ -70,7 +70,7 @@ export default async function SeekerOverviewPage() {
       label: "Open Roles",
       value: openJobs,
       icon: Briefcase,
-      href: "/dashboard/seeker/jobs",
+      href: "/jobs",
       actionIcon: Search,
       action: "Browse",
     },
@@ -104,7 +104,7 @@ export default async function SeekerOverviewPage() {
     {
       title: "Browse Open Jobs",
       copy: "Search live roles from approved employers.",
-      href: "/dashboard/seeker/jobs",
+      href: "/jobs",
       icon: Search,
     },
     {
@@ -127,7 +127,7 @@ export default async function SeekerOverviewPage() {
         title={`Hey, ${auth.name.split(" ")[0]}`}
         subtitle="Manage your profile, applications, and interviews in one place."
         action={
-          <DashboardPrimaryButton href="/dashboard/seeker/jobs" icon={Search}>
+          <DashboardPrimaryButton href="/jobs" icon={Search}>
             Find jobs
           </DashboardPrimaryButton>
         }

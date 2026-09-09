@@ -78,7 +78,7 @@ export default function SeekerApplicationsList() {
           Browse open roles and apply — they&apos;ll show up here.
         </p>
         <Link
-          href="/dashboard/seeker/jobs"
+          href="/jobs"
           className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0f2744]"
         >
           <Briefcase className="h-4 w-4" />

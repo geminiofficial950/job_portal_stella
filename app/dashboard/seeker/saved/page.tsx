@@ -22,7 +22,7 @@ export default function SeekerSavedPage() {
           Bookmark roles from Find Jobs and they&apos;ll land here.
         </p>
         <Link
-          href="/dashboard/seeker/jobs"
+          href="/jobs"
           className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#db2777] to-[#f472b6] px-5 py-3 text-sm font-bold text-white shadow-md hover:scale-105 transition-transform"
         >
           <Search className="h-4 w-4" />

@@ -3,6 +3,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import {
   X,
   MapPin,
@@ -306,10 +308,12 @@ type Props = {
 };
 
 export default function HomeJobDetailModal({ job, onClose }: Props) {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { openAuth } = useAuthModal();
   const [mounted, setMounted] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [applying, setApplying] = useState(false);
   const [profileSkills, setProfileSkills] = useState<string[]>([]);
   const [profileSkillsLoaded, setProfileSkillsLoaded] = useState(false);
   const [enrichedJob, setEnrichedJob] = useState<HomeModalJob | null>(null);
@@ -322,6 +326,10 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    setApplying(false);
+  }, [job?.id]);
 
   useEffect(() => {
     if (!job) return;
@@ -468,18 +476,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
     activeJob.source === "jooble";
 
   function renderApplyAction() {
-    if (activeJob.source === "jooble" && activeJob.applyUrl) {
-      return (
-        <a
-          href={activeJob.applyUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="job-detail-apply-btn"
-        >
-          Apply on Jooble
-        </a>
-      );
-    }
+    const isStellaJob = /^[a-f\d]{24}$/i.test(activeJob.id);
 
     if (!authLoading && !user) {
       return (
@@ -494,18 +491,63 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
     }
 
     return (
-      <Link
-        href={user?.role === "user" ? "/dashboard/seeker/jobs" : "#"}
+      <button
+        type="button"
         className="job-detail-apply-btn"
-        onClick={(e) => {
-          if (user?.role !== "user") {
-            e.preventDefault();
+        disabled={applying}
+        onClick={async () => {
+          if (!user || user.role !== "user") {
             openAuth({ mode: "login", role: "user" });
+            return;
+          }
+          setApplying(true);
+          try {
+            const body = isStellaJob
+              ? { jobId: activeJob.id }
+              : {
+                  jobId: activeJob.id,
+                  boardJob: {
+                    id: activeJob.id,
+                    source: activeJob.source || "board",
+                    title: activeJob.title,
+                    companyName: activeJob.company || "",
+                    location: activeJob.location || "",
+                    employmentType: activeJob.employmentType || "",
+                    workMode: activeJob.workMode || "",
+                    category: activeJob.category || "",
+                    applyUrl: activeJob.applyUrl || "",
+                  },
+                };
+            const res = await fetch("/api/seeker/applications", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              toast.error(data.message || "Could not apply");
+              if (
+                typeof data.message === "string" &&
+                data.message.toLowerCase().includes("profile")
+              ) {
+                setTimeout(
+                  () => router.push("/dashboard/seeker/profile"),
+                  1200,
+                );
+              }
+              return;
+            }
+            toast.success("Applied successfully");
+            onClose();
+          } catch {
+            toast.error("Could not apply");
+          } finally {
+            setApplying(false);
           }
         }}
       >
-        Apply
-      </Link>
+        {applying ? "Applying…" : "Apply"}
+      </button>
     );
   }
 

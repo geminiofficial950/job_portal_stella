@@ -28,6 +28,8 @@ import {
 import { useAuth } from "@/app/components/AuthProvider";
 import { useAuthModal } from "@/app/components/AuthModalProvider";
 import SignInMenu from "@/app/components/SignInMenu";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 import {
   formatAdzunaDescriptionPreview,
   stripHtmlToText,
@@ -578,6 +580,7 @@ function JobSearchInner() {
     searchParams.get("suburb")?.trim() ||
     "";
   const countryFromUrl = searchParams.get("country")?.trim().toLowerCase() || "";
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { openAuth } = useAuthModal();
 
@@ -588,6 +591,7 @@ function JobSearchInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adzunaWarning, setAdzunaWarning] = useState("");
+  const [applying, setApplying] = useState(false);
   const [visibleCount, setVisibleCount] = useState(JOBS_PAGE_SIZE);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -1217,18 +1221,7 @@ function JobSearchInner() {
   const renderApplyAction = () => {
     if (!displayJobDetail) return null;
 
-    if (displayJobDetail.source === "jooble" && displayJobDetail.applyUrl) {
-      return (
-        <a
-          href={displayJobDetail.applyUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="job-detail-apply-btn"
-        >
-          Apply on Jooble
-        </a>
-      );
-    }
+    const isStellaJob = /^[a-f\d]{24}$/i.test(displayJobDetail.id);
 
     if (!authLoading && !user) {
       return (
@@ -1241,19 +1234,65 @@ function JobSearchInner() {
         </button>
       );
     }
+
     return (
-      <Link
-        href={user?.role === "user" ? "/dashboard/seeker/jobs" : "#"}
+      <button
+        type="button"
         className="job-detail-apply-btn"
-        onClick={(e) => {
-          if (user?.role !== "user") {
-            e.preventDefault();
+        disabled={applying}
+        onClick={async () => {
+          if (!user || user.role !== "user") {
             openAuth({ mode: "login", role: "user" });
+            return;
+          }
+          setApplying(true);
+          try {
+            const body = isStellaJob
+              ? { jobId: displayJobDetail.id }
+              : {
+                  jobId: displayJobDetail.id,
+                  boardJob: {
+                    id: displayJobDetail.id,
+                    source: displayJobDetail.source || "board",
+                    title: displayJobDetail.title,
+                    companyName: displayJobDetail.company?.name || "",
+                    location: displayJobDetail.location || "",
+                    employmentType: displayJobDetail.employmentType || "",
+                    workMode: displayJobDetail.workMode || "",
+                    category: displayJobDetail.category || "",
+                    applyUrl: displayJobDetail.applyUrl || "",
+                  },
+                };
+            const res = await fetch("/api/seeker/applications", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              toast.error(data.message || "Could not apply");
+              if (
+                typeof data.message === "string" &&
+                data.message.toLowerCase().includes("profile")
+              ) {
+                setTimeout(
+                  () => router.push("/dashboard/seeker/profile"),
+                  1200,
+                );
+              }
+              return;
+            }
+            toast.success("Applied successfully");
+            closeJobDetail();
+          } catch {
+            toast.error("Could not apply");
+          } finally {
+            setApplying(false);
           }
         }}
       >
-        Apply
-      </Link>
+        {applying ? "Applying…" : "Apply"}
+      </button>
     );
   };
 

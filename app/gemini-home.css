@@ -1169,7 +1169,8 @@
   color: #ffffff !important;
 }
 
-.gemini-home .au-vacancies-section a.vacancy-table-cta {
+.gemini-home .au-vacancies-section a.vacancy-table-cta,
+.gemini-home .au-vacancies-section button.vacancy-table-cta {
   color: #ffffff !important;
   background-color: #2563eb !important;
   display: inline-flex !important;
@@ -1177,9 +1178,12 @@
   gap: 0.35rem;
   white-space: nowrap;
   text-decoration: none !important;
+  border: none;
+  cursor: pointer;
 }
 
-.gemini-home .au-vacancies-section a.vacancy-table-cta:hover {
+.gemini-home .au-vacancies-section a.vacancy-table-cta:hover,
+.gemini-home .au-vacancies-section button.vacancy-table-cta:hover {
   background-color: #1d4ed8 !important;
   color: #ffffff !important;
 }
@@ -1193,6 +1197,105 @@
 .gemini-home .au-vacancies-section a.vacancy-find-more:hover {
   background-color: #00061f !important;
   color: #ffffff !important;
+}
+
+/* Homepage job popup — always visible (jobs.css hides desktop-only modal on mobile) */
+.home-job-detail-modal.job-detail-modal,
+.home-job-detail-modal {
+  display: flex !important;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+@media (min-width: 640px) {
+  .home-job-detail-modal.job-detail-modal,
+  .home-job-detail-modal {
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* Keep jobs modal CTAs readable inside .gemini-home a { color: inherit } */
+.gemini-home .home-job-detail-modal a.job-detail-apply-btn,
+.gemini-home .home-job-detail-modal .job-detail-apply-btn {
+  color: #ffffff !important;
+}
+
+.gemini-home .home-job-detail-modal a.job-skill-match-cta,
+.gemini-home .home-job-detail-modal .job-skill-match-cta {
+  color: inherit;
+}
+
+.gemini-home .home-job-detail-modal a.job-detail-external-cta__btn {
+  color: #2563eb !important;
+}
+
+/*
+ * Homepage typography (huge h1/h2 clamps) was leaking into the job popup
+ * and leaving a big blank gap above the description.
+ */
+.gemini-home .home-job-detail-modal h1,
+.gemini-home .home-job-detail-modal h2,
+.gemini-home .home-job-detail-modal h3,
+.gemini-home .home-job-detail-modal h4 {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  font-weight: inherit;
+}
+
+.gemini-home .home-job-detail-modal .job-detail-title {
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.01em !important;
+  color: #1c242d !important;
+}
+
+@media (min-width: 1024px) {
+  .gemini-home .home-job-detail-modal .job-detail-title {
+    font-size: 1.5rem !important;
+  }
+}
+
+.gemini-home .home-job-detail-modal .job-detail-prose h1,
+.gemini-home .home-job-detail-modal .job-detail-prose h2,
+.gemini-home .home-job-detail-modal .job-detail-prose h3,
+.gemini-home .home-job-detail-modal .job-detail-prose h4,
+.gemini-home .home-job-detail-modal .job-detail-prose .job-desc-heading {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.01em !important;
+  color: #111827 !important;
+  margin: 1.5rem 0 0.75rem !important;
+}
+
+.gemini-home
+  .home-job-detail-modal
+  .job-detail-prose
+  .job-desc-heading:first-child,
+.gemini-home .home-job-detail-modal .job-detail-prose h3:first-child,
+.gemini-home .home-job-detail-modal .job-detail-prose p:first-child,
+.gemini-home .home-job-detail-modal .job-detail-prose .job-desc-meta:first-child {
+  margin-top: 0 !important;
+}
+
+.gemini-home .home-job-detail-modal .job-detail-panel__hero {
+  padding-bottom: 1rem;
+}
+
+.gemini-home .home-job-detail-modal .job-detail-panel__body {
+  padding-top: 1.1rem;
+}
+
+.gemini-home .home-job-detail-modal .job-skill-match-wrap {
+  margin-bottom: 0;
 }
 
 .gemini-home .trusted-by-section {

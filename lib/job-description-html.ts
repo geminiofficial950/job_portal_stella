@@ -61,7 +61,12 @@ function cleanupWhitespace(html: string): string {
   return html
     .replace(/(<br\s*\/?>\s*){3,}/gi, "<br/><br/>")
     .replace(/(<\/p>\s*){2,}/gi, "</p>")
-    .replace(/<p[^>]*>\s*<\/p>/gi, "")
+    .replace(/<p[^>]*>\s*(?:&nbsp;|\u00a0|\s|<br\s*\/?>)*\s*<\/p>/gi, "")
+    .replace(
+      /<h([1-6])[^>]*>\s*(?:&nbsp;|\u00a0|\s|<br\s*\/?>)*\s*<\/h\1>/gi,
+      "",
+    )
+    .replace(/^(?:\s|<br\s*\/?>|&nbsp;|\u00a0)+/i, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import HeroSection from "./HeroSection";
 import MemberBenefitsSection from "./MemberBenefitsSection";
 import HomeJobSearchStrip from "./HomeJobSearchStrip";
+import HomeJobDetailModal from "./HomeJobDetailModal";
 import {
   CareerJourneyStrip,
   LearningPreviewStrip,
@@ -18,13 +19,26 @@ type HomeJob = {
   id: string;
   title: string;
   company?: string;
+  companyLogoUrl?: string;
+  companyAbout?: string;
   location?: string;
   employmentType?: string;
   workMode?: string;
+  category?: string;
+  experienceLevel?: string;
   salaryMin?: number | null;
   salaryMax?: number | null;
   salaryCurrency?: string;
   salaryPeriod?: string;
+  description?: string;
+  requirements?: string;
+  responsibilities?: string;
+  skills?: string[];
+  source?: string;
+  applyUrl?: string;
+  adref?: string;
+  countryLabel?: string;
+  createdAt?: string | null;
 };
 
 const PERIOD_LABELS: Record<string, string> = {
@@ -54,16 +68,6 @@ function formatSalary(job: HomeJob) {
   return period ? `${amount} / ${period}` : amount;
 }
 
-function companyName(value: unknown): string {
-  if (!value) return "";
-  if (typeof value === "string") return value;
-  if (typeof value === "object" && value && "name" in value) {
-    const name = (value as { name?: unknown }).name;
-    return typeof name === "string" ? name : "";
-  }
-  return "";
-}
-
 function formatLocationLines(location?: string): [string, string?] {
   const raw = (location || "Australia").trim();
   if (raw.includes(" · ")) {
@@ -86,17 +90,50 @@ function formatLocationLines(location?: string): [string, string?] {
 }
 
 function mapHomeJob(j: Record<string, unknown>): HomeJob {
+  const company = j.company;
+  let companyNameStr = "";
+  let companyLogoUrl = "";
+  if (typeof company === "string") {
+    companyNameStr = company;
+  } else if (company && typeof company === "object") {
+    const c = company as { name?: unknown; logoUrl?: unknown };
+    companyNameStr = typeof c.name === "string" ? c.name : "";
+    companyLogoUrl = typeof c.logoUrl === "string" ? c.logoUrl : "";
+  }
+
+  const companyAbout =
+    company && typeof company === "object"
+      ? String((company as { about?: unknown }).about || "")
+      : "";
+
+  const skills = Array.isArray(j.skills)
+    ? j.skills.map((s) => String(s).trim()).filter(Boolean)
+    : [];
+
   return {
     id: String(j.id || j._id || ""),
     title: String(j.title || "Role"),
-    company: companyName(j.company),
+    company: companyNameStr,
+    companyLogoUrl,
+    companyAbout,
     location: j.location ? String(j.location) : "",
     employmentType: j.employmentType ? String(j.employmentType) : "",
     workMode: j.workMode ? String(j.workMode) : "",
+    category: j.category ? String(j.category) : "",
+    experienceLevel: j.experienceLevel ? String(j.experienceLevel) : "",
     salaryMin: typeof j.salaryMin === "number" ? j.salaryMin : null,
     salaryMax: typeof j.salaryMax === "number" ? j.salaryMax : null,
     salaryCurrency: j.salaryCurrency ? String(j.salaryCurrency) : "AUD",
     salaryPeriod: j.salaryPeriod ? String(j.salaryPeriod) : "",
+    description: j.description ? String(j.description) : "",
+    requirements: j.requirements ? String(j.requirements) : "",
+    responsibilities: j.responsibilities ? String(j.responsibilities) : "",
+    skills,
+    source: j.source ? String(j.source) : "",
+    applyUrl: j.applyUrl ? String(j.applyUrl) : "",
+    adref: j.adref ? String(j.adref) : "",
+    countryLabel: j.countryLabel ? String(j.countryLabel) : "",
+    createdAt: j.createdAt ? String(j.createdAt) : null,
   };
 }
 
@@ -129,6 +166,7 @@ function pickPaidAuJobs(
 function GenuineJobsStrip() {
   const [jobs, setJobs] = useState<HomeJob[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<HomeJob | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -258,8 +296,9 @@ function GenuineJobsStrip() {
                         {formatSalary(job)}
                       </td>
                       <td className="px-5 py-4 align-middle text-right sm:px-6">
-                        <Link
-                          href={`/jobs/${encodeURIComponent(job.id)}`}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedJob(job)}
                           className="vacancy-table-cta inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#2563eb] px-4 py-2.5 text-sm font-bold shadow-sm transition hover:bg-[#1d4ed8]"
                           style={{ color: "#ffffff" }}
                         >
@@ -278,7 +317,7 @@ function GenuineJobsStrip() {
                             <path d="M5 12h14" />
                             <path d="m12 5 7 7-7 7" />
                           </svg>
-                        </Link>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -312,6 +351,11 @@ function GenuineJobsStrip() {
           </Link>
         </div>
       </div>
+
+      <HomeJobDetailModal
+        job={selectedJob}
+        onClose={() => setSelectedJob(null)}
+      />
     </section>
   );
 }

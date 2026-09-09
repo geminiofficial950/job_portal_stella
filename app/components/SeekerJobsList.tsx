@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Loader2, MapPin, Search, Sparkles, Check } from "lucide-react";
+import { Loader2, MapPin, Search, Check } from "lucide-react";
 
 type SeekerJob = {
   id: string;
@@ -106,7 +106,7 @@ function SeekerJobsListInner() {
     <div>
       {matchedMode ? (
         <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#c5d0e0] bg-[#f1f5f9] px-4 py-3 text-sm text-[#1e3a5f]">
-          <Sparkles className="h-4 w-4 shrink-0" />
+          <Check className="h-4 w-4 shrink-0" />
           Showing jobs that match your profile skills.
         </div>
       ) : null}

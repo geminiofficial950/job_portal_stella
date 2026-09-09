@@ -104,11 +104,7 @@ export default function AuthModal() {
   if (!open) return null;
 
   return (
-    <div
-      className="auth-modal-overlay"
-      role="presentation"
-      onClick={closeAuth}
-    >
+    <div className="auth-modal-overlay" role="presentation" onClick={closeAuth}>
       <div
         className="auth-modal"
         role="dialog"
@@ -134,7 +130,7 @@ export default function AuthModal() {
         <div className="auth-modal-panel">
           <h2 id="auth-modal-title" className="auth-brand">
             {isLogin ? "Sign in to" : "Join"}{" "}
-            <span>Gemini Education and Careers</span>
+            <span>Stella Careers</span>
           </h2>
           <p className="auth-sub">
             {isLogin
@@ -146,7 +142,11 @@ export default function AuthModal() {
                 : "Create a profile and start getting matched."}
           </p>
 
-          <div className="auth-role-switch" role="tablist" aria-label="Account type">
+          <div
+            className="auth-role-switch"
+            role="tablist"
+            aria-label="Account type"
+          >
             <button
               type="button"
               className={!isRecruiter ? "is-active" : ""}

@@ -9,6 +9,7 @@ import {
   UserRound,
   Settings,
   Briefcase,
+  Bell,
 } from "lucide-react";
 import DashboardSidebarShell from "./DashboardSidebarShell";
 
@@ -52,6 +53,11 @@ export default function SeekerSidebar() {
               label: "Interviews",
               href: "/dashboard/seeker/interviews",
               icon: CalendarCheck,
+            },
+            {
+              label: "Learning prefs",
+              href: "/dashboard/seeker/preferences",
+              icon: Bell,
             },
           ],
         },

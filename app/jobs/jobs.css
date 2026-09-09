@@ -1,8 +1,8 @@
 /* Jobs browse — professional list layout */
 
 .jobs-page {
-  --jobs-primary: #00082C;
-  --jobs-primary-hover: #00061F;
+  --jobs-primary: #00082c;
+  --jobs-primary-hover: #00061f;
   --jobs-surface: #ffffff;
   --jobs-bg: #f5f8ff;
   --jobs-border: #e5e7eb;
@@ -19,8 +19,13 @@
   z-index: 1;
   overflow: hidden;
   padding: 0.55rem 1.25rem 0.75rem;
-  background: #00082C;
-  border-bottom: none;
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: saturate(180%) blur(28px);
+  -webkit-backdrop-filter: saturate(180%) blur(28px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 0 rgba(0, 8, 44, 0.06);
 }
 
 @media (min-width: 1280px) {
@@ -35,46 +40,162 @@
   left: 0;
   right: 0;
   z-index: 60;
-  padding: 0.65rem 1.25rem;
-  background: #00082C;
-  box-shadow: 0 10px 28px rgba(0, 0, 80, 0.22);
-  transform: translate3d(0, -110%, 0);
-  opacity: 0;
+  padding: 0.6rem 1.25rem;
+  /* iOS-style: translucent fill so backdrop color bleeds through */
+  background: rgba(255, 255, 255, 0.48);
+  backdrop-filter: saturate(180%) blur(32px);
+  -webkit-backdrop-filter: saturate(180%) blur(32px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 8px 28px rgba(0, 8, 44, 0.08);
+  transform: translate3d(0, -120%, 0);
+  /* opacity breaks backdrop-filter — hide with transform only */
+  visibility: hidden;
   pointer-events: none;
   transition:
     transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.28s ease;
-  will-change: transform, opacity;
+    visibility 0s linear 0.42s;
+  will-change: transform;
+}
+
+.jobs-search-fixed-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: 3.4rem;
+}
+
+.jobs-search-fixed-logo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 13rem;
+  min-width: 0;
+  overflow: visible;
+  text-decoration: none;
+}
+
+.jobs-brand-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  font-family: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui,
+    sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.jobs-brand-text__stella {
+  color: #00082c;
+}
+
+.jobs-brand-text__careers {
+  color: #c5a028;
 }
 
 .jobs-search-fixed-inner {
-  width: 100%;
-  max-width: 56rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 46rem;
   margin: 0 auto;
 }
 
 .jobs-search-fixed .jobs-search-bar {
   margin-top: 0;
   max-width: none;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(0, 8, 44, 0.14);
+  box-shadow: 0 4px 16px rgba(0, 8, 44, 0.08);
+}
+
+.jobs-search-fixed-menu {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  width: 11.5rem;
+  min-width: 0;
+}
+
+.jobs-search-fixed-nav {
+  display: none;
+  color: #00082c;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.jobs-search-fixed-nav:hover {
+  opacity: 0.72;
+}
+
+@media (min-width: 768px) {
+  .jobs-search-fixed-logo {
+    width: 14.5rem;
+  }
+
+  .jobs-brand-text {
+    font-size: 1.3rem;
+  }
+
+  .jobs-search-fixed-menu {
+    width: 13.5rem;
+  }
+
+  .jobs-search-fixed-nav {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .jobs-search-fixed-logo {
+    width: 16.5rem;
+  }
+
+  .jobs-brand-text {
+    font-size: 1.4rem;
+  }
+
+  .jobs-search-fixed-menu {
+    width: 15rem;
+  }
 }
 
 header {
   transition:
     transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.28s ease;
-  will-change: transform, opacity;
+    visibility 0s linear 0s;
+  will-change: transform;
 }
 
+/* Scroll: swap main header for sticky logo + search + menu */
 html.jobs-search-compact header {
   transform: translate3d(0, -110%, 0);
-  opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+  transition:
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.42s;
 }
 
 html.jobs-search-compact .jobs-search-fixed {
   transform: translate3d(0, 0, 0);
-  opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  transition:
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0s;
 }
 
 @media (min-width: 1280px) {
@@ -107,18 +228,35 @@ html.jobs-search-compact .jobs-search-fixed {
   text-align: center;
 }
 
+.jobs-hero-search-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.55rem;
+}
+
+.jobs-hero-search-row .jobs-search-bar {
+  width: 100%;
+  max-width: 48rem;
+  margin-top: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .jobs-hero h1 {
   font-size: clamp(1.2rem, 2.4vw, 1.55rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #ffffff;
+  color: #00082c;
   line-height: 1.2;
   margin: 0;
 }
 
 .jobs-hero h1 em {
   font-style: normal;
-  color: #ffffff;
+  color: #00082c;
   position: relative;
 }
 
@@ -129,7 +267,7 @@ html.jobs-search-compact .jobs-search-fixed {
   right: 0;
   bottom: 1px;
   height: 5px;
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(0, 8, 44, 0.18);
   border-radius: 4px;
   z-index: -1;
 }
@@ -139,7 +277,7 @@ html.jobs-search-compact .jobs-search-fixed {
   margin-bottom: 0;
   font-size: 0.8rem;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(0, 8, 44, 0.72);
 }
 
 @media (max-width: 639px) {
@@ -156,10 +294,10 @@ html.jobs-search-compact .jobs-search-fixed {
   width: 100%;
   max-width: 48rem;
   margin: 0.65rem auto 0;
-  background: var(--jobs-surface);
-  border: 1px solid var(--jobs-border);
+  background: #ffffff;
+  border: 1px solid rgba(0, 8, 44, 0.14);
   border-radius: 0.85rem;
-  box-shadow: 0 6px 20px rgba(0, 0, 255, 0.07);
+  box-shadow: 0 6px 20px rgba(0, 8, 44, 0.08);
   overflow: hidden;
 }
 
@@ -217,12 +355,12 @@ html.jobs-search-compact .jobs-search-fixed {
   margin-left: auto;
   margin-right: auto;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(0, 8, 44, 0.72);
 }
 
 .jobs-popular button {
   margin-left: 0.35rem;
-  color: #ffffff;
+  color: #00082c;
   font-weight: 600;
   background: none;
   border: none;
@@ -651,7 +789,27 @@ html.jobs-search-compact .jobs-search-fixed {
   }
 
   .jobs-search-fixed {
-    padding: 0.55rem 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .jobs-search-fixed-row {
+    gap: 0.55rem;
+    min-height: 3rem;
+  }
+
+  .jobs-search-fixed-logo {
+    width: 8.25rem;
+  }
+
+  .jobs-brand-text {
+    font-size: 0.88rem;
+    letter-spacing: 0.04em;
+    gap: 0.28em;
+  }
+
+  .jobs-search-fixed-menu {
+    width: auto;
+    min-width: 5.5rem;
   }
 
   .jobs-search-fixed .jobs-search-bar {
@@ -665,7 +823,7 @@ html.jobs-search-compact .jobs-search-fixed {
     min-width: 0;
     border-bottom: none;
     border-right: 1px solid var(--jobs-border);
-    padding: 0.45rem 0.55rem;
+    padding: 0.4rem 0.45rem;
   }
 
   .jobs-search-fixed .jobs-search-field:last-of-type {
@@ -673,15 +831,15 @@ html.jobs-search-compact .jobs-search-fixed {
   }
 
   .jobs-search-fixed .jobs-search-field input {
-    font-size: 0.78rem;
+    font-size: 0.72rem;
   }
 
   .jobs-search-fixed .jobs-search-btn {
     width: auto;
     flex: 0 0 auto;
-    margin: 0.25rem;
-    padding: 0.5rem 0.8rem;
-    font-size: 0.78rem;
+    margin: 0.2rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.72rem;
   }
 
   .jobs-results-header {
@@ -832,7 +990,7 @@ html.jobs-search-compact .jobs-search-fixed {
   font-weight: 800;
   font-size: 1rem;
   color: #fff;
-  background: linear-gradient(135deg, #00082C, #1A3A6B);
+  background: linear-gradient(135deg, #00082c, #1a3a6b);
   overflow: hidden;
 }
 
@@ -895,7 +1053,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-tag--purple {
-  color: #00082C;
+  color: #00082c;
   border-color: #b3b3ff;
   background: #f0f4ff;
 }
@@ -1084,7 +1242,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-card-match-ring--good {
-  --ring-color: #00082C;
+  --ring-color: #00082c;
 }
 
 .jobs-card-match-ring--wildcard {
@@ -1126,7 +1284,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .jobs-card-match--good .jobs-card-match-title {
-  color: #00082C;
+  color: #00082c;
 }
 
 .jobs-card-match--wildcard .jobs-card-match-title {
@@ -1613,7 +1771,7 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .job-skill-match-ring--good {
-  --ring-color: #00082C;
+  --ring-color: #00082c;
 }
 
 .job-skill-match-ring--wildcard {

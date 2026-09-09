@@ -24,6 +24,7 @@ function LoginForm() {
     () => resolveRole(searchParams.get("role")),
     [searchParams],
   );
+  const nextPath = searchParams.get("next")?.trim() || "";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,7 +54,9 @@ function LoginForm() {
       await refreshUser();
       toast.success("Signed in successfully");
 
-      if (data.user?.role === "recruiter") {
+      if (nextPath.startsWith("/") && !nextPath.startsWith("//")) {
+        router.push(nextPath);
+      } else if (data.user?.role === "recruiter") {
         router.push("/dashboard/recruiter");
       } else if (data.user?.role === "admin") {
         router.push("/dashboard/admin");
@@ -72,7 +75,7 @@ function LoginForm() {
     <AuthShell
       role={role}
       titlePrefix="Sign in to"
-      titleAccent="Gemini Education and Careers"
+      titleAccent="Stella Careers"
       subtitle={
         isRecruiter
           ? "Post roles and review verified candidates."

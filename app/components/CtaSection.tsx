@@ -40,11 +40,11 @@ export default function CtaSection() {
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <a href="#" className="cta-btn cta-btn-primary">
+            <a href="/register?role=recruiter&next=/dashboard/recruiter/jobs/new" className="cta-btn cta-btn-primary">
               Post a job
               <ArrowRight className="h-4 w-4" strokeWidth={2.2} />
             </a>
-            <a href="#" className="cta-btn cta-btn-ghost">
+            <a href="/profile/setup" className="cta-btn cta-btn-ghost">
               Create your profile
             </a>
           </div>

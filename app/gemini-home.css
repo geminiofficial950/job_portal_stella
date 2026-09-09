@@ -1119,13 +1119,80 @@
   font-style: normal;
 }
 
-.gemini-home section:not(.hero-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
+.gemini-home section:not(.hero-section):not(.benefits-section):not(.journey-section):not(.learning-flow-section):not(.au-vacancies-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
   padding: 104px 0;
 }
 
 .gemini-home .hero-section {
   padding: 0 !important;
   min-height: 0 !important;
+}
+
+/* Primary CTA is white on blue; override .gemini-home a { color: inherit } */
+.gemini-home .hero-section a.hero-primary-cta {
+  color: #00082c !important;
+}
+
+.gemini-home .benefits-section a.benefit-card-cta {
+  color: #ffffff !important;
+}
+
+.gemini-home .benefits-section .benefits-intro {
+  text-align: center !important;
+}
+
+.gemini-home .journey-section .journey-intro {
+  text-align: center !important;
+}
+
+.gemini-home .journey-section a.journey-step-link {
+  color: #0d5c4d !important;
+}
+
+.gemini-home .learning-flow-section .learning-flow-intro {
+  text-align: center !important;
+}
+
+.gemini-home .learning-flow-section a.learning-flow-cta {
+  color: #2563eb !important;
+}
+
+.gemini-home .employers-home-strip a.employer-primary-cta {
+  color: #00082c !important;
+}
+
+.gemini-home .employers-home-strip a.employer-secondary-cta {
+  color: #ffffff !important;
+}
+
+.gemini-home a.faq-primary-cta {
+  color: #ffffff !important;
+}
+
+.gemini-home .au-vacancies-section a.vacancy-table-cta {
+  color: #ffffff !important;
+  background-color: #2563eb !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  text-decoration: none !important;
+}
+
+.gemini-home .au-vacancies-section a.vacancy-table-cta:hover {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+.gemini-home .au-vacancies-section a.vacancy-find-more {
+  color: #ffffff !important;
+  background-color: #00082c !important;
+  text-decoration: none !important;
+}
+
+.gemini-home .au-vacancies-section a.vacancy-find-more:hover {
+  background-color: #00061f !important;
+  color: #ffffff !important;
 }
 
 .gemini-home .trusted-by-section {

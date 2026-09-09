@@ -94,6 +94,35 @@ const UserSchema = new Schema(
       portfolio: { type: String, trim: true, maxlength: 200, default: "" },
       resumeUrl: { type: String, trim: true, maxlength: 500, default: "" },
       openToWork: { type: Boolean, default: true },
+      /** C05 / E02 — employer discovery controls */
+      discoverable: { type: Boolean, default: false },
+      discoveryPaused: { type: Boolean, default: false },
+      suburb: { type: String, trim: true, maxlength: 120, default: "" },
+      travelRadiusKm: { type: Number, default: 25, min: 0, max: 500 },
+      availabilityNote: { type: String, trim: true, maxlength: 300, default: "" },
+      availabilityConfirmedAt: { type: Date, default: null },
+      targetRoles: { type: [String], default: [] },
+      /** C06 — separate status tracks (not a single hiring rank) */
+      profileStatus: {
+        type: String,
+        enum: ["incomplete", "basic", "complete"],
+        default: "incomplete",
+      },
+      credentialStatus: {
+        type: String,
+        enum: ["none", "pending", "partial", "verified"],
+        default: "none",
+      },
+      screeningStatus: {
+        type: String,
+        enum: ["none", "pending", "clear", "attention"],
+        default: "none",
+      },
+      availabilityStatus: {
+        type: String,
+        enum: ["unknown", "available", "limited", "unavailable"],
+        default: "unknown",
+      },
     },
     settings: {
       notifications: {
@@ -107,6 +136,10 @@ const UserSchema = new Schema(
         emailApplicationUpdates: { type: Boolean, default: true },
         emailInterviewReminders: { type: Boolean, default: true },
         emailWeeklyDigest: { type: Boolean, default: false },
+        emailSessionReminders: { type: Boolean, default: true },
+        emailCourseUpdates: { type: Boolean, default: true },
+        emailEventReminders: { type: Boolean, default: true },
+        emailMarketing: { type: Boolean, default: false },
       },
       hiring: {
         defaultEmploymentType: {
@@ -252,6 +285,21 @@ export function defaultSeekerProfile() {
     portfolio: "",
     resumeUrl: "",
     openToWork: true,
+    discoverable: false,
+    discoveryPaused: false,
+    suburb: "",
+    travelRadiusKm: 25,
+    availabilityNote: "",
+    availabilityConfirmedAt: null as string | null,
+    targetRoles: [] as string[],
+    profileStatus: "incomplete" as "incomplete" | "basic" | "complete",
+    credentialStatus: "none" as "none" | "pending" | "partial" | "verified",
+    screeningStatus: "none" as "none" | "pending" | "clear" | "attention",
+    availabilityStatus: "unknown" as
+      | "unknown"
+      | "available"
+      | "limited"
+      | "unavailable",
   };
 }
 
@@ -285,6 +333,17 @@ export function serializeSeekerProfile(user: {
     portfolio?: string | null;
     resumeUrl?: string | null;
     openToWork?: boolean | null;
+    discoverable?: boolean | null;
+    discoveryPaused?: boolean | null;
+    suburb?: string | null;
+    travelRadiusKm?: number | null;
+    availabilityNote?: string | null;
+    availabilityConfirmedAt?: Date | string | null;
+    targetRoles?: string[] | null;
+    profileStatus?: string | null;
+    credentialStatus?: string | null;
+    screeningStatus?: string | null;
+    availabilityStatus?: string | null;
   } | null;
   settings?: {
     seekerNotifications?: {
@@ -328,6 +387,22 @@ export function serializeSeekerProfile(user: {
       portfolio: p?.portfolio ?? d.portfolio,
       resumeUrl: p?.resumeUrl ?? d.resumeUrl,
       openToWork: p?.openToWork ?? d.openToWork,
+      discoverable: p?.discoverable ?? d.discoverable,
+      discoveryPaused: p?.discoveryPaused ?? d.discoveryPaused,
+      suburb: p?.suburb ?? d.suburb,
+      travelRadiusKm: p?.travelRadiusKm ?? d.travelRadiusKm,
+      availabilityNote: p?.availabilityNote ?? d.availabilityNote,
+      availabilityConfirmedAt: p?.availabilityConfirmedAt
+        ? new Date(p.availabilityConfirmedAt).toISOString()
+        : null,
+      targetRoles: p?.targetRoles ?? d.targetRoles,
+      profileStatus: (p?.profileStatus || d.profileStatus) as typeof d.profileStatus,
+      credentialStatus: (p?.credentialStatus ||
+        d.credentialStatus) as typeof d.credentialStatus,
+      screeningStatus: (p?.screeningStatus ||
+        d.screeningStatus) as typeof d.screeningStatus,
+      availabilityStatus: (p?.availabilityStatus ||
+        d.availabilityStatus) as typeof d.availabilityStatus,
     },
     notifications: {
       emailJobAlerts: n?.emailJobAlerts ?? nd.emailJobAlerts,

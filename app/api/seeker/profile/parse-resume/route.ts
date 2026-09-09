@@ -45,9 +45,17 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get("file");
+    const source = String(formData.get("source") || "")
+      .trim()
+      .toLowerCase();
+    const fromLinkedIn = source === "linkedin";
 
     if (!file || !(file instanceof File)) {
-      return badRequest("Upload a resume file (PDF, DOCX, or image)");
+      return badRequest(
+        fromLinkedIn
+          ? "Upload your LinkedIn profile PDF (More → Save to PDF)"
+          : "Upload a resume file (PDF, DOCX, or image)",
+      );
     }
 
     if (file.size > MAX_BYTES) {
@@ -104,7 +112,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Resume parsed successfully — review and save",
+      message: fromLinkedIn
+        ? "LinkedIn profile imported — review and save"
+        : "Resume parsed successfully — review and save",
       profile: {
         ...profile,
         resumeUrl,

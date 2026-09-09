@@ -11,8 +11,11 @@ import {
   ExternalLink,
   CheckCircle2,
   Globe,
+  PenLine,
+  ArrowLeft,
 } from "lucide-react";
 import { DASH } from "@/app/lib/dashboardTheme";
+import { useRouter } from "next/navigation";
 
 type ProfileState = {
   headline: string;
@@ -30,7 +33,7 @@ type ProfileState = {
   openToWork: boolean;
 };
 
-type Mode = "preview" | "edit";
+type Mode = "choose" | "import" | "preview" | "edit";
 
 const emptyProfile = (): ProfileState => ({
   headline: "",
@@ -147,6 +150,64 @@ function hasMeaningfulProfile(p: ProfileState) {
   );
 }
 
+function mergeImportedProfile(
+  current: ProfileState,
+  imported: Partial<ProfileState>,
+  linkedinUrl: string,
+): ProfileState {
+  const skills = Array.isArray(imported.skills)
+    ? imported.skills.map((s) => String(s).trim()).filter(Boolean).slice(0, 30)
+    : current.skills;
+
+  const level = String(imported.experienceLevel || "");
+  const experienceLevel = (["entry", "mid", "senior"].includes(level)
+    ? level
+    : current.experienceLevel) as ProfileState["experienceLevel"];
+
+  const employment = Array.isArray(imported.preferredEmploymentTypes)
+    ? imported.preferredEmploymentTypes
+        .map((s) => String(s).toLowerCase())
+        .filter((s) => EMPLOYMENT.includes(s))
+    : [];
+
+  const modes = Array.isArray(imported.preferredWorkModes)
+    ? imported.preferredWorkModes
+        .map((s) => String(s).toLowerCase())
+        .filter((s) => WORK_MODES.includes(s))
+    : [];
+
+  const importedLinkedin = String(imported.linkedin || "").trim();
+  const typedLinkedin = linkedinUrl.trim();
+
+  return {
+    ...current,
+    headline: String(imported.headline || "").trim() || current.headline,
+    location: String(imported.location || "").trim() || current.location,
+    about: String(imported.about || "").trim() || current.about,
+    skills: skills.length ? skills : current.skills,
+    experienceLevel,
+    education: String(imported.education || "").trim() || current.education,
+    preferredEmploymentTypes: employment.length
+      ? employment
+      : current.preferredEmploymentTypes,
+    preferredWorkModes: modes.length ? modes : current.preferredWorkModes,
+    salaryExpectation: isValidSalaryExpectation(
+      String(imported.salaryExpectation || "").trim(),
+    )
+      ? String(imported.salaryExpectation).trim()
+      : current.salaryExpectation,
+    linkedin:
+      (importedLinkedin && isValidLinkedInUrl(importedLinkedin)
+        ? importedLinkedin
+        : "") ||
+      (typedLinkedin && isValidLinkedInUrl(typedLinkedin) ? typedLinkedin : "") ||
+      current.linkedin,
+    portfolio: String(imported.portfolio || "").trim() || current.portfolio,
+    resumeUrl: String(imported.resumeUrl || "").trim() || current.resumeUrl,
+    openToWork: imported.openToWork !== false,
+  };
+}
+
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-[#eef2ff] py-2.5 last:border-0">
@@ -159,14 +220,17 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 export default function SeekerProfileForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [mode, setMode] = useState<Mode>("edit");
+  const [importing, setImporting] = useState(false);
+  const [mode, setMode] = useState<Mode>("choose");
   const [skillInput, setSkillInput] = useState("");
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [profile, setProfile] = useState<ProfileState>(emptyProfile());
+  const [linkedinWarnings, setLinkedinWarnings] = useState<string[]>([]);
 
   useEffect(() => {
     void (async () => {
@@ -182,14 +246,61 @@ export default function SeekerProfileForm() {
         setUserName(String(data.account?.name || "").trim());
         setUserEmail(String(data.account?.email || "").trim());
         setUserPhone(String(data.account?.phone || "").trim());
-        setMode(hasMeaningfulProfile(next) ? "preview" : "edit");
+
+        const params = new URLSearchParams(window.location.search);
+        const linkedinStatus = params.get("linkedin");
+
+        if (linkedinStatus === "error") {
+          toast.error(
+            params.get("message") || "LinkedIn import failed. Try again.",
+          );
+          setMode(hasMeaningfulProfile(next) ? "edit" : "choose");
+          router.replace("/dashboard/seeker/profile");
+        } else if (linkedinStatus === "imported") {
+          setImporting(true);
+          try {
+            const importRes = await fetch(
+              "/api/seeker/profile/linkedin/result",
+              { cache: "no-store" },
+            );
+            const importData = await importRes.json();
+            if (!importRes.ok || !importData.success) {
+              toast.error(importData.message || "LinkedIn import failed");
+              setMode(hasMeaningfulProfile(next) ? "edit" : "choose");
+            } else {
+              const merged = mergeImportedProfile(
+                next,
+                importData.profile as Partial<ProfileState>,
+                String(importData.profile?.linkedin || ""),
+              );
+              setProfile(merged);
+              if (importData.account?.name) {
+                setUserName(String(importData.account.name));
+              }
+              const warnings = Array.isArray(importData.linkedin?.warnings)
+                ? (importData.linkedin.warnings as string[])
+                : [];
+              setLinkedinWarnings(warnings);
+              toast.success(
+                importData.message ||
+                  "LinkedIn profile imported — review and save",
+              );
+              setMode("edit");
+            }
+          } finally {
+            setImporting(false);
+            router.replace("/dashboard/seeker/profile");
+          }
+        } else {
+          setMode(hasMeaningfulProfile(next) ? "preview" : "choose");
+        }
       } catch {
         toast.error("Failed to load profile");
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [router]);
 
   function addSkill() {
     const value = skillInput.trim();
@@ -226,6 +337,7 @@ export default function SeekerProfileForm() {
         return;
       }
       setProfile(data.profile);
+      setLinkedinWarnings([]);
       toast.success("Profile saved");
       if (hasMeaningfulProfile(data.profile)) setMode("preview");
     } catch {
@@ -233,6 +345,11 @@ export default function SeekerProfileForm() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function startLinkedInOAuth() {
+    setImporting(true);
+    window.location.href = "/api/seeker/profile/linkedin/authorize";
   }
 
   if (loading) {
@@ -250,6 +367,131 @@ export default function SeekerProfileForm() {
       ? nameParts[0].slice(0, 2).toUpperCase()
       : `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
     : "ME";
+
+  /* ── Choose: Manual vs LinkedIn ── */
+  if (mode === "choose") {
+    return (
+      <div className="mx-auto max-w-3xl space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#0f172a]">
+            Build your profile
+          </h1>
+          <p className="mt-1 text-sm text-[#6b7280]">
+            Choose how you want to get started. You can always edit before
+            saving.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => setMode("edit")}
+            className="group rounded-[22px] border border-[#e8ecf8] bg-white p-6 text-left shadow-[0_8px_24px_rgba(26,26,46,0.04)] transition hover:border-[#5850ec]/40 hover:shadow-[0_12px_28px_rgba(88,80,236,0.12)]"
+          >
+            <span
+              className="inline-flex h-12 w-12 items-center justify-center rounded-2xl text-white"
+              style={{ background: DASH.accent }}
+            >
+              <PenLine className="h-5 w-5" />
+            </span>
+            <h2 className="mt-4 text-lg font-bold text-[#0f172a]">
+              Create manually
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-[#6b7280]">
+              Fill in headline, about, skills, education, and preferences
+              yourself.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMode("import")}
+            className="group rounded-[22px] border border-[#e8ecf8] bg-white p-6 text-left shadow-[0_8px_24px_rgba(26,26,46,0.04)] transition hover:border-[#0a66c2]/40 hover:shadow-[0_12px_28px_rgba(10,102,194,0.12)]"
+          >
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0a66c2] text-white">
+              <ExternalLink className="h-5 w-5" />
+            </span>
+            <h2 className="mt-4 text-lg font-bold text-[#0f172a]">
+              Import from LinkedIn
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-[#6b7280]">
+              Sign in with LinkedIn (official OAuth) and autofill your profile.
+            </p>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Import from LinkedIn OAuth ── */
+  if (mode === "import") {
+    return (
+      <div className="mx-auto max-w-xl space-y-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-[#0f172a]">
+              Import from LinkedIn
+            </h1>
+            <p className="mt-1 text-sm text-[#6b7280]">
+              Official LinkedIn OAuth. With Member Data Portability access we
+              can import About, experience, education, and skills (often
+              EU/EEA/CH profiles).
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              setMode(hasMeaningfulProfile(profile) ? "edit" : "choose")
+            }
+            className="inline-flex items-center gap-1.5 rounded-2xl border border-[#dce3f5] bg-white px-4 py-2.5 text-sm font-semibold text-[#475569]"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back
+          </button>
+        </div>
+
+        <div className="space-y-4 rounded-[22px] border border-[#e8ecf8] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
+          <ol className="space-y-2 text-sm text-[#475569]">
+            <li>
+              <span className="font-semibold text-[#0f172a]">1.</span> Continue
+              with LinkedIn and approve access
+            </li>
+            <li>
+              <span className="font-semibold text-[#0f172a]">2.</span> We fetch
+              allowed profile fields via LinkedIn APIs
+            </li>
+            <li>
+              <span className="font-semibold text-[#0f172a]">3.</span> Review
+              autofilled form fields, then save
+            </li>
+          </ol>
+
+          <button
+            type="button"
+            onClick={startLinkedInOAuth}
+            disabled={importing}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(10,102,194,0.28)] disabled:opacity-60"
+            style={{ background: "#0a66c2" }}
+          >
+            {importing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ExternalLink className="h-4 w-4" />
+            )}
+            {importing ? "Redirecting to LinkedIn…" : "Continue with LinkedIn"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMode("edit")}
+            className="w-full text-center text-sm font-semibold text-[#5850ec] hover:underline"
+          >
+            Create manually instead
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   /* ── CLINIK-style preview ── */
   if (mode === "preview") {
@@ -275,7 +517,6 @@ export default function SeekerProfileForm() {
         </div>
 
         <div className="grid min-w-0 gap-4 lg:grid-cols-3">
-          {/* Identity card */}
           <section className="min-w-0 overflow-hidden rounded-[22px] border border-[#e8ecf8] bg-white p-6 text-center shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
             <div
               className="mx-auto flex h-28 w-28 items-center justify-center rounded-full text-3xl font-bold text-white shadow-md"
@@ -302,7 +543,6 @@ export default function SeekerProfileForm() {
             ) : null}
           </section>
 
-          {/* General information */}
           <section className="min-w-0 overflow-hidden rounded-[22px] border border-[#e8ecf8] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-[15px] font-bold text-[#0f172a]">
@@ -339,7 +579,6 @@ export default function SeekerProfileForm() {
             />
           </section>
 
-          {/* About / preferences */}
           <section className="min-w-0 overflow-hidden rounded-[22px] border border-[#e8ecf8] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-[15px] font-bold text-[#0f172a]">About</h3>
@@ -426,7 +665,7 @@ export default function SeekerProfileForm() {
     );
   }
 
-  /* ── Manual edit (no autofill) ── */
+  /* ── Edit form ── */
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -435,10 +674,23 @@ export default function SeekerProfileForm() {
             {hasMeaningfulProfile(profile) ? "Edit profile" : "Build your profile"}
           </h1>
           <p className="mt-1 text-sm text-[#6b7280]">
-            Fill every field manually — recruiters will see this information.
+            Review every field — recruiters will see this information.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={startLinkedInOAuth}
+            disabled={importing}
+            className="inline-flex items-center gap-1.5 rounded-2xl border border-[#0a66c2]/25 bg-white px-4 py-2.5 text-sm font-semibold text-[#0a66c2] disabled:opacity-60"
+          >
+            {importing ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <ExternalLink className="h-3.5 w-3.5" />
+            )}
+            Re-import from LinkedIn
+          </button>
           {hasMeaningfulProfile(profile) ? (
             <button
               type="button"
@@ -447,7 +699,15 @@ export default function SeekerProfileForm() {
             >
               Cancel
             </button>
-          ) : null}
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMode("choose")}
+              className="rounded-2xl border border-[#dce3f5] bg-white px-4 py-2.5 text-sm font-semibold text-[#475569]"
+            >
+              Back
+            </button>
+          )}
           <button
             type="submit"
             disabled={saving}
@@ -463,6 +723,17 @@ export default function SeekerProfileForm() {
           </button>
         </div>
       </div>
+
+      {linkedinWarnings.length > 0 ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-semibold">LinkedIn import notes</p>
+          <ul className="mt-1 list-disc space-y-1 pl-5">
+            {linkedinWarnings.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-3">
         <section className="rounded-[22px] border border-[#e8ecf8] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
@@ -615,7 +886,7 @@ export default function SeekerProfileForm() {
       <section className="rounded-[22px] border border-[#e8ecf8] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
         <h3 className="mb-1 text-[15px] font-bold text-[#0f172a]">Skills *</h3>
         <p className="mb-3 text-xs text-[#6b7280]">
-          Press Enter or Add — fill these yourself.
+          Press Enter or Add — edit imported skills as needed.
         </p>
         <div className="flex gap-2">
           <input

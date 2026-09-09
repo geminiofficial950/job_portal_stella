@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/app/components/AuthProvider";
 import { useAuthModal } from "@/app/components/AuthModalProvider";
+import SignInMenu from "@/app/components/SignInMenu";
 import {
   formatAdzunaDescriptionPreview,
   stripHtmlToText,
@@ -197,8 +198,6 @@ function formatSalaryDetail(job: JobItem): string | null {
   return `${fmt(lo)} – ${fmt(hi)} ${period}`;
 }
 
-
-
 /** Keep card location inside column — max 2 lines */
 function formatCardLocation(location: string): React.ReactNode {
   const raw = location.trim().replace(/\s+/g, " ");
@@ -262,9 +261,7 @@ function jobCardSnippet(job: JobItem, maxLen = 140): string | null {
 }
 
 function isExternalJobSource(source?: string) {
-  return (
-    source === "adzuna" || source === "himalayas" || source === "jooble"
-  );
+  return source === "adzuna" || source === "himalayas" || source === "jooble";
 }
 
 function renderJobDescription(job: JobItem) {
@@ -575,6 +572,12 @@ function CompanyLogo({
 function JobSearchInner() {
   const searchParams = useSearchParams();
   const companyFromUrl = searchParams.get("company")?.trim() || "";
+  const qFromUrl = searchParams.get("q")?.trim() || "";
+  const locationFromUrl =
+    searchParams.get("location")?.trim() ||
+    searchParams.get("suburb")?.trim() ||
+    "";
+  const countryFromUrl = searchParams.get("country")?.trim().toLowerCase() || "";
   const { user, loading: authLoading } = useAuth();
   const { openAuth } = useAuthModal();
 
@@ -588,13 +591,15 @@ function JobSearchInner() {
   const [visibleCount, setVisibleCount] = useState(JOBS_PAGE_SIZE);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(qFromUrl);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [selectedCompanyId, setSelectedCompanyId] = useState("All");
-  const [selectedCountry, setSelectedCountry] = useState("all");
+  const [selectedCountry, setSelectedCountry] = useState(
+    countryFromUrl || "au",
+  );
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -604,7 +609,7 @@ function JobSearchInner() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [descriptionIsPreview, setDescriptionIsPreview] = useState(false);
   const [descriptionHtml, setDescriptionHtml] = useState("");
-  const [locationQuery, setLocationQuery] = useState("");
+  const [locationQuery, setLocationQuery] = useState(locationFromUrl);
   const [sortBy, setSortBy] = useState<"relevant" | "newest">("relevant");
   const [profileSkills, setProfileSkills] = useState<string[]>([]);
   const [profileSkillsLoaded, setProfileSkillsLoaded] = useState(false);
@@ -1451,11 +1456,7 @@ function JobSearchInner() {
               {displayJobDetail.source === "jooble" ? (
                 <p className="job-detail-source-note">
                   Aggregated via{" "}
-                  <a
-                    href="https://jooble.org"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a href="https://jooble.org" target="_blank" rel="noreferrer">
                     Jooble
                   </a>
                 </p>
@@ -1561,99 +1562,105 @@ function JobSearchInner() {
         } as React.CSSProperties
       }
     >
-      <div
-        className="jobs-search-fixed"
-        style={{ background: "#00082C" }}
-      >
-        <div className="jobs-search-fixed-inner">
-          <div className="jobs-search-bar">
-            <div className="jobs-search-field">
-              <Search className="h-5 w-5 shrink-0 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+      <div className="jobs-search-fixed">
+        <div className="jobs-search-fixed-row">
+          <Link href="/" className="jobs-search-fixed-logo" tabIndex={-1}>
+            <span className="jobs-brand-text" aria-label="Stella Careers">
+              <span className="jobs-brand-text__stella">STELLA</span>
+              <span className="jobs-brand-text__careers">CAREERS</span>
+            </span>
+          </Link>
+
+          <div className="jobs-search-fixed-inner">
+            <div className="jobs-search-bar">
+              <div className="jobs-search-field">
+                <Search className="h-5 w-5 shrink-0 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  tabIndex={-1}
+                  placeholder={
+                    searchQuery
+                      ? ""
+                      : `Job title or keyword — ${currentPlaceholderText}`
+                  }
+                />
+              </div>
+              <div className="jobs-search-field">
+                <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
+                <input
+                  type="text"
+                  value={locationQuery}
+                  onChange={(e) => setLocationQuery(e.target.value)}
+                  tabIndex={-1}
+                  placeholder="City or region"
+                />
+              </div>
+              <button
+                type="button"
+                className="jobs-search-btn"
                 tabIndex={-1}
-                placeholder={
-                  searchQuery
-                    ? ""
-                    : `Job title or keyword — ${currentPlaceholderText}`
-                }
-              />
+                style={{ background: "#00082C" }}
+              >
+                Search
+              </button>
             </div>
-            <div className="jobs-search-field">
-              <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
-              <input
-                type="text"
-                value={locationQuery}
-                onChange={(e) => setLocationQuery(e.target.value)}
-                tabIndex={-1}
-                placeholder="City or region"
-              />
-            </div>
-            <button
-              type="button"
-              className="jobs-search-btn"
-              tabIndex={-1}
-              style={{ background: "#00082C" }}
-            >
-              Search
-            </button>
+          </div>
+
+          <div className="jobs-search-fixed-menu">
+            <Link href="/jobs" className="jobs-search-fixed-nav" tabIndex={-1}>
+              Find Jobs
+            </Link>
+            <SignInMenu variant="solid" tone="light" />
           </div>
         </div>
       </div>
 
-      <section
-        className="jobs-hero"
-        style={{
-          background: "#00082C",
-          borderBottom: "none",
-        }}
-      >
+      <section className="jobs-hero">
         <div className="jobs-hero-inner">
           <div className="jobs-hero-intro">
-            <h1 className="font-manrope" style={{ color: "#ffffff" }}>
-              Find your <em style={{ color: "#ffffff" }}>dream job</em>
+            <h1 className="font-manrope">
+              Find your <em>dream job</em>
             </h1>
-            <p
-              className="jobs-hero-sub"
-              style={{ color: "rgba(255, 255, 255, 0.86)" }}
-            >
+            <p className="jobs-hero-sub">
               Discover your next career at verified employers and top companies
               across Australia and beyond.
             </p>
           </div>
 
-          <div className="jobs-search-bar">
-            <div className="jobs-search-field">
-              <Search className="h-5 w-5 shrink-0 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={
-                  searchQuery
-                    ? ""
-                    : `Job title or keyword — ${currentPlaceholderText}`
-                }
-              />
+          <div className="jobs-hero-search-row">
+            <div className="jobs-search-bar">
+              <div className="jobs-search-field">
+                <Search className="h-5 w-5 shrink-0 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={
+                    searchQuery
+                      ? ""
+                      : `Job title or keyword — ${currentPlaceholderText}`
+                  }
+                />
+              </div>
+              <div className="jobs-search-field">
+                <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
+                <input
+                  type="text"
+                  value={locationQuery}
+                  onChange={(e) => setLocationQuery(e.target.value)}
+                  placeholder="City or region"
+                />
+              </div>
+              <button
+                type="button"
+                className="jobs-search-btn"
+                style={{ background: "#00082C" }}
+              >
+                Search
+              </button>
             </div>
-            <div className="jobs-search-field">
-              <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
-              <input
-                type="text"
-                value={locationQuery}
-                onChange={(e) => setLocationQuery(e.target.value)}
-                placeholder="City or region"
-              />
-            </div>
-            <button
-              type="button"
-              className="jobs-search-btn"
-              style={{ background: "#00082C" }}
-            >
-              Search
-            </button>
           </div>
 
           <p className="jobs-popular">
@@ -1661,11 +1668,7 @@ function JobSearchInner() {
             {POPULAR_KEYWORDS.map((kw, i) => (
               <span key={kw}>
                 {i > 0 ? ", " : " "}
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery(kw)}
-                  style={{ color: "#ffffff" }}
-                >
+                <button type="button" onClick={() => setSearchQuery(kw)}>
                   {kw}
                 </button>
               </span>
@@ -2035,10 +2038,15 @@ function JobSearchInner() {
                             </div>
                           </div>
 
-                          <div className="jobs-card-divider" aria-hidden="true" />
+                          <div
+                            className="jobs-card-divider"
+                            aria-hidden="true"
+                          />
 
                           <div className="jobs-card-meta jobs-card-location">
-                            <span className="jobs-card-meta-label">Location</span>
+                            <span className="jobs-card-meta-label">
+                              Location
+                            </span>
                             <span className="jobs-card-meta-value">
                               {formatCardLocation(
                                 job.location ||
@@ -2048,7 +2056,10 @@ function JobSearchInner() {
                             </span>
                           </div>
 
-                          <div className="jobs-card-divider" aria-hidden="true" />
+                          <div
+                            className="jobs-card-divider"
+                            aria-hidden="true"
+                          />
 
                           <div className="jobs-card-meta jobs-card-pay">
                             <span className="jobs-card-meta-label">Pay</span>
@@ -2061,7 +2072,10 @@ function JobSearchInner() {
                             </span>
                           </div>
 
-                          <div className="jobs-card-divider" aria-hidden="true" />
+                          <div
+                            className="jobs-card-divider"
+                            aria-hidden="true"
+                          />
 
                           <div className="jobs-card-center">
                             <span className="jobs-card-meta-label">Rating</span>
@@ -2077,7 +2091,10 @@ function JobSearchInner() {
                             />
                           </div>
 
-                          <div className="jobs-card-divider" aria-hidden="true" />
+                          <div
+                            className="jobs-card-divider"
+                            aria-hidden="true"
+                          />
 
                           <div className="jobs-card-actions">
                             <button

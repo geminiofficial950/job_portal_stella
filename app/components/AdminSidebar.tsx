@@ -7,6 +7,8 @@ import {
   Briefcase,
   UserCog,
   Shield,
+  BadgeCheck,
+  GraduationCap,
 } from "lucide-react";
 import DashboardSidebarShell from "./DashboardSidebarShell";
 
@@ -45,6 +47,16 @@ export default function AdminSidebar() {
               label: "Jobs",
               href: "/dashboard/admin/jobs",
               icon: Briefcase,
+            },
+            {
+              label: "Verification",
+              href: "/dashboard/admin/verification",
+              icon: BadgeCheck,
+            },
+            {
+              label: "Learning",
+              href: "/dashboard/admin/learning",
+              icon: GraduationCap,
             },
           ],
         },

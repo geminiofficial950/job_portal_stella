@@ -10,6 +10,8 @@ import { useAuthModal } from "./AuthModalProvider";
 interface SignInMenuProps {
   variant?: "ghost" | "solid";
   className?: string;
+  /** Override dark-nav detection (e.g. glass sticky bar on /jobs) */
+  tone?: "auto" | "light" | "dark";
 }
 
 function initials(name: string) {
@@ -22,12 +24,19 @@ function initials(name: string) {
 export default function SignInMenu({
   variant = "ghost",
   className = "",
+  tone = "auto",
 }: SignInMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();
   const { openAuth } = useAuthModal();
   const isJobsPage = pathname === "/jobs";
+  const isDarkNav =
+    tone === "dark"
+      ? true
+      : tone === "light"
+        ? false
+        : pathname === "/" || isJobsPage;
 
   const triggerClass =
     variant === "ghost"
@@ -65,7 +74,7 @@ export default function SignInMenu({
           type="button"
           className={`signin-trigger profile-trigger ${triggerClass}`}
           style={
-            variant === "solid" && isJobsPage
+            variant === "solid" && isDarkNav
               ? {
                   color: "#ffffff",
                   borderColor: "#ffffff",
@@ -126,9 +135,9 @@ export default function SignInMenu({
       style={
         variant === "solid"
           ? {
-              color: isJobsPage ? "#ffffff" : "#0000FF",
-              borderColor: isJobsPage ? "#ffffff" : "#0000FF",
-              background: isJobsPage ? "transparent" : "#ffffff",
+              color: isDarkNav ? "#ffffff" : "#0000FF",
+              borderColor: isDarkNav ? "#ffffff" : "#0000FF",
+              background: isDarkNav ? "transparent" : "#ffffff",
             }
           : undefined
       }

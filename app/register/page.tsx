@@ -24,6 +24,7 @@ function RegisterForm() {
     () => resolveRole(searchParams.get("role")),
     [searchParams],
   );
+  const nextPath = searchParams.get("next")?.trim() || "";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,7 +55,9 @@ function RegisterForm() {
       await refreshUser();
       toast.success("Account created successfully");
 
-      if (data.user?.role === "recruiter") {
+      if (nextPath.startsWith("/") && !nextPath.startsWith("//")) {
+        router.push(nextPath);
+      } else if (data.user?.role === "recruiter") {
         router.push("/dashboard/recruiter");
       } else {
         router.push("/dashboard/seeker");
@@ -71,7 +74,7 @@ function RegisterForm() {
     <AuthShell
       role={role}
       titlePrefix="Join"
-      titleAccent="Gemini Education and Careers"
+      titleAccent="Stella Careers"
       subtitle={
         isRecruiter
           ? "Create an employer account to post jobs."

@@ -97,21 +97,21 @@ export default function Navbar() {
             : "none",
       }}
     >
-      <div className="w-full px-4 sm:px-6 md:px-7 xl:px-10 2xl:px-12">
-        <div className="relative flex w-full items-center justify-between h-12 sm:h-14 overflow-visible">
+      <div className="w-full px-3 sm:px-6 md:px-7 xl:px-10 2xl:px-12">
+        <div className="relative flex w-full items-center gap-2 h-12 sm:h-14 overflow-visible">
           <Link
             href="/"
-            className="relative z-10 flex h-full min-h-0 shrink-0 items-center overflow-visible select-none group"
+            className="relative z-10 flex h-full min-h-0 min-w-0 flex-1 items-center overflow-hidden select-none group"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logonew.jpeg"
               alt="Stella Careers"
-              className="pointer-events-none h-8 sm:h-9 w-auto max-w-[min(55vw,320px)] origin-left scale-[1.45] sm:scale-[1.55] object-contain object-left transition-transform duration-200 group-hover:scale-[1.5] sm:group-hover:scale-[1.6]"
+              className="pointer-events-none h-7 w-auto max-w-full object-contain object-left transition-transform duration-200 sm:h-9 sm:max-w-[min(42vw,280px)] sm:origin-left sm:scale-[1.35] sm:group-hover:scale-[1.4] md:max-w-[320px] md:scale-[1.45] md:group-hover:scale-[1.5]"
             />
           </Link>
 
-          <div className="relative z-10 ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3">
+          <div className="relative z-20 flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3">
             <nav className="hidden lg:flex items-center gap-0.5">
               <Link
                 href="/jobs"
@@ -188,15 +188,15 @@ export default function Navbar() {
               variant="solid"
               className={
                 isDarkNav
-                  ? "text-white border-white hover:bg-white/10 hover:border-white"
-                  : ""
+                  ? "navbar-account text-white border-white hover:bg-white/10 hover:border-white"
+                  : "navbar-account"
               }
             />
 
             <button
               type="button"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className={`lg:hidden w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${
+              className={`lg:hidden w-9 h-9 shrink-0 flex items-center justify-center rounded-lg transition-colors ${
                 isDarkNav
                   ? "text-white hover:bg-white/10"
                   : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"

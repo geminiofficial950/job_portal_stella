@@ -1126,6 +1126,8 @@
 .gemini-home .hero-section {
   padding: 0 !important;
   min-height: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 /* Primary CTA is white on blue; override .gemini-home a { color: inherit } */
@@ -1133,12 +1135,52 @@
   color: #00082c !important;
 }
 
+.gemini-home .hero-section a.hero-secondary-cta {
+  color: #ffffff !important;
+}
+
+@media (max-width: 1023px) {
+  .gemini-home .hero-section .hero-copy {
+    text-align: center !important;
+    align-items: center !important;
+  }
+
+  .gemini-home .hero-section .hero-copy h1,
+  .gemini-home .hero-section .hero-copy p,
+  .gemini-home .hero-section .hero-title {
+    text-align: center !important;
+  }
+
+  .gemini-home .hero-section .hero-primary-cta,
+  .gemini-home .hero-section .hero-secondary-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .gemini-home .benefits-section a.benefit-card-cta {
   color: #ffffff !important;
 }
 
+#benefits.benefits-section .benefits-header,
+#benefits.benefits-section .benefits-header h2,
+#benefits.benefits-section .benefits-header p,
+#benefits.benefits-section .benefits-intro,
+.gemini-home #benefits .benefits-header,
+.gemini-home #benefits .benefits-header h2,
+.gemini-home #benefits .benefits-header p,
+.gemini-home #benefits .benefits-intro,
+.gemini-home .benefits-section .benefits-header,
+.gemini-home .benefits-section .benefits-header h2,
+.gemini-home .benefits-section .benefits-header p,
 .gemini-home .benefits-section .benefits-intro {
   text-align: center !important;
+}
+
+/* .gemini-home p { margin: 0 } kills Tailwind mx-auto on intro copy */
+.gemini-home .benefits-section .benefits-intro {
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 .gemini-home .journey-section .journey-intro {
@@ -1150,6 +1192,12 @@
 }
 
 .gemini-home .learning-flow-section .learning-flow-intro {
+  text-align: center !important;
+}
+
+.gemini-home .home-job-search-strip .home-job-search-intro,
+.gemini-home .home-job-search-strip .home-job-search-intro h2,
+.gemini-home .home-job-search-strip .home-job-search-intro p {
   text-align: center !important;
 }
 
@@ -1199,7 +1247,7 @@
   color: #ffffff !important;
 }
 
-/* Homepage job popup — always visible (jobs.css hides desktop-only modal on mobile) */
+/* Homepage job popup — portaled to body; always visible on all breakpoints */
 .home-job-detail-modal.job-detail-modal,
 .home-job-detail-modal {
   display: flex !important;
@@ -1220,82 +1268,51 @@
   }
 }
 
-/* Keep jobs modal CTAs readable inside .gemini-home a { color: inherit } */
-.gemini-home .home-job-detail-modal a.job-detail-apply-btn,
-.gemini-home .home-job-detail-modal .job-detail-apply-btn {
-  color: #ffffff !important;
+/* Kill empty / spacer nodes that inflate description height */
+.home-job-detail-modal .job-detail-prose > :empty,
+.home-job-detail-modal .job-detail-prose > br:first-child {
+  display: none !important;
 }
 
-.gemini-home .home-job-detail-modal a.job-skill-match-cta,
-.gemini-home .home-job-detail-modal .job-skill-match-cta {
-  color: inherit;
-}
-
-.gemini-home .home-job-detail-modal a.job-detail-external-cta__btn {
-  color: #2563eb !important;
-}
-
-/*
- * Homepage typography (huge h1/h2 clamps) was leaking into the job popup
- * and leaving a big blank gap above the description.
- */
-.gemini-home .home-job-detail-modal h1,
-.gemini-home .home-job-detail-modal h2,
-.gemini-home .home-job-detail-modal h3,
-.gemini-home .home-job-detail-modal h4 {
-  font-size: inherit;
-  line-height: inherit;
-  letter-spacing: inherit;
-  font-weight: inherit;
-}
-
-.gemini-home .home-job-detail-modal .job-detail-title {
-  font-size: 1.35rem !important;
-  font-weight: 700 !important;
-  line-height: 1.3 !important;
-  letter-spacing: -0.01em !important;
-  color: #1c242d !important;
-}
-
-@media (min-width: 1024px) {
-  .gemini-home .home-job-detail-modal .job-detail-title {
-    font-size: 1.5rem !important;
-  }
-}
-
-.gemini-home .home-job-detail-modal .job-detail-prose h1,
-.gemini-home .home-job-detail-modal .job-detail-prose h2,
-.gemini-home .home-job-detail-modal .job-detail-prose h3,
-.gemini-home .home-job-detail-modal .job-detail-prose h4,
-.gemini-home .home-job-detail-modal .job-detail-prose .job-desc-heading {
+.home-job-detail-modal .job-detail-prose h1,
+.home-job-detail-modal .job-detail-prose h2,
+.home-job-detail-modal .job-detail-prose h3,
+.home-job-detail-modal .job-detail-prose h4,
+.home-job-detail-modal .job-detail-prose .job-desc-heading {
   font-size: 1.05rem !important;
   font-weight: 700 !important;
   line-height: 1.35 !important;
-  letter-spacing: -0.01em !important;
-  color: #111827 !important;
-  margin: 1.5rem 0 0.75rem !important;
+  margin: 1rem 0 0.5rem !important;
 }
 
-.gemini-home
-  .home-job-detail-modal
-  .job-detail-prose
-  .job-desc-heading:first-child,
-.gemini-home .home-job-detail-modal .job-detail-prose h3:first-child,
-.gemini-home .home-job-detail-modal .job-detail-prose p:first-child,
-.gemini-home .home-job-detail-modal .job-detail-prose .job-desc-meta:first-child {
+.home-job-detail-modal .job-detail-prose > :first-child {
   margin-top: 0 !important;
 }
 
-.gemini-home .home-job-detail-modal .job-detail-panel__hero {
-  padding-bottom: 1rem;
+.home-job-detail-modal .job-detail-iframe {
+  min-height: 220px !important;
 }
 
-.gemini-home .home-job-detail-modal .job-detail-panel__body {
-  padding-top: 1.1rem;
+.home-job-detail-modal .job-skill-match-wrap {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
 }
 
-.gemini-home .home-job-detail-modal .job-skill-match-wrap {
-  margin-bottom: 0;
+.home-job-detail-modal .job-detail-panel__hero {
+  padding-bottom: 0.85rem;
+}
+
+.home-job-detail-modal .job-detail-panel__body {
+  padding-top: 1rem;
+}
+
+.home-job-detail-modal a.job-detail-apply-btn,
+.home-job-detail-modal .job-detail-apply-btn {
+  color: #ffffff !important;
+}
+
+.home-job-detail-modal a.job-detail-external-cta__btn {
+  color: #2563eb !important;
 }
 
 .gemini-home .trusted-by-section {

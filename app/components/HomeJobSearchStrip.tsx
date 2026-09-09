@@ -19,14 +19,16 @@ export default function HomeJobSearchStrip() {
   }
 
   return (
-    <section id="job-search" className="bg-slate-50/80 py-10 sm:py-12">
+    <section id="job-search" className="home-job-search-strip bg-slate-50/80 py-10 sm:py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
-        <h2 className="text-center text-xl font-bold tracking-tight text-[#0f2744] sm:text-2xl">
-          Search Australian jobs
-        </h2>
-        <p className="mx-auto mt-2 max-w-xl text-center text-sm text-slate-500">
-          Job title and suburb or postcode. Australia is the default country.
-        </p>
+        <div className="home-job-search-intro mx-auto max-w-xl">
+          <h2 className="text-center text-xl font-bold tracking-tight text-[#0f2744] sm:text-2xl">
+            Search Australian jobs
+          </h2>
+          <p className="mt-2 text-center text-sm text-slate-500">
+            Job title and suburb or postcode. Australia is the default country.
+          </p>
+        </div>
         <form
           onSubmit={onSubmit}
           className="mx-auto mt-6 flex w-full max-w-3xl flex-col gap-1.5 rounded-2xl bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(15,39,68,0.18)] sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:p-2 sm:pl-5"

@@ -89,8 +89,14 @@ export default function MemberBenefitsSection() {
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
-        <div className="mx-auto mb-10 max-w-4xl text-center sm:mb-12">
-          <h2 className="text-[1.5rem] font-bold leading-tight tracking-tight text-[#0f2744] sm:text-3xl lg:whitespace-nowrap lg:text-4xl">
+        <div
+          className="benefits-header mx-auto mb-10 w-full max-w-3xl sm:mb-12"
+          style={{ textAlign: "center" }}
+        >
+          <h2
+            className="text-[1.5rem] font-bold leading-tight tracking-tight text-[#0f2744] sm:text-3xl lg:whitespace-nowrap lg:text-4xl"
+            style={{ textAlign: "center" }}
+          >
             Five ways Stella Careers supports{" "}
             <span className="relative inline-block bg-gradient-to-r from-[#f97316] via-[#ec4899] to-[#8b5cf6] bg-clip-text text-transparent">
               you
@@ -100,11 +106,16 @@ export default function MemberBenefitsSection() {
               />
             </span>
           </h2>
-          <p className="benefits-intro mx-auto mt-4 max-w-2xl text-center text-[15px] leading-relaxed text-slate-500 sm:text-base">
-            Only profile building is promised as free across the whole offer.
-            Courses, sessions, events and checks show Free, Included for
-            members, or their price.
-          </p>
+          <div className="mx-auto mt-4 w-full max-w-2xl">
+            <p
+              className="benefits-intro text-[15px] leading-relaxed text-slate-500 sm:text-base"
+              style={{ textAlign: "center" }}
+            >
+              Only profile building is promised as free across the whole offer.
+              Courses, sessions, events and checks show Free, Included for
+              members, or their price.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">

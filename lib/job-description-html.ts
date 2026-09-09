@@ -58,7 +58,7 @@ function softenLinks(html: string): string {
 }
 
 function cleanupWhitespace(html: string): string {
-  return html
+  let out = html
     .replace(/(<br\s*\/?>\s*){3,}/gi, "<br/><br/>")
     .replace(/(<\/p>\s*){2,}/gi, "</p>")
     .replace(/<p[^>]*>\s*(?:&nbsp;|\u00a0|\s|<br\s*\/?>)*\s*<\/p>/gi, "")
@@ -66,9 +66,28 @@ function cleanupWhitespace(html: string): string {
       /<h([1-6])[^>]*>\s*(?:&nbsp;|\u00a0|\s|<br\s*\/?>)*\s*<\/h\1>/gi,
       "",
     )
+    .replace(
+      /<(div|span|section|article)[^>]*>\s*(?:&nbsp;|\u00a0|\s|<br\s*\/?>)*\s*<\/\1>/gi,
+      "",
+    )
     .replace(/^(?:\s|<br\s*\/?>|&nbsp;|\u00a0)+/i, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+
+  // Keep stripping leading empty blocks until content starts
+  for (let i = 0; i < 8; i++) {
+    const next = out
+      .replace(
+        /^(?:<(?:p|div|span|h[1-6])[^>]*>\s*(?:&nbsp;|\u00a0|\s|<br\s*\/?>)*\s*<\/(?:p|div|span|h[1-6])>\s*)+/i,
+        "",
+      )
+      .replace(/^(?:\s|<br\s*\/?>|&nbsp;|\u00a0)+/i, "")
+      .trim();
+    if (next === out) break;
+    out = next;
+  }
+
+  return out;
 }
 
 /** Promote plain paragraphs like "Role Title: Foo" into bold meta rows */

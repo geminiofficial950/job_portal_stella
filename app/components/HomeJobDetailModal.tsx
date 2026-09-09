@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
   X,
@@ -156,7 +157,7 @@ function SkillMatchCard({
       className="job-skill-match-wrap"
       aria-label="Job 2 Skill Match Rating"
     >
-      <h3 className="job-skill-match-kicker">Job 2 Skill Match Rating</h3>
+      <p className="job-skill-match-kicker">Job 2 Skill Match Rating</p>
 
       {loading ? (
         <div className="job-skill-match job-skill-match--loading">
@@ -307,6 +308,7 @@ type Props = {
 export default function HomeJobDetailModal({ job, onClose }: Props) {
   const { user, loading: authLoading } = useAuth();
   const { openAuth } = useAuthModal();
+  const [mounted, setMounted] = useState(false);
   const [saved, setSaved] = useState(false);
   const [profileSkills, setProfileSkills] = useState<string[]>([]);
   const [profileSkillsLoaded, setProfileSkillsLoaded] = useState(false);
@@ -316,6 +318,10 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
   const [descriptionHtml, setDescriptionHtml] = useState("");
 
   const displayJob = enrichedJob || job;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!job) return;
@@ -447,7 +453,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
     });
   }, [displayJob, profileSkills, descriptionHtml]);
 
-  if (!displayJob) return null;
+  if (!displayJob || !mounted) return null;
 
   const activeJob = displayJob;
   const canSaveJob = !authLoading && Boolean(user);
@@ -503,7 +509,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
     );
   }
 
-  return (
+  return createPortal(
     <div
       className="job-detail-modal home-job-detail-modal"
       role="dialog"
@@ -555,7 +561,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
                   <p className="job-detail-company">
                     {displayJob.company || "Company"}
                   </p>
-                  <h2 className="job-detail-title">{displayJob.title}</h2>
+                  <p className="job-detail-title">{displayJob.title}</p>
                 </div>
               </div>
 
@@ -711,9 +717,9 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
                 <>
                   {displayJob.responsibilities ? (
                     <section className="job-detail-section">
-                      <h3 className="job-detail-section-title">
+                      <p className="job-detail-section-title">
                         Key responsibilities
-                      </h3>
+                      </p>
                       <div
                         className="job-detail-prose"
                         dangerouslySetInnerHTML={{
@@ -726,9 +732,9 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
                   ) : null}
                   {displayJob.requirements ? (
                     <section className="job-detail-section">
-                      <h3 className="job-detail-section-title">
+                      <p className="job-detail-section-title">
                         Qualifications & requirements
-                      </h3>
+                      </p>
                       <div
                         className="job-detail-prose"
                         dangerouslySetInnerHTML={{
@@ -744,7 +750,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
 
               {(displayJob.skills || []).length > 0 ? (
                 <section className="job-detail-section">
-                  <h3 className="job-detail-section-title">Required skills</h3>
+                  <p className="job-detail-section-title">Required skills</p>
                   <div className="job-detail-skills">
                     {(displayJob.skills || []).map((skill) => (
                       <span key={skill} className="job-detail-skill">
@@ -757,7 +763,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
                 (skillMatch.matchedSkills.length > 0 ||
                   skillMatch.missingSkills.length > 0) ? (
                 <section className="job-detail-section">
-                  <h3 className="job-detail-section-title">Skills</h3>
+                  <p className="job-detail-section-title">Skills</p>
                   <div className="job-detail-skills">
                     {skillMatch.matchedSkills.map((skill) => (
                       <span
@@ -781,9 +787,9 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
 
               {displayJob.companyAbout ? (
                 <section className="job-detail-section">
-                  <h3 className="job-detail-section-title">
+                  <p className="job-detail-section-title">
                     About {displayJob.company || "company"}
-                  </h3>
+                  </p>
                   <p className="job-detail-about">{displayJob.companyAbout}</p>
                 </section>
               ) : null}
@@ -793,6 +799,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
           <div className="job-detail-panel__footer">{renderApplyAction()}</div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

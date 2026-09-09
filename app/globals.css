@@ -340,6 +340,23 @@ body {
   white-space: nowrap;
 }
 
+@media (max-width: 639px) {
+  .navbar-account .profile-name {
+    display: none;
+  }
+
+  .navbar-account .signin-trigger.profile-trigger,
+  .navbar-account.signin-menu .profile-trigger {
+    gap: 0;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  .navbar-account .signin-chevron {
+    display: none;
+  }
+}
+
 .profile-dropdown {
   min-width: 280px;
 }

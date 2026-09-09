@@ -449,22 +449,23 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
 
   if (!displayJob) return null;
 
+  const activeJob = displayJob;
   const canSaveJob = !authLoading && Boolean(user);
   const adzunaEmbedSrc =
-    displayJob.source === "adzuna" && displayJob.applyUrl
-      ? `/api/jobs/adzuna-embed?id=${encodeURIComponent(displayJob.id)}&url=${encodeURIComponent(displayJob.applyUrl)}&title=${encodeURIComponent(displayJob.title)}&preview=${encodeURIComponent(displayJob.description || "")}`
+    activeJob.source === "adzuna" && activeJob.applyUrl
+      ? `/api/jobs/adzuna-embed?id=${encodeURIComponent(activeJob.id)}&url=${encodeURIComponent(activeJob.applyUrl)}&title=${encodeURIComponent(activeJob.title)}&preview=${encodeURIComponent(activeJob.description || "")}`
       : "";
 
   const isExternalSource =
-    displayJob.source === "adzuna" ||
-    displayJob.source === "himalayas" ||
-    displayJob.source === "jooble";
+    activeJob.source === "adzuna" ||
+    activeJob.source === "himalayas" ||
+    activeJob.source === "jooble";
 
   function renderApplyAction() {
-    if (displayJob.source === "jooble" && displayJob.applyUrl) {
+    if (activeJob.source === "jooble" && activeJob.applyUrl) {
       return (
         <a
-          href={displayJob.applyUrl}
+          href={activeJob.applyUrl}
           target="_blank"
           rel="noreferrer"
           className="job-detail-apply-btn"

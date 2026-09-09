@@ -302,12 +302,14 @@ type Props = {
   job: HomeModalJob | null;
   onClose: () => void;
   alreadyApplied?: boolean;
+  onApplied?: (jobId: string) => void;
 };
 
 export default function HomeJobDetailModal({
   job,
   onClose,
   alreadyApplied = false,
+  onApplied,
 }: Props) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -718,7 +720,16 @@ export default function HomeJobDetailModal({
             });
             const data = await res.json();
             if (!res.ok || !data.success) {
-              toast.error(data.message || "Could not apply");
+              const msg = data.message || "Could not apply";
+              toast.error(msg);
+              if (
+                typeof data.message === "string" &&
+                data.message.toLowerCase().includes("already applied")
+              ) {
+                onApplied?.(activeJob.id);
+                onClose();
+                return;
+              }
               if (
                 typeof data.message === "string" &&
                 data.message.toLowerCase().includes("profile")
@@ -731,6 +742,7 @@ export default function HomeJobDetailModal({
               return;
             }
             toast.success("Applied successfully");
+            onApplied?.(activeJob.id);
             onClose();
           } catch {
             toast.error("Could not apply");

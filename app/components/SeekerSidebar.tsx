@@ -30,8 +30,8 @@ export default function SeekerSidebar() {
               exact: true,
             },
             {
-              label: "Find Jobs",
-              href: "/jobs",
+              label: "Suggested Jobs",
+              href: "/dashboard/seeker/suggested",
               icon: Search,
             },
           ],

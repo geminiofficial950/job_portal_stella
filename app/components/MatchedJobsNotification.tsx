@@ -122,7 +122,7 @@ export default function MatchedJobsNotification() {
           </div>
 
           <Link
-            href="/dashboard/seeker/jobs?matched=1"
+            href="/dashboard/seeker/suggested"
             className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#dc2626] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b91c1c]"
           >
             Review jobs →

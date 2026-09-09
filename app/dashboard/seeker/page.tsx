@@ -104,9 +104,9 @@ export default async function SeekerOverviewPage() {
 
   const shortcuts = [
     {
-      title: "Browse Open Jobs",
-      copy: "Search live roles from approved employers.",
-      href: "/jobs",
+      title: "Suggested Jobs",
+      copy: "See roles matched to your profile skills.",
+      href: "/dashboard/seeker/suggested",
       icon: Search,
     },
     {
@@ -129,8 +129,8 @@ export default async function SeekerOverviewPage() {
         title={`Hey, ${auth.name.split(" ")[0]}`}
         subtitle="Manage your profile, applications, and interviews in one place."
         action={
-          <DashboardPrimaryButton href="/jobs" icon={Search}>
-            Find jobs
+          <DashboardPrimaryButton href="/dashboard/seeker/suggested" icon={Search}>
+            Suggested jobs
           </DashboardPrimaryButton>
         }
       />

@@ -9,6 +9,13 @@
  * Note: Ireland (ie) is NOT supported by Adzuna.
  */
 
+import { normalizeAdzunaListingUrl } from "@/lib/adzuna-url";
+
+export {
+  parseAdzunaJobId,
+  normalizeAdzunaListingUrl,
+} from "@/lib/adzuna-url";
+
 export const ADZUNA_COUNTRIES = [
   { code: "au", label: "Australia", flag: "🇦🇺", currency: "AUD" },
   { code: "us", label: "USA", flag: "🇺🇸", currency: "USD" },
@@ -175,56 +182,6 @@ function normalizeJob(
   };
 }
 
-export function parseAdzunaJobId(
-  compositeId: string,
-): { country: string; jobId: string } | null {
-  const match = compositeId.match(/^adzuna-([a-z]{2})-(\d+)$/i);
-  if (!match) return null;
-  return { country: match[1].toLowerCase(), jobId: match[2] };
-}
-
-const ADZUNA_HOSTS: Record<string, string> = {
-  au: "www.adzuna.com.au",
-  us: "www.adzuna.com",
-  gb: "www.adzuna.co.uk",
-  nz: "www.adzuna.co.nz",
-  ca: "www.adzuna.ca",
-  sg: "www.adzuna.sg",
-};
-
-/** Adzuna API redirect_url uses /land/ad/ — scrape works on /details/{id}. */
-export function normalizeAdzunaListingUrl(
-  listingUrl: string,
-  compositeJobId?: string,
-): string {
-  let jobNum: string | undefined;
-  let host: string | undefined;
-
-  const parsed = compositeJobId ? parseAdzunaJobId(compositeJobId) : null;
-  if (parsed) {
-    jobNum = parsed.jobId;
-    host = ADZUNA_HOSTS[parsed.country];
-  }
-
-  if (listingUrl) {
-    try {
-      const url = new URL(listingUrl);
-      host = host || url.host;
-      const landMatch = url.pathname.match(/\/land\/ad\/(\d+)/i);
-      const detailsMatch = url.pathname.match(/\/details\/(\d+)/i);
-      jobNum = jobNum || landMatch?.[1] || detailsMatch?.[1];
-    } catch {
-      /* keep original */
-    }
-  }
-
-  if (jobNum && host) {
-    return `https://${host}/details/${jobNum}`;
-  }
-
-  return listingUrl;
-}
-
 /**
  * KeyCDN mirror of Adzuna detail pages — often reachable from cloud hosts
  * when www.adzuna.* is blocked by CloudFront/WAF.
@@ -370,12 +327,16 @@ async function fetchCountryJobs(options: {
     if (page < pages) await sleep(300);
   }
 
-  return { jobs: jobs.slice(0, total), error: jobs.length ? undefined : lastError };
+  return {
+    jobs: jobs.slice(0, total),
+    error: jobs.length ? undefined : lastError,
+  };
 }
 
 export async function fetchAdzunaJobs(options?: {
   country?: string;
   q?: string;
+  where?: string;
   resultsPerCountry?: number;
   forceRefresh?: boolean;
 }): Promise<{
@@ -397,6 +358,9 @@ export async function fetchAdzunaJobs(options?: {
   }
 
   const countryParam = options?.country?.toLowerCase().trim() || "all";
+  const searchWhat = options?.q?.trim() || "";
+  const searchWhere = options?.where?.trim() || "";
+  const isLiveSearch = Boolean(searchWhat || searchWhere);
 
   if (countryParam === "ie") {
     return {
@@ -422,17 +386,22 @@ export async function fetchAdzunaJobs(options?: {
     };
   }
 
-  const {
-    filterAdzunaJobs,
-    getAdzunaCacheMeta,
-    getCachedCountryJobs,
-  } = await import("@/lib/adzuna-cache");
+  const { filterAdzunaJobs, getAdzunaCacheMeta, getCachedCountryJobs } =
+    await import("@/lib/adzuna-cache");
 
   const cacheMeta = getAdzunaCacheMeta();
 
   // Default: ~100/country when browsing all (~600 total), AU gets more
+  // Live search: fewer per country but actually query Adzuna `what`/`where`
   const resultsPerCountry =
-    options?.resultsPerCountry ?? (countryParam === "all" ? 100 : 150);
+    options?.resultsPerCountry ??
+    (isLiveSearch
+      ? countryParam === "all"
+        ? 40
+        : 80
+      : countryParam === "all"
+        ? 100
+        : 150);
 
   const jobs: AdzunaJobNormalized[] = [];
   const countriesFetched: string[] = [];
@@ -444,12 +413,23 @@ export async function fetchAdzunaJobs(options?: {
     const country = targets[i];
     const total =
       country.code === "au"
-        ? Math.max(resultsPerCountry, countryParam === "all" ? 150 : 200)
+        ? Math.max(
+            resultsPerCountry,
+            isLiveSearch
+              ? countryParam === "all"
+                ? 50
+                : resultsPerCountry
+              : countryParam === "all"
+                ? 150
+                : 200,
+          )
         : resultsPerCountry;
 
     const loadCountry = async () => {
       const result = await fetchCountryJobs({
         country,
+        what: searchWhat || undefined,
+        where: searchWhere || undefined,
         total,
       });
       if (result.error) errors.push(result.error);
@@ -458,7 +438,8 @@ export async function fetchAdzunaJobs(options?: {
 
     let countryJobs: AdzunaJobNormalized[] = [];
 
-    if (options?.forceRefresh) {
+    // Cache is unscoped browse data — never reuse it for keyword/location search.
+    if (options?.forceRefresh || isLiveSearch) {
       countryJobs = await loadCountry();
       servedFromCache = false;
     } else {
@@ -475,11 +456,12 @@ export async function fetchAdzunaJobs(options?: {
     }
 
     if (i < targets.length - 1) {
-      await sleep(options?.forceRefresh ? 400 : 200);
+      await sleep(options?.forceRefresh || isLiveSearch ? 400 : 200);
     }
   }
 
-  const filtered = filterAdzunaJobs(jobs, options?.q);
+  // Live Adzuna search already applied what/where; only filter cache browse by q.
+  const filtered = isLiveSearch ? jobs : filterAdzunaJobs(jobs, options?.q);
 
   filtered.sort((a, b) => {
     const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;

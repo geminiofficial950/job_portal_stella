@@ -121,3 +121,32 @@ export function getJoobleCacheMeta() {
     cacheDir: CACHE_DIR,
   };
 }
+
+/** Look up a single job from in-memory / disk cache (no network). */
+export async function findCachedJoobleJob(
+  jobId: string,
+): Promise<JoobleJobNormalized | null> {
+  const id = jobId.trim();
+  if (!id) return null;
+
+  const countryMatch = id.match(/^jooble-([a-z]{2})-/i);
+  const preferred = countryMatch?.[1]?.toLowerCase();
+  const codes = preferred
+    ? [preferred]
+    : ["au", "us", "gb", "nz", "ca", "sg"];
+
+  for (const code of codes) {
+    const mem = memory.get(code);
+    const fromMem = mem?.jobs.find((j) => j.id === id);
+    if (fromMem) return fromMem;
+
+    const disk = await readDiskCache(code);
+    if (disk) {
+      memory.set(code, disk);
+      const fromDisk = disk.jobs.find((j) => j.id === id);
+      if (fromDisk) return fromDisk;
+    }
+  }
+
+  return null;
+}

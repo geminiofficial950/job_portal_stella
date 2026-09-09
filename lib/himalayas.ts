@@ -401,3 +401,55 @@ export async function fetchHimalayasJobs(options?: {
     cacheTtlHours: cacheMeta.ttlHours,
   };
 }
+
+/** Resolve a single Himalayas listing (cache first, then title search). */
+export async function findHimalayasJobDetail(options: {
+  id: string;
+  title?: string;
+}): Promise<HimalayasJobNormalized | null> {
+  const id = options.id.trim();
+  const title = options.title?.trim() || "";
+
+  const {
+    findCachedHimalayasJob,
+    findCachedHimalayasByTitle,
+  } = await import("@/lib/himalayas-cache");
+
+  if (id) {
+    const cached = await findCachedHimalayasJob(id);
+    if (cached && (cached.description || "").trim().length > 40) {
+      return cached;
+    }
+  }
+
+  const countryMatch = id.match(/^himalayas-([a-z]{2})-/i);
+  const country = countryMatch?.[1]?.toLowerCase() || "au";
+
+  if (title) {
+    const byTitle = await findCachedHimalayasByTitle(title, country);
+    if (byTitle && (byTitle.description || "").trim().length > 40) {
+      return byTitle;
+    }
+  }
+
+  if (!title) {
+    return id ? await findCachedHimalayasJob(id) : null;
+  }
+
+  const result = await fetchHimalayasJobs({
+    country,
+    q: title,
+    jobsPerCountry: 60,
+  });
+
+  const exact = id ? result.jobs.find((j) => j.id === id) : null;
+  if (exact) return exact;
+
+  const titleLower = title.toLowerCase();
+  const titleMatch =
+    result.jobs.find((j) => j.title.trim().toLowerCase() === titleLower) ||
+    result.jobs.find((j) => j.title.trim().toLowerCase().includes(titleLower)) ||
+    result.jobs.find((j) => titleLower.includes(j.title.trim().toLowerCase()));
+
+  return titleMatch || (id ? await findCachedHimalayasJob(id) : null);
+}

@@ -1,7 +1,6 @@
 import mongoose, { Schema, models, model, type InferSchemaType } from "mongoose";
-import { APPLICATION_STATUSES, type ApplicationStatus } from "./Application";
 
-const BoardApplicationSchema = new Schema(
+const SavedJobSchema = new Schema(
   {
     seekerId: {
       type: Schema.Types.ObjectId,
@@ -23,6 +22,12 @@ const BoardApplicationSchema = new Schema(
       maxlength: 40,
       default: "board",
     },
+    jobId: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 160,
+    },
     title: {
       type: String,
       required: true,
@@ -33,6 +38,12 @@ const BoardApplicationSchema = new Schema(
       type: String,
       trim: true,
       maxlength: 160,
+      default: "",
+    },
+    companyLogoUrl: {
+      type: String,
+      trim: true,
+      maxlength: 500,
       default: "",
     },
     location: {
@@ -65,12 +76,6 @@ const BoardApplicationSchema = new Schema(
       maxlength: 40,
       default: "",
     },
-    companyLogoUrl: {
-      type: String,
-      trim: true,
-      maxlength: 500,
-      default: "",
-    },
     salaryMin: { type: Number, default: null },
     salaryMax: { type: Number, default: null },
     salaryCurrency: {
@@ -85,7 +90,7 @@ const BoardApplicationSchema = new Schema(
       maxlength: 20,
       default: "",
     },
-    listingUrl: {
+    applyUrl: {
       type: String,
       trim: true,
       maxlength: 1000,
@@ -94,55 +99,35 @@ const BoardApplicationSchema = new Schema(
     description: {
       type: String,
       trim: true,
-      maxlength: 8000,
-      default: "",
-    },
-    status: {
-      type: String,
-      enum: APPLICATION_STATUSES,
-      default: "pending",
-      index: true,
-    },
-    coverNote: {
-      type: String,
-      trim: true,
-      maxlength: 1000,
-      default: "",
-    },
-    statusNote: {
-      type: String,
-      trim: true,
-      maxlength: 500,
+      maxlength: 5000,
       default: "",
     },
   },
   { timestamps: true },
 );
 
-BoardApplicationSchema.index(
-  { seekerId: 1, externalKey: 1 },
-  { unique: true },
-);
+SavedJobSchema.index({ seekerId: 1, externalKey: 1 }, { unique: true });
 
-export type BoardApplicationDocument = InferSchemaType<
-  typeof BoardApplicationSchema
-> & {
+export type SavedJobDocument = InferSchemaType<typeof SavedJobSchema> & {
   _id: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 };
 
-export const BoardApplication: mongoose.Model<BoardApplicationDocument> =
-  (models.BoardApplication as
-    | mongoose.Model<BoardApplicationDocument>
-    | undefined) ??
-  model<BoardApplicationDocument>("BoardApplication", BoardApplicationSchema);
+export const SavedJob: mongoose.Model<SavedJobDocument> =
+  (models.SavedJob as mongoose.Model<SavedJobDocument> | undefined) ??
+  model<SavedJobDocument>("SavedJob", SavedJobSchema);
 
-export function serializeBoardApplication(doc: {
+export function savedJobExternalKey(source: string, jobId: string) {
+  return `${source || "board"}:${jobId}`.slice(0, 200);
+}
+
+export function serializeSavedJob(doc: {
   _id: mongoose.Types.ObjectId;
   seekerId: mongoose.Types.ObjectId;
   externalKey: string;
   source: string;
+  jobId: string;
   title: string;
   companyName?: string | null;
   companyLogoUrl?: string | null;
@@ -155,43 +140,31 @@ export function serializeBoardApplication(doc: {
   salaryMax?: number | null;
   salaryCurrency?: string | null;
   salaryPeriod?: string | null;
-  listingUrl?: string | null;
+  applyUrl?: string | null;
   description?: string | null;
-  status: ApplicationStatus;
-  coverNote?: string | null;
-  statusNote?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }) {
   return {
     id: String(doc._id),
-    kind: "board" as const,
-    seekerId: String(doc.seekerId),
     externalKey: doc.externalKey,
     source: doc.source,
-    status: doc.status,
-    coverNote: doc.coverNote || "",
-    statusNote: doc.statusNote || "",
-    listingUrl: doc.listingUrl || "",
+    jobId: doc.jobId,
+    title: doc.title,
+    companyName: doc.companyName || "",
+    companyLogoUrl: doc.companyLogoUrl || "",
+    location: doc.location || "",
+    employmentType: doc.employmentType || "",
+    workMode: doc.workMode || "",
+    category: doc.category || "",
+    experienceLevel: doc.experienceLevel || "",
+    salaryMin: doc.salaryMin ?? null,
+    salaryMax: doc.salaryMax ?? null,
+    salaryCurrency: doc.salaryCurrency || "AUD",
+    salaryPeriod: doc.salaryPeriod || "",
+    applyUrl: doc.applyUrl || "",
+    description: doc.description || "",
     createdAt: doc.createdAt ? doc.createdAt.toISOString() : null,
     updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
-    job: {
-      title: doc.title,
-      location: doc.location || "",
-      employmentType: doc.employmentType || "",
-      workMode: doc.workMode || "",
-      status: "open",
-      category: doc.category || "",
-      experienceLevel: doc.experienceLevel || "",
-      salaryMin: doc.salaryMin ?? null,
-      salaryMax: doc.salaryMax ?? null,
-      salaryCurrency: doc.salaryCurrency || "AUD",
-      salaryPeriod: doc.salaryPeriod || "",
-      description: doc.description || "",
-    },
-    company: {
-      name: doc.companyName || "Employer",
-      logoUrl: doc.companyLogoUrl || "",
-    },
   };
 }

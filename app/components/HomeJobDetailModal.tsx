@@ -16,9 +16,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "./AuthProvider";
 import { useAuthModal } from "./AuthModalProvider";
+import { formatAdzunaDescriptionPreview } from "@/lib/adzuna-description";
 import {
-  formatAdzunaDescriptionPreview,
-} from "@/lib/adzuna-description";
+  normalizeAdzunaListingUrl,
+  parseAdzunaJobId,
+} from "@/lib/adzuna-url";
 import { normalizeJobDescriptionHtml } from "@/lib/job-description-html";
 import {
   rateSkillMatch,
@@ -85,8 +87,7 @@ function formatSalaryDetail(job: HomeModalJob): string | null {
     year: "per year",
   };
   const period =
-    periodWords[job.salaryPeriod || ""] ||
-    `per ${job.salaryPeriod || "year"}`;
+    periodWords[job.salaryPeriod || ""] || `per ${job.salaryPeriod || "year"}`;
   const lo = min > 0 ? min : max;
   const hi = max > 0 ? max : min;
   const fmt = (n: number) => `$${n.toLocaleString()}`;
@@ -111,13 +112,7 @@ function timeAgo(iso: string | null | undefined) {
   return new Date(iso).toLocaleDateString();
 }
 
-function CompanyLogo({
-  name,
-  logoUrl,
-}: {
-  name: string;
-  logoUrl: string;
-}) {
+function CompanyLogo({ name, logoUrl }: { name: string; logoUrl: string }) {
   const initial = name.trim().charAt(0).toUpperCase() || "J";
   if (logoUrl) {
     return (
@@ -306,9 +301,14 @@ function renderJobDescription(job: HomeModalJob) {
 type Props = {
   job: HomeModalJob | null;
   onClose: () => void;
+  alreadyApplied?: boolean;
 };
 
-export default function HomeJobDetailModal({ job, onClose }: Props) {
+export default function HomeJobDetailModal({
+  job,
+  onClose,
+  alreadyApplied = false,
+}: Props) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { openAuth } = useAuthModal();
@@ -331,6 +331,90 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
   useEffect(() => {
     setApplying(false);
   }, [job?.id]);
+
+  useEffect(() => {
+    if (!job) return;
+    if (authLoading) return;
+    if (!user || user.role !== "user") {
+      setSaved(false);
+      return;
+    }
+
+    let cancelled = false;
+    fetch("/api/seeker/saved", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled || !data.success) return;
+        const ids = Array.isArray(data.jobIds)
+          ? data.jobIds.map((id: unknown) => String(id))
+          : [];
+        setSaved(ids.includes(job.id));
+      })
+      .catch(() => {
+        if (!cancelled) setSaved(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [job, user, authLoading]);
+
+  async function toggleSave() {
+    if (!job) return;
+    if (!user || user.role !== "user") {
+      openAuth({ mode: "login", role: "user" });
+      return;
+    }
+
+    const next = !saved;
+    setSaved(next);
+    try {
+      if (!next) {
+        const res = await fetch(
+          `/api/seeker/saved?jobId=${encodeURIComponent(job.id)}&source=${encodeURIComponent(job.source || "board")}`,
+          { method: "DELETE" },
+        );
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          setSaved(true);
+          toast.error(data.message || "Could not remove saved job");
+        }
+      } else {
+        const res = await fetch("/api/seeker/saved", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jobId: job.id,
+            source: job.source || "board",
+            title: job.title,
+            companyName: job.company || "",
+            companyLogoUrl: job.companyLogoUrl || "",
+            location: job.location || "",
+            employmentType: job.employmentType || "",
+            workMode: job.workMode || "",
+            category: job.category || "",
+            experienceLevel: job.experienceLevel || "",
+            salaryMin: job.salaryMin,
+            salaryMax: job.salaryMax,
+            salaryCurrency: job.salaryCurrency,
+            salaryPeriod: job.salaryPeriod,
+            applyUrl: job.applyUrl || "",
+            description: job.description || "",
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          setSaved(false);
+          toast.error(data.message || "Could not save job");
+        } else {
+          toast.success("Job saved");
+        }
+      }
+    } catch {
+      setSaved(!next);
+      toast.error("Could not update saved jobs");
+    }
+  }
 
   useEffect(() => {
     if (!job) return;
@@ -387,68 +471,161 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
   }, [user, authLoading]);
 
   useEffect(() => {
-    if (!job || job.source !== "adzuna") {
+    if (!job) return;
+
+    const isAdzuna =
+      job.source === "adzuna" ||
+      Boolean(parseAdzunaJobId(job.id)) ||
+      /adzuna\./i.test(job.applyUrl || "");
+
+    const isBoardLookup =
+      job.source === "himalayas" ||
+      job.source === "jooble" ||
+      job.id.startsWith("himalayas-") ||
+      job.id.startsWith("jooble-") ||
+      /himalayas\.app/i.test(job.applyUrl || "");
+
+    const hasSolidDescription = (job.description || "").trim().length > 80;
+
+    if (isAdzuna) {
+      const applyUrl =
+        job.applyUrl ||
+        normalizeAdzunaListingUrl(job.applyUrl || "", job.id) ||
+        "";
+
+      if (hasSolidDescription && !applyUrl) {
+        setEnrichedJob(null);
+        setDetailLoading(false);
+        setDescriptionIsPreview(false);
+        setDescriptionHtml("");
+        return;
+      }
+
+      if (!applyUrl && !job.adref) {
+        setEnrichedJob(null);
+        setDetailLoading(false);
+        setDescriptionIsPreview(true);
+        setDescriptionHtml("");
+        return;
+      }
+
+      let cancelled = false;
       setEnrichedJob(null);
-      setDetailLoading(false);
+      setDetailLoading(true);
       setDescriptionIsPreview(false);
       setDescriptionHtml("");
-      return;
-    }
 
-    if (!job.applyUrl) {
-      setEnrichedJob(null);
-      setDetailLoading(false);
-      setDescriptionIsPreview(true);
-      setDescriptionHtml("");
-      return;
-    }
+      const params = new URLSearchParams({ id: job.id });
+      if (job.adref) params.set("adref", job.adref);
+      if (applyUrl) params.set("applyUrl", applyUrl);
+      if (job.title) params.set("title", job.title);
 
-    let cancelled = false;
-    setEnrichedJob(null);
-    setDetailLoading(true);
-    setDescriptionIsPreview(false);
-    setDescriptionHtml("");
-
-    const params = new URLSearchParams({ id: job.id });
-    if (job.adref) params.set("adref", job.adref);
-    if (job.applyUrl) params.set("applyUrl", job.applyUrl);
-    if (job.title) params.set("title", job.title);
-
-    fetch(`/api/jobs/adzuna-detail?${params}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (cancelled || !data.success || !data.job) {
+      fetch(`/api/jobs/adzuna-detail?${params}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (cancelled || !data.success || !data.job) {
+            if (!cancelled) {
+              setDescriptionIsPreview(true);
+              setDescriptionHtml("");
+            }
+            return;
+          }
+          setDescriptionIsPreview(data.descriptionSource !== "listing");
+          setDescriptionHtml(
+            typeof data.descriptionHtml === "string"
+              ? data.descriptionHtml
+              : "",
+          );
+          setEnrichedJob({
+            ...job,
+            ...data.job,
+            source: "adzuna",
+            applyUrl: data.job.applyUrl || applyUrl || job.applyUrl,
+            company: data.job.company?.name || job.company,
+            companyLogoUrl: data.job.company?.logoUrl || job.companyLogoUrl,
+            companyAbout: data.job.company?.about || job.companyAbout,
+          });
+        })
+        .catch(() => {
           if (!cancelled) {
             setDescriptionIsPreview(true);
             setDescriptionHtml("");
           }
-          return;
-        }
-        setDescriptionIsPreview(data.descriptionSource !== "listing");
-        setDescriptionHtml(
-          typeof data.descriptionHtml === "string" ? data.descriptionHtml : "",
-        );
-        setEnrichedJob({
-          ...job,
-          ...data.job,
-          company: data.job.company?.name || job.company,
-          companyLogoUrl: data.job.company?.logoUrl || job.companyLogoUrl,
-          companyAbout: data.job.company?.about || job.companyAbout,
+        })
+        .finally(() => {
+          if (!cancelled) setDetailLoading(false);
         });
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setDescriptionIsPreview(true);
-          setDescriptionHtml("");
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setDetailLoading(false);
-      });
 
-    return () => {
-      cancelled = true;
-    };
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    if (isBoardLookup && !hasSolidDescription) {
+      let cancelled = false;
+      setEnrichedJob(null);
+      setDetailLoading(true);
+      setDescriptionIsPreview(false);
+      setDescriptionHtml("");
+
+      const params = new URLSearchParams({
+        id: job.id,
+        source: job.source || "",
+      });
+      if (job.title) params.set("title", job.title);
+      if (job.applyUrl) params.set("applyUrl", job.applyUrl);
+      if (job.company) params.set("company", job.company);
+
+      fetch(`/api/jobs/board-detail?${params}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (cancelled || !data.success || !data.job) {
+            if (!cancelled) setDescriptionIsPreview(true);
+            return;
+          }
+          if (typeof data.descriptionHtml === "string" && data.descriptionHtml) {
+            setDescriptionHtml(data.descriptionHtml);
+          }
+          setEnrichedJob({
+            ...job,
+            ...data.job,
+            source: data.job.source || job.source,
+            applyUrl: data.job.applyUrl || job.applyUrl,
+            company: data.job.company?.name || job.company,
+            companyLogoUrl: data.job.company?.logoUrl || job.companyLogoUrl,
+            companyAbout: data.job.company?.about || job.companyAbout,
+            description: data.job.description || job.description,
+            requirements: data.job.requirements || job.requirements,
+            responsibilities:
+              data.job.responsibilities || job.responsibilities,
+            skills: data.job.skills || job.skills,
+            salaryMin: data.job.salaryMin ?? job.salaryMin,
+            salaryMax: data.job.salaryMax ?? job.salaryMax,
+            salaryCurrency: data.job.salaryCurrency || job.salaryCurrency,
+            salaryPeriod: data.job.salaryPeriod || job.salaryPeriod,
+            experienceLevel: data.job.experienceLevel || job.experienceLevel,
+            location: data.job.location || job.location,
+            category: data.job.category || job.category,
+            countryLabel: data.job.countryLabel || job.countryLabel,
+            createdAt: data.job.createdAt || job.createdAt,
+          });
+        })
+        .catch(() => {
+          if (!cancelled) setDescriptionIsPreview(true);
+        })
+        .finally(() => {
+          if (!cancelled) setDetailLoading(false);
+        });
+
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    setEnrichedJob(null);
+    setDetailLoading(false);
+    setDescriptionIsPreview(false);
+    setDescriptionHtml("");
   }, [job]);
 
   const skillMatch = useMemo(() => {
@@ -478,6 +655,14 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
 
   function renderApplyAction() {
     const isStellaJob = /^[a-f\d]{24}$/i.test(activeJob.id);
+
+    if (alreadyApplied) {
+      return (
+        <button type="button" className="job-detail-apply-btn" disabled>
+          Applied
+        </button>
+      );
+    }
 
     if (!authLoading && !user) {
       return (
@@ -512,11 +697,18 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
                     source: activeJob.source || "board",
                     title: activeJob.title,
                     companyName: activeJob.company || "",
+                    companyLogoUrl: activeJob.companyLogoUrl || "",
                     location: activeJob.location || "",
                     employmentType: activeJob.employmentType || "",
                     workMode: activeJob.workMode || "",
                     category: activeJob.category || "",
+                    experienceLevel: activeJob.experienceLevel || "",
+                    salaryMin: activeJob.salaryMin,
+                    salaryMax: activeJob.salaryMax,
+                    salaryCurrency: activeJob.salaryCurrency,
+                    salaryPeriod: activeJob.salaryPeriod,
                     applyUrl: activeJob.applyUrl || "",
+                    description: activeJob.description || "",
                   },
                 };
             const res = await fetch("/api/seeker/applications", {
@@ -570,13 +762,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
             <div className="job-detail-panel__toolbar-actions">
               <button
                 type="button"
-                onClick={() => {
-                  if (!canSaveJob) {
-                    openAuth({ mode: "login", role: "user" });
-                    return;
-                  }
-                  setSaved((v) => !v);
-                }}
+                onClick={() => void toggleSave()}
                 className={`job-detail-icon-btn ${saved ? "is-saved" : ""}`}
                 aria-label={canSaveJob ? "Save job" : "Sign in to save jobs"}
               >
@@ -655,9 +841,7 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
 
               <p className="job-detail-posted">
                 Posted {timeAgo(displayJob.createdAt)}
-                {displayJob.countryLabel
-                  ? ` · ${displayJob.countryLabel}`
-                  : ""}
+                {displayJob.countryLabel ? ` · ${displayJob.countryLabel}` : ""}
               </p>
 
               <SkillMatchCard
@@ -697,7 +881,19 @@ export default function HomeJobDetailModal({ job, onClose }: Props) {
                     />
                   </div>
                 ) : (
-                  <p className="job-detail-empty">No description provided.</p>
+                  <div className="job-detail-empty">
+                    <p>No description provided.</p>
+                    {displayJob.applyUrl ? (
+                      <a
+                        href={displayJob.applyUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="job-detail-external-cta__btn mt-3 inline-flex"
+                      >
+                        Open original listing
+                      </a>
+                    ) : null}
+                  </div>
                 )}
 
                 {displayJob.source === "adzuna" &&

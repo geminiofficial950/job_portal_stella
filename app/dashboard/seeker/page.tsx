@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
 import { Job } from "@/models/Job";
 import { Application } from "@/models/Application";
+import { SavedJob } from "@/models/SavedJob";
 import DashboardStatCards from "@/app/components/DashboardStatCards";
 import {
   DashboardPageHeader,
@@ -55,10 +56,11 @@ export default async function SeekerOverviewPage() {
   const auth = await requireAuth(["user"]);
 
   await connectDB();
-  const [user, openJobs, applicationCount] = await Promise.all([
+  const [user, openJobs, applicationCount, savedCount] = await Promise.all([
     User.findById(auth.sub).select("seekerProfile phone").lean(),
     Job.countDocuments({ status: "open" }),
     Application.countDocuments({ seekerId: auth.sub }),
+    SavedJob.countDocuments({ seekerId: auth.sub }),
   ]);
 
   const { checks, doneCount, percent } = profileCompletion(
@@ -84,7 +86,7 @@ export default async function SeekerOverviewPage() {
     },
     {
       label: "Saved Jobs",
-      value: 0,
+      value: savedCount,
       icon: Bookmark,
       href: "/dashboard/seeker/saved",
       actionIcon: Heart,

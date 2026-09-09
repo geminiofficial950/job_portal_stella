@@ -12,6 +12,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() || "";
+    const location = searchParams.get("location")?.trim() || "";
     const companyId = searchParams.get("companyId")?.trim() || "";
     const companyName = searchParams.get("company")?.trim() || "";
     const category = searchParams.get("category")?.trim() || "";
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
     // fast=1 → skip Himalayas fallback loops (first paint)
     const fastMode =
       searchParams.get("fast") === "1" || searchParams.get("fast") === "true";
+    const externalCountry = country && country !== "all" ? country : "all";
 
     const includeGemini = source === "all" || source === "gemini";
     const includeAdzuna = source === "all" || source === "adzuna";
@@ -261,20 +263,21 @@ export async function GET(request: Request) {
       await Promise.allSettled([
         includeAdzuna
           ? fetchAdzunaJobs({
-              country: "all",
+              country: externalCountry,
               q: q || undefined,
-              resultsPerCountry: 100,
+              where: location || undefined,
+              resultsPerCountry: q || location ? 50 : 100,
             })
           : Promise.resolve(null),
         includeHimalayas
           ? fetchHimalayasJobs({
-              country: "all",
+              country: externalCountry,
               q: q || undefined,
             })
           : Promise.resolve(null),
         includeJooble
           ? fetchJoobleJobs({
-              country: "all",
+              country: externalCountry,
               q: q || undefined,
             })
           : Promise.resolve(null),
@@ -351,6 +354,7 @@ export async function GET(request: Request) {
             const extra = await fetchAdzunaJobs({
               country: code,
               q: q || undefined,
+              where: location || undefined,
               resultsPerCountry: 80,
             });
             const existing = new Set(adzunaJobs.map((j) => String(j.id)));

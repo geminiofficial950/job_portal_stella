@@ -595,6 +595,8 @@ function JobSearchInner() {
   const [applying, setApplying] = useState(false);
   const [visibleCount, setVisibleCount] = useState(JOBS_PAGE_SIZE);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const searchBootstrappedRef = useRef(false);
+  const searchReqIdRef = useRef(0);
 
   const [searchQuery, setSearchQuery] = useState(qFromUrl);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -729,63 +731,132 @@ function JobSearchInner() {
   const [currentPlaceholderText, setCurrentPlaceholderText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const loadJobs = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    setVisibleCount(JOBS_PAGE_SIZE);
+  const loadJobs = useCallback(
+    async (opts?: { q?: string; location?: string; country?: string }) => {
+      const reqId = ++searchReqIdRef.current;
+      setLoading(true);
+      setError("");
+      setVisibleCount(JOBS_PAGE_SIZE);
 
-    const applyBrowsePayload = (data: {
-      jobs?: JobItem[];
-      companies?: CompanyOption[];
-      categories?: string[];
-      countries?: CountryOption[];
-      adzuna?: { configured?: boolean; error?: string };
-    }) => {
-      setJobs(data.jobs ?? []);
-      setCompanyOptions(data.companies ?? []);
-      setCategories(["All", ...((data.categories as string[]) ?? [])]);
-      setCountryOptions(data.countries ?? []);
-      if (
-        data.adzuna &&
-        data.adzuna.configured === false &&
-        data.adzuna.error
-      ) {
-        setAdzunaWarning(data.adzuna.error);
-      } else {
-        setAdzunaWarning("");
+      const q = (opts?.q ?? searchQuery).trim();
+      const loc = (opts?.location ?? locationQuery).trim();
+      const country = (opts?.country ?? selectedCountry).trim() || "all";
+
+      const buildParams = (fast?: boolean) => {
+        const params = new URLSearchParams();
+        if (fast) params.set("fast", "1");
+        if (q) params.set("q", q);
+        if (loc) params.set("location", loc);
+        if (country && country !== "all") params.set("country", country);
+        return params.toString();
+      };
+
+      const applyBrowsePayload = (data: {
+        jobs?: JobItem[];
+        companies?: CompanyOption[];
+        categories?: string[];
+        countries?: CountryOption[];
+        adzuna?: { configured?: boolean; error?: string };
+      }) => {
+        if (reqId !== searchReqIdRef.current) return;
+        setJobs(data.jobs ?? []);
+        setCompanyOptions(data.companies ?? []);
+        setCategories(["All", ...((data.categories as string[]) ?? [])]);
+        setCountryOptions(data.countries ?? []);
+        if (
+          data.adzuna &&
+          data.adzuna.configured === false &&
+          data.adzuna.error
+        ) {
+          setAdzunaWarning(data.adzuna.error);
+        } else {
+          setAdzunaWarning("");
+        }
+      };
+
+      try {
+        // Phase 1: fast sources for quick first paint
+        const fastQs = buildParams(true);
+        const fastRes = await fetch(
+          `/api/jobs/browse${fastQs ? `?${fastQs}` : "?fast=1"}`,
+        );
+        const fastData = await fastRes.json();
+        if (reqId !== searchReqIdRef.current) return;
+        if (!fastRes.ok || !fastData.success) {
+          throw new Error(fastData.message || "Failed to load jobs");
+        }
+        applyBrowsePayload(fastData);
+        if (reqId === searchReqIdRef.current) setLoading(false);
+
+        // Phase 2: full enrich in background (fallbacks + remaining sources)
+        const fullQs = buildParams(false);
+        void fetch(`/api/jobs/browse${fullQs ? `?${fullQs}` : ""}`)
+          .then(async (res) => {
+            const data = await res.json();
+            if (reqId !== searchReqIdRef.current) return;
+            if (!res.ok || !data.success) return;
+            applyBrowsePayload(data);
+          })
+          .catch((err) => {
+            console.warn("Background jobs enrich failed:", err);
+          });
+      } catch (err) {
+        if (reqId !== searchReqIdRef.current) return;
+        setError(err instanceof Error ? err.message : "Failed to load jobs");
+        setJobs([]);
+        setLoading(false);
       }
-    };
+    },
+    [searchQuery, locationQuery, selectedCountry],
+  );
 
-    try {
-      // Phase 1: fast sources for quick first paint
-      const fastRes = await fetch("/api/jobs/browse?fast=1");
-      const fastData = await fastRes.json();
-      if (!fastRes.ok || !fastData.success) {
-        throw new Error(fastData.message || "Failed to load jobs");
-      }
-      applyBrowsePayload(fastData);
-      setLoading(false);
-
-      // Phase 2: full enrich in background (fallbacks + remaining sources)
-      void fetch("/api/jobs/browse")
-        .then(async (res) => {
-          const data = await res.json();
-          if (!res.ok || !data.success) return;
-          applyBrowsePayload(data);
-        })
-        .catch((err) => {
-          console.warn("Background jobs enrich failed:", err);
-        });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load jobs");
-      setJobs([]);
-      setLoading(false);
+  const runSearch = useCallback(() => {
+    const q = searchQuery.trim();
+    const loc = locationQuery.trim();
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (loc) params.set("location", loc);
+    if (selectedCountry && selectedCountry !== "all") {
+      params.set("country", selectedCountry);
     }
-  }, []);
+    const qs = params.toString();
+    router.replace(qs ? `/jobs?${qs}` : "/jobs");
+    void loadJobs({ q, location: loc, country: selectedCountry });
+  }, [searchQuery, locationQuery, selectedCountry, loadJobs, router]);
 
   useEffect(() => {
-    void loadJobs();
-  }, [loadJobs]);
+    void loadJobs({
+      q: qFromUrl,
+      location: locationFromUrl,
+      country: countryFromUrl || selectedCountry,
+    });
+    // Initial load only — typing uses debounced auto-search below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-search while typing (no Search click needed)
+  useEffect(() => {
+    if (!searchBootstrappedRef.current) {
+      searchBootstrappedRef.current = true;
+      return;
+    }
+
+    const q = searchQuery.trim();
+    const loc = locationQuery.trim();
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (loc) params.set("location", loc);
+      if (selectedCountry && selectedCountry !== "all") {
+        params.set("country", selectedCountry);
+      }
+      const qs = params.toString();
+      router.replace(qs ? `/jobs?${qs}` : "/jobs");
+      void loadJobs({ q, location: loc, country: selectedCountry });
+    }, 450);
+
+    return () => window.clearTimeout(timer);
+  }, [searchQuery, locationQuery, selectedCountry, loadJobs, router]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -875,14 +946,106 @@ function JobSearchInner() {
     { value: "senior", label: "Senior" },
   ];
 
-  const toggleBookmark = (id: string) => {
-    if (!user) return;
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user || user.role !== "user") {
+      setSavedJobs([]);
+      return;
+    }
+
+    let cancelled = false;
+    fetch("/api/seeker/saved", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled || !data.success) return;
+        setSavedJobs(
+          Array.isArray(data.jobIds)
+            ? data.jobIds.map((id: unknown) => String(id))
+            : [],
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setSavedJobs([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, authLoading]);
+
+  const toggleBookmark = async (job: JobItem) => {
+    if (!user) {
+      openAuth({ mode: "login", role: "user" });
+      return;
+    }
+    if (user.role !== "user") {
+      openAuth({ mode: "login", role: "user" });
+      return;
+    }
+
+    const isSaved = savedJobs.includes(job.id);
     setSavedJobs((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+      isSaved ? prev.filter((item) => item !== job.id) : [...prev, job.id],
     );
+
+    try {
+      if (isSaved) {
+        const res = await fetch(
+          `/api/seeker/saved?jobId=${encodeURIComponent(job.id)}&source=${encodeURIComponent(job.source || "board")}`,
+          { method: "DELETE" },
+        );
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          setSavedJobs((prev) =>
+            prev.includes(job.id) ? prev : [...prev, job.id],
+          );
+          toast.error(data.message || "Could not remove saved job");
+        }
+      } else {
+        const res = await fetch("/api/seeker/saved", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jobId: job.id,
+            source: job.source || "board",
+            title: job.title,
+            company: job.company,
+            companyName: job.company?.name || "",
+            companyLogoUrl: job.company?.logoUrl || "",
+            location: job.location || "",
+            employmentType: job.employmentType || "",
+            workMode: job.workMode || "",
+            category: job.category || "",
+            experienceLevel: job.experienceLevel || "",
+            salaryMin: job.salaryMin,
+            salaryMax: job.salaryMax,
+            salaryCurrency: job.salaryCurrency,
+            salaryPeriod: job.salaryPeriod,
+            applyUrl: job.applyUrl || "",
+            description: job.description || "",
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          setSavedJobs((prev) => prev.filter((item) => item !== job.id));
+          toast.error(data.message || "Could not save job");
+        } else {
+          toast.success("Job saved");
+        }
+      }
+    } catch {
+      setSavedJobs((prev) =>
+        isSaved
+          ? prev.includes(job.id)
+            ? prev
+            : [...prev, job.id]
+          : prev.filter((item) => item !== job.id),
+      );
+      toast.error("Could not update saved jobs");
+    }
   };
 
-  const canSaveJob = !authLoading && Boolean(user);
+  const canSaveJob = !authLoading && Boolean(user) && user?.role === "user";
 
   const toggleTypeFilter = (type: string) => {
     setSelectedTypes((prev) =>
@@ -905,6 +1068,8 @@ function JobSearchInner() {
     setSelectedLevel("All");
     setSelectedCompanyId("All");
     setSelectedCountry("all");
+    router.replace("/jobs");
+    void loadJobs({ q: "", location: "", country: "all" });
   };
 
   const matchesSelectedCountry = useCallback(
@@ -938,21 +1103,6 @@ function JobSearchInner() {
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
       if (!matchesSelectedCountry(job)) return false;
-      const companyName = job.company?.name || "";
-      if (
-        searchQuery &&
-        !job.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !companyName.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !job.location.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        return false;
-      }
-      if (
-        locationQuery &&
-        !job.location.toLowerCase().includes(locationQuery.toLowerCase())
-      ) {
-        return false;
-      }
       if (
         selectedCategory !== "All" &&
         job.category.toLowerCase() !== selectedCategory.toLowerCase()
@@ -981,14 +1131,12 @@ function JobSearchInner() {
     });
   }, [
     jobs,
-    searchQuery,
     selectedCategory,
     selectedLevel,
     selectedTypes,
     selectedModels,
     selectedCompanyId,
     matchesSelectedCountry,
-    locationQuery,
   ]);
 
   const sortedJobs = useMemo(() => {
@@ -1257,11 +1405,18 @@ function JobSearchInner() {
                     source: displayJobDetail.source || "board",
                     title: displayJobDetail.title,
                     companyName: displayJobDetail.company?.name || "",
+                    companyLogoUrl: displayJobDetail.company?.logoUrl || "",
                     location: displayJobDetail.location || "",
                     employmentType: displayJobDetail.employmentType || "",
                     workMode: displayJobDetail.workMode || "",
                     category: displayJobDetail.category || "",
+                    experienceLevel: displayJobDetail.experienceLevel || "",
+                    salaryMin: displayJobDetail.salaryMin,
+                    salaryMax: displayJobDetail.salaryMax,
+                    salaryCurrency: displayJobDetail.salaryCurrency,
+                    salaryPeriod: displayJobDetail.salaryPeriod,
                     applyUrl: displayJobDetail.applyUrl || "",
+                    description: displayJobDetail.description || "",
                   },
                 };
             const res = await fetch("/api/seeker/applications", {
@@ -1312,8 +1467,10 @@ function JobSearchInner() {
               <div className="job-detail-panel__toolbar-actions">
                 <button
                   type="button"
-                  onClick={() => toggleBookmark(displayJobDetail.id)}
-                  disabled={!canSaveJob}
+                  onClick={() => {
+                    if (!displayJobDetail) return;
+                    void toggleBookmark(displayJobDetail);
+                  }}
                   title={canSaveJob ? "Save job" : "Sign in to save jobs"}
                   className={`job-detail-icon-btn ${
                     savedJobs.includes(displayJobDetail.id) ? "is-saved" : ""
@@ -1624,6 +1781,12 @@ function JobSearchInner() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      runSearch();
+                    }
+                  }}
                   tabIndex={-1}
                   placeholder={
                     searchQuery
@@ -1638,6 +1801,12 @@ function JobSearchInner() {
                   type="text"
                   value={locationQuery}
                   onChange={(e) => setLocationQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      runSearch();
+                    }
+                  }}
                   tabIndex={-1}
                   placeholder="City or region"
                 />
@@ -1647,8 +1816,10 @@ function JobSearchInner() {
                 className="jobs-search-btn"
                 tabIndex={-1}
                 style={{ background: "#00082C" }}
+                onClick={runSearch}
+                disabled={loading}
               >
-                Search
+                {loading ? "Searching…" : "Search"}
               </button>
             </div>
           </div>
@@ -1682,6 +1853,12 @@ function JobSearchInner() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      runSearch();
+                    }
+                  }}
                   placeholder={
                     searchQuery
                       ? ""
@@ -1695,6 +1872,12 @@ function JobSearchInner() {
                   type="text"
                   value={locationQuery}
                   onChange={(e) => setLocationQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      runSearch();
+                    }
+                  }}
                   placeholder="City or region"
                 />
               </div>
@@ -1702,8 +1885,10 @@ function JobSearchInner() {
                 type="button"
                 className="jobs-search-btn"
                 style={{ background: "#00082C" }}
+                onClick={runSearch}
+                disabled={loading}
               >
-                Search
+                {loading ? "Searching…" : "Search"}
               </button>
             </div>
           </div>
@@ -2152,9 +2337,8 @@ function JobSearchInner() {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleBookmark(job.id);
+                                void toggleBookmark(job);
                               }}
-                              disabled={!canSaveJob}
                               title={
                                 canSaveJob ? "Save job" : "Sign in to save jobs"
                               }

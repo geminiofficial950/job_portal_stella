@@ -69,10 +69,12 @@ export async function GET() {
     const companyIds = apps.map((a) => a.companyId);
     const [jobs, companies] = await Promise.all([
       Job.find({ _id: { $in: jobIds } })
-        .select("title location employmentType workMode status category")
+        .select(
+          "title location employmentType workMode status category salaryMin salaryMax salaryCurrency salaryPeriod experienceLevel description requirements responsibilities skills",
+        )
         .lean(),
       Company.find({ _id: { $in: companyIds } })
-        .select("name logoUrl")
+        .select("name logoUrl about")
         .lean(),
     ]);
     const jobMap = new Map(jobs.map((j) => [String(j._id), j]));
@@ -95,10 +97,23 @@ export async function GET() {
               workMode: job.workMode,
               status: job.status,
               category: job.category,
+              salaryMin: job.salaryMin ?? null,
+              salaryMax: job.salaryMax ?? null,
+              salaryCurrency: job.salaryCurrency || "AUD",
+              salaryPeriod: job.salaryPeriod || "",
+              experienceLevel: job.experienceLevel || "",
+              description: job.description || "",
+              requirements: job.requirements || "",
+              responsibilities: job.responsibilities || "",
+              skills: Array.isArray(job.skills) ? job.skills : [],
             }
           : null,
         company: company
-          ? { name: company.name, logoUrl: company.logoUrl || "" }
+          ? {
+              name: company.name,
+              logoUrl: company.logoUrl || "",
+              about: company.about || "",
+            }
           : null,
       };
     });
@@ -193,12 +208,35 @@ export async function POST(request: Request) {
         .trim()
         .slice(0, 160);
 
+      const salaryMinRaw = boardJob?.salaryMin ?? body.salaryMin;
+      const salaryMaxRaw = boardJob?.salaryMax ?? body.salaryMax;
+      const salaryMin =
+        typeof salaryMinRaw === "number" && Number.isFinite(salaryMinRaw)
+          ? salaryMinRaw
+          : null;
+      const salaryMax =
+        typeof salaryMaxRaw === "number" && Number.isFinite(salaryMaxRaw)
+          ? salaryMaxRaw
+          : null;
+
       const app = await BoardApplication.create({
         seekerId: result.auth.sub,
         externalKey,
         source: source || "board",
         title,
         companyName,
+        companyLogoUrl: String(
+          boardJob?.companyLogoUrl ||
+            (typeof boardJob?.company === "object" &&
+            boardJob?.company &&
+            "logoUrl" in (boardJob.company as object)
+              ? (boardJob.company as { logoUrl?: unknown }).logoUrl
+              : "") ||
+            body.companyLogoUrl ||
+            "",
+        )
+          .trim()
+          .slice(0, 500),
         location: String(boardJob?.location || body.location || "")
           .trim()
           .slice(0, 200),
@@ -213,11 +251,33 @@ export async function POST(request: Request) {
         category: String(boardJob?.category || body.category || "")
           .trim()
           .slice(0, 80),
+        experienceLevel: String(
+          boardJob?.experienceLevel || body.experienceLevel || "",
+        )
+          .trim()
+          .slice(0, 40),
+        salaryMin,
+        salaryMax,
+        salaryCurrency: String(
+          boardJob?.salaryCurrency || body.salaryCurrency || "AUD",
+        )
+          .trim()
+          .slice(0, 8),
+        salaryPeriod: String(
+          boardJob?.salaryPeriod || body.salaryPeriod || "",
+        )
+          .trim()
+          .slice(0, 20),
         listingUrl: String(
           boardJob?.applyUrl || boardJob?.listingUrl || body.applyUrl || "",
         )
           .trim()
           .slice(0, 1000),
+        description: String(
+          boardJob?.description || body.description || "",
+        )
+          .trim()
+          .slice(0, 8000),
         status: "pending",
         coverNote,
       });

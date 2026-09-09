@@ -571,3 +571,37 @@ export async function fetchJoobleJobs(options?: {
     cacheTtlHours: cacheMeta.ttlHours,
   };
 }
+
+/** Resolve a single Jooble listing (cache first, then title search). */
+export async function findJoobleJobDetail(options: {
+  id: string;
+  title?: string;
+}): Promise<JoobleJobNormalized | null> {
+  const id = options.id.trim();
+  if (!id) return null;
+
+  const { findCachedJoobleJob } = await import("@/lib/jooble-cache");
+  const cached = await findCachedJoobleJob(id);
+  if (cached && (cached.description || "").trim().length > 40) {
+    return cached;
+  }
+
+  const countryMatch = id.match(/^jooble-([a-z]{2})-/i);
+  const country = countryMatch?.[1]?.toLowerCase() || "au";
+  const q = options.title?.trim();
+  if (!q) return cached;
+
+  const result = await fetchJoobleJobs({
+    country,
+    q,
+    jobsPerCountry: 40,
+  });
+
+  const exact = result.jobs.find((j) => j.id === id);
+  if (exact) return exact;
+
+  const titleMatch = result.jobs.find(
+    (j) => j.title.trim().toLowerCase() === q.toLowerCase(),
+  );
+  return titleMatch || cached;
+}

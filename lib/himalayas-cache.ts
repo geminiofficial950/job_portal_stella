@@ -148,3 +148,89 @@ export function getHimalayasCacheMeta() {
     cacheDir: CACHE_DIR,
   };
 }
+
+/** Look up a single job from in-memory / disk cache (no network). */
+export async function findCachedHimalayasJob(
+  jobId: string,
+): Promise<HimalayasJobNormalized | null> {
+  const id = jobId.trim();
+  if (!id) return null;
+
+  const countryMatch = id.match(/^himalayas-([a-z]{2})-/i);
+  const preferred = countryMatch?.[1]?.toLowerCase();
+  const codes = preferred
+    ? [preferred, "au", "us", "gb", "nz", "ca", "sg"].filter(
+        (c, i, arr) => arr.indexOf(c) === i,
+      )
+    : ["au", "us", "gb", "nz", "ca", "sg"];
+
+  for (const code of codes) {
+    const mem = memory.get(code);
+    const fromMem = mem?.jobs.find((j) => j.id === id);
+    if (fromMem) return fromMem;
+
+    const disk = await readDiskCache(code);
+    if (disk) {
+      memory.set(code, disk);
+      const fromDisk = disk.jobs.find((j) => j.id === id);
+      if (fromDisk) return fromDisk;
+    }
+  }
+
+  return null;
+}
+
+/** Title/company fuzzy lookup across country caches. */
+export async function findCachedHimalayasByTitle(
+  title: string,
+  countryCode?: string,
+): Promise<HimalayasJobNormalized | null> {
+  const needle = title.trim().toLowerCase();
+  if (!needle) return null;
+
+  const codes = countryCode
+    ? [countryCode, "au", "us", "gb", "nz", "ca", "sg"].filter(
+        (c, i, arr) => arr.indexOf(c) === i,
+      )
+    : ["au", "us", "gb", "nz", "ca", "sg"];
+
+  let best: HimalayasJobNormalized | null = null;
+  let bestScore = -1;
+
+  for (const code of codes) {
+    let jobs = memory.get(code)?.jobs;
+    if (!jobs) {
+      const disk = await readDiskCache(code);
+      if (disk) {
+        memory.set(code, disk);
+        jobs = disk.jobs;
+      }
+    }
+    if (!jobs?.length) continue;
+
+    for (const job of jobs) {
+      const jobTitle = (job.title || "").trim().toLowerCase();
+      if (!jobTitle) continue;
+      let score = 0;
+      if (jobTitle === needle) score = 100;
+      else if (jobTitle.includes(needle) || needle.includes(jobTitle)) score = 80;
+      else if (
+        needle
+          .split(/\s+/)
+          .filter((w) => w.length > 2)
+          .every((w) => jobTitle.includes(w))
+      ) {
+        score = 60;
+      } else continue;
+
+      const descLen = (job.description || "").trim().length;
+      score += Math.min(20, Math.floor(descLen / 400));
+      if (score > bestScore) {
+        bestScore = score;
+        best = job;
+      }
+    }
+  }
+
+  return best;
+}

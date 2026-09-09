@@ -5,6 +5,10 @@ import { Company } from "@/models/Company";
 import { ADZUNA_COUNTRIES, fetchAdzunaJobs } from "@/lib/adzuna";
 import { fetchHimalayasJobs } from "@/lib/himalayas";
 import { fetchJoobleJobs } from "@/lib/jooble";
+import {
+  jobMatchesLocationQuery,
+  locationSearchValue,
+} from "@/lib/auLocations";
 
 export const maxDuration = 60;
 
@@ -12,7 +16,8 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() || "";
-    const location = searchParams.get("location")?.trim() || "";
+    const locationRaw = searchParams.get("location")?.trim() || "";
+    const location = locationSearchValue(locationRaw);
     const companyId = searchParams.get("companyId")?.trim() || "";
     const companyName = searchParams.get("company")?.trim() || "";
     const category = searchParams.get("category")?.trim() || "";
@@ -25,11 +30,24 @@ export async function GET(request: Request) {
     const fastMode =
       searchParams.get("fast") === "1" || searchParams.get("fast") === "true";
     const externalCountry = country && country !== "all" ? country : "all";
-
+    // Himalayas is remote-first; skip when user asked for a place.
+    const hasPlaceQuery = Boolean(location);
+    // City/suburb searches with AU state tokens → prefer Adzuna AU.
+    const looksAustralianPlace =
+      hasPlaceQuery &&
+      /\b(nsw|vic|qld|sa|wa|tas|act|nt|sydney|melbourne|brisbane|perth|adelaide|canberra|australia)\b/i.test(
+        `${locationRaw} ${location}`,
+      );
+    const adzunaCountry =
+      looksAustralianPlace && externalCountry === "all"
+        ? "au"
+        : externalCountry;
     const includeGemini = source === "all" || source === "gemini";
     const includeAdzuna = source === "all" || source === "adzuna";
-    const includeHimalayas = source === "all" || source === "himalayas";
-    const includeJooble = source === "all" || source === "jooble";
+    const includeHimalayas =
+      (source === "all" || source === "himalayas") && !hasPlaceQuery;
+    const includeJooble =
+      (source === "all" || source === "jooble") && !hasPlaceQuery;
     const allowHeavyFallback = !fastMode;
 
     let geminiJobs: Array<Record<string, unknown>> = [];
@@ -106,6 +124,12 @@ export async function GET(request: Request) {
             const loc = String(j.location || "").toLowerCase();
             return needles.some((n) => loc.includes(n));
           });
+        }
+
+        if (location) {
+          jobs = jobs.filter((j) =>
+            jobMatchesLocationQuery(String(j.location || ""), location),
+          );
         }
 
         const openCompanyIds = await Job.distinct("companyId", {
@@ -263,7 +287,7 @@ export async function GET(request: Request) {
       await Promise.allSettled([
         includeAdzuna
           ? fetchAdzunaJobs({
-              country: externalCountry,
+              country: adzunaCountry,
               q: q || undefined,
               where: location || undefined,
               resultsPerCountry: q || location ? 50 : 100,
@@ -477,7 +501,12 @@ export async function GET(request: Request) {
       return score;
     };
 
-    const uniqueJobs = [...uniquePrimary, ...uniqueJooble].sort((a, b) => {
+    const uniqueJobs = [...uniquePrimary, ...uniqueJooble]
+      .filter((job) => {
+        if (!location) return true;
+        return jobMatchesLocationQuery(String(job.location || ""), location);
+      })
+      .sort((a, b) => {
       // Australia → salary → richer detail → newer
       const auDiff = Number(isAu(b)) - Number(isAu(a));
       if (auDiff !== 0) return auDiff;

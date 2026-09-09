@@ -28,6 +28,13 @@ import {
 import { useAuth } from "@/app/components/AuthProvider";
 import { useAuthModal } from "@/app/components/AuthModalProvider";
 import SignInMenu from "@/app/components/SignInMenu";
+import LocationSuggestInput from "@/app/components/LocationSuggestInput";
+import KeywordSuggestInput from "@/app/components/KeywordSuggestInput";
+import JobsSeekFilters, {
+  jobMatchesPayRange,
+  type PayPeriod,
+} from "@/app/components/JobsSeekFilters";
+import { locationSearchValue } from "@/lib/auLocations";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
@@ -346,13 +353,128 @@ function tagVariant(index: number) {
   return TAG_VARIANTS[index % TAG_VARIANTS.length];
 }
 
-const POPULAR_KEYWORDS = [
-  "Software Engineer",
-  "Accountant",
+/** High-volume search terms that typically return many board listings. */
+const POPULAR_KEYWORD_FALLBACKS = [
+  "Developer",
+  "Engineer",
+  "Manager",
+  "Sales",
+  "Analyst",
   "Remote",
   "Marketing",
-  "Nurse",
+  "Customer Service",
 ];
+
+/** Multi-word roles matched in job titles (longest first). */
+const POPULAR_ROLE_PHRASES = [
+  "software engineer",
+  "software developer",
+  "project manager",
+  "product manager",
+  "account manager",
+  "business analyst",
+  "data analyst",
+  "data scientist",
+  "customer service",
+  "customer support",
+  "registered nurse",
+  "administrative assistant",
+  "marketing manager",
+  "sales manager",
+  "frontend developer",
+  "backend developer",
+  "full stack",
+  "full-stack",
+];
+
+const POPULAR_SKIP = new Set([
+  "general",
+  "other",
+  "n/a",
+  "full-time",
+  "part-time",
+  "contract",
+  "casual",
+  "onsite",
+  "hybrid",
+]);
+
+function titleCaseTag(value: string) {
+  return value
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Build Popular tags from loaded jobs so chips point at roles with real volume. */
+function derivePopularKeywords(
+  jobs: JobItem[],
+  limit = 6,
+): { label: string; count: number }[] {
+  const counts = new Map<string, { label: string; count: number }>();
+
+  const bump = (raw: string, weight = 1) => {
+    const cleaned = raw.replace(/\s+jobs$/i, "").trim();
+    if (!cleaned || cleaned.length < 2) return;
+    const key = cleaned.toLowerCase();
+    if (POPULAR_SKIP.has(key)) return;
+    const prev = counts.get(key);
+    if (prev) {
+      prev.count += weight;
+      return;
+    }
+    counts.set(key, { label: titleCaseTag(cleaned), count: weight });
+  };
+
+  for (const job of jobs) {
+    if (job.category) bump(job.category, 2);
+    if (job.workMode?.toLowerCase() === "remote") bump("Remote", 1);
+
+    const title = (job.title || "").toLowerCase();
+    let matchedPhrase = false;
+    for (const phrase of POPULAR_ROLE_PHRASES) {
+      if (title.includes(phrase)) {
+        bump(phrase, 3);
+        matchedPhrase = true;
+        break;
+      }
+    }
+
+    if (!matchedPhrase) {
+      for (const fallback of POPULAR_KEYWORD_FALLBACKS) {
+        const needle = fallback.toLowerCase();
+        if (title.includes(needle)) {
+          bump(fallback, 2);
+          break;
+        }
+      }
+    }
+
+    for (const skill of job.skills.slice(0, 4)) {
+      if (skill && skill.length >= 2 && skill.length <= 24) bump(skill, 1);
+    }
+  }
+
+  const ranked = [...counts.values()]
+    .filter((item) => item.count >= 2)
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+
+  if (ranked.length >= 3) {
+    return ranked.slice(0, limit);
+  }
+
+  // Not enough signal yet — use high-volume defaults, prefer ones already seen.
+  const seen = new Set(ranked.map((r) => r.label.toLowerCase()));
+  const merged = [...ranked];
+  for (const label of POPULAR_KEYWORD_FALLBACKS) {
+    if (merged.length >= limit) break;
+    if (seen.has(label.toLowerCase())) continue;
+    const hit = counts.get(label.toLowerCase());
+    merged.push({ label, count: hit?.count ?? 0 });
+    seen.add(label.toLowerCase());
+  }
+  return merged.slice(0, limit);
+}
 
 function skillMatchTierClass(tier: SkillMatchTier): string {
   return `job-skill-match job-skill-match--${tier}`;
@@ -586,6 +708,7 @@ function JobSearchInner() {
   const { openAuth } = useAuthModal();
 
   const [jobs, setJobs] = useState<JobItem[]>([]);
+  const [popularSeedJobs, setPopularSeedJobs] = useState<JobItem[]>([]);
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([]);
   const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
   const [categories, setCategories] = useState<string[]>(["All"]);
@@ -595,10 +718,14 @@ function JobSearchInner() {
   const [applying, setApplying] = useState(false);
   const [visibleCount, setVisibleCount] = useState(JOBS_PAGE_SIZE);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const searchBootstrappedRef = useRef(false);
   const searchReqIdRef = useRef(0);
 
   const [searchQuery, setSearchQuery] = useState(qFromUrl);
+  const [filtersEnabled, setFiltersEnabled] = useState(false);
+  const [payPeriod, setPayPeriod] = useState<PayPeriod>("year");
+  const [payMin, setPayMin] = useState("");
+  const [payMax, setPayMax] = useState("");
+  const [payFilterActive, setPayFilterActive] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -739,7 +866,7 @@ function JobSearchInner() {
       setVisibleCount(JOBS_PAGE_SIZE);
 
       const q = (opts?.q ?? searchQuery).trim();
-      const loc = (opts?.location ?? locationQuery).trim();
+      const loc = locationSearchValue(opts?.location ?? locationQuery);
       const country = (opts?.country ?? selectedCountry).trim() || "all";
 
       const buildParams = (fast?: boolean) => {
@@ -759,7 +886,12 @@ function JobSearchInner() {
         adzuna?: { configured?: boolean; error?: string };
       }) => {
         if (reqId !== searchReqIdRef.current) return;
-        setJobs(data.jobs ?? []);
+        const nextJobs = data.jobs ?? [];
+        setJobs(nextJobs);
+        // Keep Popular tags seeded from broad browse results (lots of jobs).
+        if (!q && !loc && nextJobs.length > 0) {
+          setPopularSeedJobs(nextJobs);
+        }
         setCompanyOptions(data.companies ?? []);
         setCategories(["All", ...((data.categories as string[]) ?? [])]);
         setCountryOptions(data.countries ?? []);
@@ -812,16 +944,17 @@ function JobSearchInner() {
 
   const runSearch = useCallback(() => {
     const q = searchQuery.trim();
-    const loc = locationQuery.trim();
+    const locDisplay = locationQuery.trim();
     const params = new URLSearchParams();
     if (q) params.set("q", q);
-    if (loc) params.set("location", loc);
+    if (locDisplay) params.set("location", locDisplay);
     if (selectedCountry && selectedCountry !== "all") {
       params.set("country", selectedCountry);
     }
     const qs = params.toString();
     router.replace(qs ? `/jobs?${qs}` : "/jobs");
-    void loadJobs({ q, location: loc, country: selectedCountry });
+    setFiltersEnabled(true);
+    void loadJobs({ q, location: locDisplay, country: selectedCountry });
   }, [searchQuery, locationQuery, selectedCountry, loadJobs, router]);
 
   useEffect(() => {
@@ -830,33 +963,9 @@ function JobSearchInner() {
       location: locationFromUrl,
       country: countryFromUrl || selectedCountry,
     });
-    // Initial load only — typing uses debounced auto-search below.
+    // Initial load only — search runs on Search click.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Auto-search while typing (no Search click needed)
-  useEffect(() => {
-    if (!searchBootstrappedRef.current) {
-      searchBootstrappedRef.current = true;
-      return;
-    }
-
-    const q = searchQuery.trim();
-    const loc = locationQuery.trim();
-    const timer = window.setTimeout(() => {
-      const params = new URLSearchParams();
-      if (q) params.set("q", q);
-      if (loc) params.set("location", loc);
-      if (selectedCountry && selectedCountry !== "all") {
-        params.set("country", selectedCountry);
-      }
-      const qs = params.toString();
-      router.replace(qs ? `/jobs?${qs}` : "/jobs");
-      void loadJobs({ q, location: loc, country: selectedCountry });
-    }, 450);
-
-    return () => window.clearTimeout(timer);
-  }, [searchQuery, locationQuery, selectedCountry, loadJobs, router]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -1064,6 +1173,10 @@ function JobSearchInner() {
     setLocationQuery("");
     setSelectedTypes([]);
     setSelectedModels([]);
+    setPayPeriod("year");
+    setPayMin("");
+    setPayMax("");
+    setPayFilterActive(false);
     setSelectedCategory("All");
     setSelectedLevel("All");
     setSelectedCompanyId("All");
@@ -1127,6 +1240,9 @@ function JobSearchInner() {
       ) {
         return false;
       }
+      if (!jobMatchesPayRange(job, payPeriod, payMin, payMax, payFilterActive)) {
+        return false;
+      }
       return true;
     });
   }, [
@@ -1136,6 +1252,10 @@ function JobSearchInner() {
     selectedTypes,
     selectedModels,
     selectedCompanyId,
+    payPeriod,
+    payMin,
+    payMax,
+    payFilterActive,
     matchesSelectedCountry,
   ]);
 
@@ -1148,17 +1268,18 @@ function JobSearchInner() {
         return tb - ta;
       };
 
-      // Newest first = pure date order
+      // Jobs with pay always float to the top
+      const payDiff = Number(hasSalary(b)) - Number(hasSalary(a));
+      if (payDiff !== 0) return payDiff;
+
+      // Newest first = date within pay/no-pay groups
       if (sortBy === "newest") {
         return dateDiff();
       }
 
-      // Most relevant: Australia → salary → richer detail → newer
+      // Most relevant: Australia → richer detail → newer
       const auDiff = Number(isAustraliaJob(b)) - Number(isAustraliaJob(a));
       if (auDiff !== 0) return auDiff;
-
-      const payDiff = Number(hasSalary(b)) - Number(hasSalary(a));
-      if (payDiff !== 0) return payDiff;
 
       const infoDiff = jobInfoScore(b) - jobInfoScore(a);
       if (infoDiff !== 0) return infoDiff;
@@ -1173,17 +1294,40 @@ function JobSearchInner() {
     [sortedJobs, visibleCount],
   );
 
+  const popularKeywords = useMemo(
+    () =>
+      derivePopularKeywords(
+        popularSeedJobs.length > 0 ? popularSeedJobs : jobs,
+        6,
+      ),
+    [popularSeedJobs, jobs],
+  );
+
+  const keywordSuggestTerms = useMemo(() => {
+    const source = popularSeedJobs.length > 0 ? popularSeedJobs : jobs;
+    const terms: string[] = [...categories.filter((c) => c !== "All")];
+    for (const job of source.slice(0, 120)) {
+      if (job.title) terms.push(job.title);
+      if (job.category) terms.push(job.category);
+      for (const skill of job.skills.slice(0, 3)) terms.push(skill);
+    }
+    for (const item of popularKeywords) terms.push(item.label);
+    return terms;
+  }, [popularSeedJobs, jobs, categories, popularKeywords]);
+
   useEffect(() => {
     setVisibleCount(JOBS_PAGE_SIZE);
   }, [
-    searchQuery,
-    locationQuery,
     selectedCategory,
     selectedLevel,
     selectedTypes,
     selectedModels,
     selectedCompanyId,
     selectedCountry,
+    payPeriod,
+    payMin,
+    payMax,
+    payFilterActive,
     sortBy,
   ]);
 
@@ -1775,40 +1919,33 @@ function JobSearchInner() {
 
           <div className="jobs-search-fixed-inner">
             <div className="jobs-search-bar">
-              <div className="jobs-search-field">
-                <Search className="h-5 w-5 shrink-0 text-slate-400" />
-                <input
-                  type="text"
+              <div className="jobs-search-field jobs-search-field--suggest">
+                <KeywordSuggestInput
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      runSearch();
-                    }
-                  }}
+                  onChange={setSearchQuery}
+                  onSelect={setSearchQuery}
+                  extraTerms={keywordSuggestTerms}
                   tabIndex={-1}
                   placeholder={
                     searchQuery
                       ? ""
                       : `Job title or keyword — ${currentPlaceholderText}`
                   }
+                  leading={
+                    <Search className="h-5 w-5 shrink-0 text-slate-400" />
+                  }
                 />
               </div>
-              <div className="jobs-search-field">
-                <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
-                <input
-                  type="text"
+              <div className="jobs-search-field jobs-search-field--suggest">
+                <LocationSuggestInput
                   value={locationQuery}
-                  onChange={(e) => setLocationQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      runSearch();
-                    }
-                  }}
+                  onChange={setLocationQuery}
+                  onSelect={setLocationQuery}
                   tabIndex={-1}
-                  placeholder="City or region"
+                  placeholder="Suburb / postcode"
+                  leading={
+                    <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
+                  }
                 />
               </div>
               <button
@@ -1847,38 +1984,31 @@ function JobSearchInner() {
 
           <div className="jobs-hero-search-row">
             <div className="jobs-search-bar">
-              <div className="jobs-search-field">
-                <Search className="h-5 w-5 shrink-0 text-slate-400" />
-                <input
-                  type="text"
+              <div className="jobs-search-field jobs-search-field--suggest">
+                <KeywordSuggestInput
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      runSearch();
-                    }
-                  }}
+                  onChange={setSearchQuery}
+                  onSelect={setSearchQuery}
+                  extraTerms={keywordSuggestTerms}
                   placeholder={
                     searchQuery
                       ? ""
                       : `Job title or keyword — ${currentPlaceholderText}`
                   }
+                  leading={
+                    <Search className="h-5 w-5 shrink-0 text-slate-400" />
+                  }
                 />
               </div>
-              <div className="jobs-search-field">
-                <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
-                <input
-                  type="text"
+              <div className="jobs-search-field jobs-search-field--suggest">
+                <LocationSuggestInput
                   value={locationQuery}
-                  onChange={(e) => setLocationQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      runSearch();
-                    }
-                  }}
-                  placeholder="City or region"
+                  onChange={setLocationQuery}
+                  onSelect={setLocationQuery}
+                  placeholder="Suburb / postcode"
+                  leading={
+                    <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
+                  }
                 />
               </div>
               <button
@@ -1893,17 +2023,48 @@ function JobSearchInner() {
             </div>
           </div>
 
-          <p className="jobs-popular">
-            Popular:
-            {POPULAR_KEYWORDS.map((kw, i) => (
-              <span key={kw}>
-                {i > 0 ? ", " : " "}
-                <button type="button" onClick={() => setSearchQuery(kw)}>
-                  {kw}
-                </button>
-              </span>
-            ))}
-          </p>
+          {filtersEnabled ? (
+            <div className="jobs-seek-filters-under-search">
+              <JobsSeekFilters
+                enabled
+                payPeriod={payPeriod}
+                payMin={payMin}
+                payMax={payMax}
+                selectedTypes={selectedTypes}
+                selectedModels={selectedModels}
+                onPayPeriodChange={(period) => {
+                  setPayPeriod(period);
+                  setPayFilterActive(true);
+                }}
+                onPayMinChange={(value) => {
+                  setPayMin(value);
+                  setPayFilterActive(true);
+                }}
+                onPayMaxChange={(value) => {
+                  setPayMax(value);
+                  setPayFilterActive(true);
+                }}
+                onToggleType={toggleTypeFilter}
+                onToggleModel={toggleModelFilter}
+                payFilterActive={payFilterActive}
+              />
+            </div>
+          ) : (
+            <p className="jobs-popular">
+              Popular:
+              {popularKeywords.map((item, i) => (
+                <span key={item.label}>
+                  {i > 0 ? ", " : " "}
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery(item.label)}
+                  >
+                    {item.label}
+                  </button>
+                </span>
+              ))}
+            </p>
+          )}
         </div>
       </section>
 
@@ -2208,7 +2369,6 @@ function JobSearchInner() {
                       const snippet = jobCardSnippet(job);
                       const tags = [
                         TYPE_LABELS[job.employmentType] || job.employmentType,
-                        job.category !== "General" ? job.category : null,
                         WORK_MODE_LABELS[job.workMode] || job.workMode,
                       ].filter(Boolean) as string[];
                       const hasVisaSponsorship = jobOffersVisaSponsorship(job);

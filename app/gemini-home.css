@@ -67,13 +67,19 @@
   font-weight: 500;
 }
 
-.gemini-home h1:not(.hero-title):not(.trusted-by-title):not(.four-things-title):not(.four-things-card-title) {
+.gemini-home
+  h1:not(.hero-title):not(.trusted-by-title):not(.four-things-title):not(
+    .four-things-card-title
+  ) {
   font-size: clamp(2.8rem, 6vw, 4.9rem);
   line-height: 0.99;
   letter-spacing: -0.048em;
 }
 
-.gemini-home h2:not(.four-things-title):not(.trusted-by-title):not(.paths-title):not(.support-hero-title):not(.levels-title):not(.newcomers-title):not(.cta-title) {
+.gemini-home
+  h2:not(.four-things-title):not(.trusted-by-title):not(.paths-title):not(
+    .support-hero-title
+  ):not(.levels-title):not(.newcomers-title):not(.cta-title) {
   font-size: clamp(1.95rem, 3.7vw, 2.9rem);
   line-height: 1.05;
   letter-spacing: -0.042em;
@@ -1119,7 +1125,14 @@
   font-style: normal;
 }
 
-.gemini-home section:not(.hero-section):not(.benefits-section):not(.journey-section):not(.learning-flow-section):not(.au-vacancies-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
+.gemini-home
+  section:not(.hero-section):not(.benefits-section):not(.journey-section):not(
+    .learning-flow-section
+  ):not(.au-vacancies-section):not(.trusted-by-section):not(
+    .four-things-section
+  ):not(.paths-section):not(.support-section):not(.levels-section):not(
+    .newcomers-section
+  ):not(.cta-section) {
   padding: 104px 0;
 }
 
@@ -1128,6 +1141,172 @@
   min-height: 0 !important;
   width: 100% !important;
   max-width: 100% !important;
+}
+
+.gemini-home .hero-section .hero-title {
+  margin-bottom: 1.35rem !important;
+  font-weight: 600 !important;
+}
+
+@media (min-width: 640px) {
+  .gemini-home .hero-section .hero-title {
+    margin-bottom: 1.6rem !important;
+  }
+}
+
+.gemini-home .hero-section .hero-sub {
+  margin-bottom: 1.75rem !important;
+}
+
+@media (min-width: 640px) {
+  .gemini-home .hero-section .hero-sub {
+    margin-bottom: 2rem !important;
+  }
+}
+
+.gemini-home .hero-section .hero-atmosphere {
+  background:
+    radial-gradient(
+      ellipse 58% 72% at 8% 42%,
+      rgba(200, 240, 102, 0.42),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 48% 60% at 92% 18%,
+      rgba(79, 108, 245, 0.14),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 42% 48% at 78% 92%,
+      rgba(200, 240, 102, 0.22),
+      transparent 52%
+    ),
+    linear-gradient(180deg, #ffffff 0%, #fbfdf7 48%, #f4f6ff 100%);
+}
+
+.gemini-home .hero-section .hero-orb {
+  filter: blur(56px);
+  will-change: transform, opacity;
+}
+
+.gemini-home .hero-section .hero-orb--lime {
+  background: rgba(200, 240, 102, 0.55);
+  animation: hero-orb-drift 12s ease-in-out infinite;
+}
+
+.gemini-home .hero-section .hero-orb--blue {
+  background: rgba(79, 108, 245, 0.22);
+  animation: hero-orb-drift 14s ease-in-out infinite reverse;
+}
+
+.gemini-home .hero-section .hero-orb--lime-soft {
+  background: rgba(200, 240, 102, 0.35);
+  animation: hero-orb-drift 16s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+.gemini-home .hero-section .hero-next-word {
+  position: relative;
+  display: inline-block;
+}
+
+.gemini-home .hero-section .hero-next-word::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.08em;
+  height: 0.22em;
+  background: rgba(200, 240, 102, 0.85);
+  border-radius: 999px;
+  z-index: -1;
+  transform: scaleX(0.92);
+  transform-origin: left center;
+}
+
+.gemini-home .hero-section .hero-search-form:focus-within {
+  border-color: rgba(79, 108, 245, 0.35);
+  box-shadow:
+    0 18px 50px -20px rgba(79, 108, 245, 0.4),
+    0 0 0 3px rgba(200, 240, 102, 0.35);
+}
+
+.gemini-home .hero-section .hero-visual-disc {
+  width: min(72%, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 40% 35%,
+      rgba(255, 255, 255, 0.85),
+      transparent 45%
+    ),
+    linear-gradient(
+      145deg,
+      #c8f066 0%,
+      #b6e34f 45%,
+      rgba(79, 108, 245, 0.55) 100%
+    );
+  opacity: 0.95;
+}
+
+.gemini-home .hero-section .hero-visual-glow {
+  width: 70%;
+  height: 90px;
+  border-radius: 100%;
+  background: rgba(200, 240, 102, 0.55);
+  filter: blur(28px);
+}
+
+.gemini-home .hero-section .hero-visual-img {
+  animation: hero-visual-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  filter: drop-shadow(0 24px 40px rgba(15, 23, 42, 0.18));
+}
+
+.gemini-home .hero-section .hero-copy-enter {
+  animation: hero-copy-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hero-orb-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate3d(18px, -14px, 0) scale(1.06);
+    opacity: 1;
+  }
+}
+
+@keyframes hero-copy-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-visual-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gemini-home .hero-section .hero-orb,
+  .gemini-home .hero-section .hero-copy-enter,
+  .gemini-home .hero-section .hero-visual-img {
+    animation: none !important;
+  }
 }
 
 /* Primary CTA is white on blue; override .gemini-home a { color: inherit } */
@@ -1159,7 +1338,201 @@
 }
 
 .gemini-home .benefits-section a.benefit-card-cta {
+  color: inherit !important;
+}
+
+.gemini-home .benefits-section a.benefit-card-cta--blue {
   color: #ffffff !important;
+}
+
+.gemini-home .benefits-section a.benefit-card-cta--green {
+  color: #0f172a !important;
+}
+
+.gemini-home .benefits-section .benefit-card,
+.gemini-home .benefits-section .benefit-card h3,
+.gemini-home .benefits-section .benefit-card p {
+  text-align: left !important;
+}
+
+.gemini-home .benefits-section .benefit-card {
+  isolation: isolate;
+  box-shadow: 0 12px 30px -18px rgba(15, 23, 42, 0.3);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.gemini-home .benefits-section .benefit-card-img {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: scale(1.01);
+}
+
+.gemini-home .benefits-section .benefit-card-shade {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.18) 0%,
+    rgba(0, 0, 0, 0.42) 45%,
+    rgba(0, 0, 0, 0.88) 100%
+  );
+  transition: opacity 0.45s ease;
+}
+
+.gemini-home .benefits-section .benefit-card-tint {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.gemini-home .benefits-section .benefit-card--blue .benefit-card-tint {
+  background: linear-gradient(
+    160deg,
+    rgba(79, 108, 245, 0.28) 0%,
+    transparent 42%,
+    rgba(79, 108, 245, 0.18) 100%
+  );
+}
+
+.gemini-home .benefits-section .benefit-card--green .benefit-card-tint {
+  background: linear-gradient(
+    160deg,
+    rgba(200, 240, 102, 0.26) 0%,
+    transparent 42%,
+    rgba(200, 240, 102, 0.16) 100%
+  );
+}
+
+.gemini-home .benefits-section .benefit-card-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.28) 48%,
+    transparent 62%
+  );
+  transform: translateX(-130%) skewX(-18deg);
+  opacity: 0;
+}
+
+.gemini-home .benefits-section .benefit-card-title,
+.gemini-home .benefits-section .benefit-card-desc,
+.gemini-home .benefits-section .benefit-card-cta {
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease,
+    color 0.35s ease,
+    box-shadow 0.35s ease,
+    filter 0.35s ease;
+}
+
+.gemini-home .benefits-section .benefit-card-title {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.gemini-home .benefits-section .benefit-card-desc {
+  transform: translateY(0);
+  opacity: 0.88;
+}
+
+.gemini-home .benefits-section .benefit-card-cta {
+  transform: translateY(8px);
+  opacity: 0.92;
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.45);
+}
+
+.gemini-home .benefits-section .benefit-card-cta-icon {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hover state */
+.gemini-home .benefits-section .benefit-card:hover {
+  transform: translateY(-14px) scale(1.015);
+  z-index: 2;
+}
+
+.gemini-home .benefits-section .benefit-card--blue:hover {
+  box-shadow:
+    0 36px 70px -22px rgba(15, 23, 42, 0.5),
+    0 0 0 1.5px rgba(79, 108, 245, 0.55),
+    0 18px 40px -16px rgba(79, 108, 245, 0.45);
+}
+
+.gemini-home .benefits-section .benefit-card--green:hover {
+  box-shadow:
+    0 36px 70px -22px rgba(15, 23, 42, 0.5),
+    0 0 0 1.5px rgba(200, 240, 102, 0.7),
+    0 18px 40px -16px rgba(160, 200, 60, 0.4);
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-img {
+  transform: scale(1.12);
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-tint {
+  opacity: 1;
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-shine {
+  opacity: 1;
+  animation: benefit-card-shine 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-title {
+  transform: translateY(-10px);
+  opacity: 1;
+  transition-delay: 0.02s;
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-desc {
+  transform: translateY(-10px);
+  opacity: 1;
+  color: #fff;
+  transition-delay: 0.08s;
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-cta {
+  transform: translateY(-10px);
+  opacity: 1;
+  transition-delay: 0.14s;
+  filter: brightness(1.05);
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-cta--blue {
+  box-shadow: 0 12px 28px -10px rgba(79, 108, 245, 0.75);
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-cta--green {
+  box-shadow: 0 12px 28px -10px rgba(160, 200, 60, 0.7);
+}
+
+.gemini-home .benefits-section .benefit-card:hover .benefit-card-cta-icon {
+  transform: translateX(3px);
+}
+
+@keyframes benefit-card-shine {
+  from {
+    transform: translateX(-130%) skewX(-18deg);
+  }
+  to {
+    transform: translateX(130%) skewX(-18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gemini-home .benefits-section .benefit-card,
+  .gemini-home .benefits-section .benefit-card-img,
+  .gemini-home .benefits-section .benefit-card-title,
+  .gemini-home .benefits-section .benefit-card-desc,
+  .gemini-home .benefits-section .benefit-card-cta,
+  .gemini-home .benefits-section .benefit-card-shine {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 #benefits.benefits-section .benefits-header,
@@ -1177,22 +1550,80 @@
   text-align: center !important;
 }
 
-/* .gemini-home p { margin: 0 } kills Tailwind mx-auto on intro copy */
+.gemini-home .benefits-section .benefits-display-title {
+  margin: 0 auto !important;
+  font-size: clamp(2.25rem, 5.2vw, 3.75rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.03em !important;
+  color: #000 !important;
+  text-align: center !important;
+}
+
 .gemini-home .benefits-section .benefits-intro {
   margin-left: auto !important;
   margin-right: auto !important;
+  margin-top: 1.5rem !important;
+  color: #666666 !important;
+  text-align: center !important;
+}
+
+@media (min-width: 640px) {
+  .gemini-home .benefits-section .benefits-intro {
+    margin-top: 1.75rem !important;
+  }
+}
+
+.gemini-home .journey-section .journey-display-title {
+  margin: 0 auto !important;
+  font-size: clamp(2.25rem, 5.2vw, 3.75rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.03em !important;
+  color: #000 !important;
+  text-align: center !important;
 }
 
 .gemini-home .journey-section .journey-intro {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 1.5rem !important;
+  color: #666666 !important;
   text-align: center !important;
+}
+
+@media (min-width: 640px) {
+  .gemini-home .journey-section .journey-intro {
+    margin-top: 1.75rem !important;
+  }
 }
 
 .gemini-home .journey-section a.journey-step-link {
-  color: #0d5c4d !important;
+  color: #4f6cf5 !important;
+}
+
+.gemini-home .learning-flow-section .learning-display-title {
+  margin: 0 auto !important;
+  font-size: clamp(2.25rem, 5.2vw, 3.75rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.03em !important;
+  color: #000 !important;
+  text-align: center !important;
 }
 
 .gemini-home .learning-flow-section .learning-flow-intro {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 1.5rem !important;
+  color: #666666 !important;
   text-align: center !important;
+}
+
+@media (min-width: 640px) {
+  .gemini-home .learning-flow-section .learning-flow-intro {
+    margin-top: 1.75rem !important;
+  }
 }
 
 .gemini-home .home-job-search-strip .home-job-search-intro,
@@ -1202,48 +1633,265 @@
 }
 
 .gemini-home .learning-flow-section a.learning-flow-cta {
-  color: #2563eb !important;
+  color: #4f6cf5 !important;
+}
+
+.gemini-home .learning-flow-section .learning-card {
+  isolation: isolate;
+  transition:
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s ease,
+    box-shadow 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.4s ease;
+  will-change: transform;
+}
+
+.gemini-home .learning-flow-section .learning-card-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      circle at 20% 15%,
+      rgba(200, 240, 102, 0.35),
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(79, 108, 245, 0.28),
+      transparent 48%
+    );
+  transition: opacity 0.5s ease;
+}
+
+.gemini-home .learning-flow-section .learning-card-shine-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.gemini-home .learning-flow-section .learning-card-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 28%,
+    rgba(255, 255, 255, 0.55) 48%,
+    transparent 65%
+  );
+  transform: translateX(-140%) skewX(-16deg);
+  opacity: 0;
+}
+
+.gemini-home .learning-flow-section .learning-card-step {
+  box-shadow: 0 8px 18px -10px rgba(79, 108, 245, 0.55);
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s ease,
+    background-color 0.35s ease;
+}
+
+.gemini-home .learning-flow-section .learning-card:hover .learning-card-step {
+  transform: translateY(-2px) scale(1.06);
+  background: #3f5ce8;
+  box-shadow: 0 12px 28px -8px rgba(79, 108, 245, 0.7);
+}
+
+.gemini-home .learning-flow-section .learning-card-icon {
+  transition:
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s ease;
+}
+
+.gemini-home .learning-flow-section .learning-card-label,
+.gemini-home .learning-flow-section .learning-card-title {
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.35s ease;
+}
+
+.gemini-home .learning-flow-section .learning-card-cta {
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.35s ease,
+    color 0.35s ease,
+    box-shadow 0.35s ease,
+    gap 0.35s ease;
+}
+
+.gemini-home .learning-flow-section .learning-card-cta-arrow {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gemini-home .learning-flow-section .learning-item {
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.35s ease,
+    opacity 0.35s ease;
+  transition-delay: calc(var(--item-i, 0) * 40ms);
+}
+
+/* Hover — cinematic */
+.gemini-home .learning-flow-section .learning-card:hover {
+  transform: translateY(-16px) scale(1.02);
+  border-color: #4f6cf5;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+  box-shadow:
+    0 36px 70px -28px rgba(79, 108, 245, 0.55),
+    0 14px 30px -18px rgba(200, 240, 102, 0.45),
+    0 0 0 1px rgba(79, 108, 245, 0.18);
+  z-index: 3;
+}
+
+.gemini-home .learning-flow-section .learning-card:hover .learning-card-glow {
+  opacity: 1;
+}
+
+.gemini-home .learning-flow-section .learning-card:hover .learning-card-shine {
+  opacity: 1;
+  animation: learning-card-shine 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.gemini-home .learning-flow-section .learning-card:hover .learning-card-icon {
+  transform: scale(1.14) translateY(-4px);
+  animation: learning-icon-pop 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 16px 30px -14px rgba(79, 108, 245, 0.45);
+}
+
+.gemini-home .learning-flow-section .learning-card:hover .learning-card-label {
+  transform: translateY(-3px);
+}
+
+.gemini-home .learning-flow-section .learning-card:hover .learning-card-title {
+  transform: translateY(-5px);
+  color: #0f172a;
+}
+
+.gemini-home .learning-flow-section .learning-card:hover .learning-item {
+  transform: translateY(-6px);
+  border-color: rgba(79, 108, 245, 0.28);
+  box-shadow: 0 10px 22px -16px rgba(15, 23, 42, 0.28);
+}
+
+.gemini-home .learning-flow-section .learning-item:hover {
+  transform: translateY(-6px) translateX(6px) scale(1.01);
+  border-color: #4f6cf5 !important;
+  background: rgba(79, 108, 245, 0.06) !important;
+  box-shadow: 0 14px 28px -16px rgba(79, 108, 245, 0.4);
+}
+
+.gemini-home .learning-flow-section .learning-card:hover .learning-card-cta {
+  transform: translateY(-4px);
+  background: #4f6cf5;
+  color: #fff !important;
+  box-shadow: 0 12px 26px -10px rgba(79, 108, 245, 0.7);
+  gap: 0.5rem;
+}
+
+.gemini-home
+  .learning-flow-section
+  .learning-card:hover
+  .learning-card-cta-arrow {
+  transform: translateX(5px);
+}
+
+@keyframes learning-card-shine {
+  from {
+    transform: translateX(-140%) skewX(-16deg);
+  }
+  to {
+    transform: translateX(140%) skewX(-16deg);
+  }
+}
+
+@keyframes learning-icon-pop {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  45% {
+    transform: scale(1.2) translateY(-8px) rotate(-6deg);
+  }
+  100% {
+    transform: scale(1.14) translateY(-4px) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gemini-home .learning-flow-section .learning-card,
+  .gemini-home .learning-flow-section .learning-card-step,
+  .gemini-home .learning-flow-section .learning-card-icon,
+  .gemini-home .learning-flow-section .learning-card-label,
+  .gemini-home .learning-flow-section .learning-card-title,
+  .gemini-home .learning-flow-section .learning-card-cta,
+  .gemini-home .learning-flow-section .learning-card-cta-arrow,
+  .gemini-home .learning-flow-section .learning-card-shine,
+  .gemini-home .learning-flow-section .learning-item {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 .gemini-home .employers-home-strip a.employer-primary-cta {
-  color: #00082c !important;
+  color: #ffffff !important;
 }
 
 .gemini-home .employers-home-strip a.employer-secondary-cta {
-  color: #ffffff !important;
+  color: #4f6cf5 !important;
 }
 
 .gemini-home a.faq-primary-cta {
   color: #ffffff !important;
+  background-color: #4f6cf5 !important;
 }
 
-.gemini-home .au-vacancies-section a.vacancy-table-cta,
-.gemini-home .au-vacancies-section button.vacancy-table-cta {
+.gemini-home a.faq-primary-cta:hover {
+  background-color: #3f5ce8 !important;
   color: #ffffff !important;
-  background-color: #2563eb !important;
-  display: inline-flex !important;
-  align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
-  text-decoration: none !important;
-  border: none;
-  cursor: pointer;
 }
 
-.gemini-home .au-vacancies-section a.vacancy-table-cta:hover,
-.gemini-home .au-vacancies-section button.vacancy-table-cta:hover {
-  background-color: #1d4ed8 !important;
-  color: #ffffff !important;
+.gemini-home .home-faq-section .faq-display-title {
+  margin: 0 auto !important;
+  font-size: clamp(2rem, 4.5vw, 2.75rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.03em !important;
+  color: #000 !important;
+  text-align: center !important;
+}
+
+.gemini-home .home-faq-section .faq-intro {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}
+
+.gemini-home .au-vacancies-section .vacancies-display-title {
+  margin: 0 auto !important;
+  font-size: clamp(2.25rem, 5.2vw, 3.75rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.03em !important;
+  color: #000 !important;
+  text-align: center !important;
 }
 
 .gemini-home .au-vacancies-section a.vacancy-find-more {
   color: #ffffff !important;
-  background-color: #00082c !important;
+  background-color: #4f6cf5 !important;
   text-decoration: none !important;
 }
 
 .gemini-home .au-vacancies-section a.vacancy-find-more:hover {
-  background-color: #00061f !important;
+  background-color: #3f5ce8 !important;
   color: #ffffff !important;
 }
 
@@ -2659,8 +3307,7 @@
   position: relative;
   overflow: hidden;
   box-shadow: none;
-  transition:
-    border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
 }
@@ -2871,7 +3518,9 @@
   align-items: center;
   gap: 6px;
   box-shadow: none;
-  transition: border-color 0.2s, color 0.2s;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
 }
 
 .gemini-home .langgrid i:hover {
@@ -3530,11 +4179,16 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-.gemini-home footer {
-  border-top: 1px solid #e2e8f0;
-  padding: 46px 0 60px;
-  color: #64748b;
-  background: #ffffff;
+.gemini-home footer,
+.gemini-home footer.site-footer {
+  border-top: 1px solid rgba(79, 108, 245, 0.15) !important;
+  padding: 0 !important;
+  color: #0f172a !important;
+  background: #ffffff !important;
+}
+
+.gemini-home footer.site-footer a {
+  color: inherit;
 }
 
 .gemini-home .foot {
@@ -3757,7 +4411,12 @@
     align-items: flex-start;
   }
 
-  .gemini-home section:not(.hero-section):not(.trusted-by-section):not(.four-things-section):not(.paths-section):not(.support-section):not(.levels-section):not(.newcomers-section):not(.cta-section) {
+  .gemini-home
+    section:not(.hero-section):not(.trusted-by-section):not(
+      .four-things-section
+    ):not(.paths-section):not(.support-section):not(.levels-section):not(
+      .newcomers-section
+    ):not(.cta-section) {
     padding: 70px 0;
   }
 

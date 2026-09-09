@@ -1,79 +1,101 @@
 "use client";
 
-import Link from "next/link";
-import { Playfair_Display } from "next/font/google";
-import { useAuth } from "@/app/components/AuthProvider";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { MapPin, Search } from "lucide-react";
+import { Figtree } from "next/font/google";
+import LocationSuggestInput from "@/app/components/LocationSuggestInput";
+import KeywordSuggestInput from "@/app/components/KeywordSuggestInput";
 
-const playfair = Playfair_Display({
+const figtree = Figtree({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["italic", "normal"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
 /** H02–H03 hero — checklist copy; job search lives after benefits (H05) */
 export default function HeroSection() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const [jobQuery, setJobQuery] = useState("");
+  const [locationQuery, setLocationQuery] = useState("");
 
-  const primaryHref =
-    user?.role === "user"
-      ? "/profile/setup"
-      : "/register?role=user&next=/profile/setup";
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const params = new URLSearchParams({ country: "au" });
+    if (jobQuery.trim()) params.set("q", jobQuery.trim());
+    if (locationQuery.trim()) {
+      params.set("location", locationQuery.trim());
+    }
+    router.push(`/jobs?${params.toString()}`);
+  }
 
   return (
-    <section className="hero-section relative w-full overflow-hidden bg-[#005682] text-white">
-      <div className="relative mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-6 px-5 sm:gap-8 sm:px-8 lg:grid-cols-2 lg:items-start lg:gap-0 lg:px-10">
-        <div className="hero-copy relative z-10 flex w-full flex-col items-center pt-8 pb-2 text-center sm:py-10 lg:items-start lg:pt-14 lg:pb-12 lg:pr-8 lg:text-left">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#eddcb1] sm:text-xs">
-            Career support for Australia
-          </p>
+    <section className="hero-section relative w-full overflow-hidden bg-white text-[#0f172a]">
+      <div className="hero-atmosphere pointer-events-none absolute inset-0" aria-hidden />
+      <div className="hero-orb hero-orb--lime pointer-events-none absolute -left-20 top-8 h-72 w-72 rounded-full" aria-hidden />
+      <div className="hero-orb hero-orb--blue pointer-events-none absolute -right-16 top-1/3 h-80 w-80 rounded-full" aria-hidden />
+      <div className="hero-orb hero-orb--lime-soft pointer-events-none absolute bottom-[-10%] left-[35%] h-56 w-56 rounded-full" aria-hidden />
 
-          <h1 className="hero-title mb-3 max-w-xl text-[1.75rem] font-bold leading-[1.12] tracking-tight text-white sm:mb-4 sm:text-5xl lg:text-[3.35rem]">
-            Build your profile. Grow your skills. Get{" "}
-            <span
-              className={`${playfair.className} font-normal italic text-[#eddcb1]`}
-            >
-              noticed
+      <div className="relative mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-5 py-10 sm:gap-10 sm:px-8 sm:py-12 lg:grid-cols-2 lg:gap-4 lg:px-10 lg:py-6">
+        <div className="hero-copy hero-copy-enter relative z-10 flex w-full flex-col items-center text-center lg:items-start lg:pr-8 lg:text-left">
+          <h1
+            className={`${figtree.className} hero-title max-w-xl text-[1.9rem] font-semibold leading-[1.1] tracking-tight text-[#0f172a] sm:text-5xl lg:text-[3.55rem]`}
+          >
+            Find what&apos;s{" "}
+            <span className="hero-next-word font-semibold italic text-[#4f6cf5]">
+              Next
             </span>
-            .
           </h1>
 
-          <p className="mb-6 max-w-lg text-[14px] leading-relaxed text-sky-100/95 sm:text-base">
-            Create your free profile, learn from industry experts, access
-            professional development and career events, and get your
-            qualifications and work experience checked for employers.
+          <p className="hero-sub mt-0 max-w-md text-[15px] leading-relaxed text-slate-600 sm:max-w-lg sm:text-[17px] sm:leading-relaxed">
+            Australia&apos;s most intelligent talent platform - matching
+            verified candidates to the right roles, faster.
           </p>
 
-          <div className="flex w-full max-w-sm flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
-            <Link
-              href={primaryHref}
-              className="hero-primary-cta inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-[15px] font-bold shadow-[0_12px_30px_rgba(0,0,0,0.25)] hover:bg-white/95 sm:px-6 sm:py-3.5 sm:text-base"
-            >
-              Build my free profile
-            </Link>
-            <a
-              href="#benefits"
-              className="hero-secondary-cta inline-flex items-center justify-center rounded-xl border border-white/45 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
-            >
-              Explore member benefits
-            </a>
-          </div>
-
-          <Link
-            href="/employers"
-            className="mt-4 inline-block text-sm font-medium text-[#eddcb1] underline underline-offset-4"
+          <form
+            onSubmit={onSubmit}
+            className="hero-search-form mt-0 flex w-full max-w-xl flex-col gap-1.5 rounded-2xl border border-[#4f6cf5]/12 bg-white/90 p-1.5 shadow-[0_18px_50px_-20px_rgba(79,108,245,0.35)] backdrop-blur-sm transition sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:p-1.5 sm:pl-4"
           >
-            Hiring? Find verified candidates
-          </Link>
+            <div className="relative min-w-0 flex-1 px-3 py-2 sm:px-0 sm:py-0">
+              <KeywordSuggestInput
+                value={jobQuery}
+                onChange={setJobQuery}
+                placeholder="Job title"
+                leading={<Search className="h-4 w-4 shrink-0 text-[#4f6cf5]/70" />}
+                inputClassName="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none sm:py-2.5"
+                className="home-location-suggest"
+              />
+            </div>
+            <div className="hidden h-7 w-px shrink-0 bg-slate-200 sm:block" />
+            <div className="relative min-w-0 flex-1 px-3 py-2 sm:px-3 sm:py-0">
+              <LocationSuggestInput
+                value={locationQuery}
+                onChange={setLocationQuery}
+                placeholder="Location"
+                leading={<MapPin className="h-4 w-4 shrink-0 text-[#4f6cf5]/70" />}
+                inputClassName="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none sm:py-2.5"
+                className="home-location-suggest"
+              />
+            </div>
+            <button
+              type="submit"
+              className="shrink-0 rounded-lg bg-[#4f6cf5] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#3f5ce8] sm:rounded-lg"
+            >
+              Search
+            </button>
+          </form>
         </div>
 
-        <div className="relative flex w-full justify-center pb-0 sm:mt-0 lg:justify-end lg:self-end lg:pb-0">
+        <div className="hero-visual relative z-10 flex w-full items-end justify-center lg:justify-end">
           <div className="relative leading-none">
+            <div className="hero-visual-glow pointer-events-none absolute bottom-[8%] left-1/2 -translate-x-1/2" aria-hidden />
+            <div className="hero-visual-disc pointer-events-none absolute left-1/2 top-[2%] -translate-x-1/2" aria-hidden />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/homebanner.png"
+              src="/herosectionnewImage.png"
               alt="Adult professional building their career in Australia"
-              className="mx-auto block h-[200px] w-auto max-w-[min(100%,260px)] object-contain object-bottom sm:h-[400px] sm:max-w-full lg:h-[440px] lg:max-w-none"
+              className="hero-visual-img relative mx-auto block h-[220px] w-auto max-w-[min(100%,280px)] object-contain object-bottom sm:h-[420px] sm:max-w-full lg:h-[460px] lg:max-w-none"
             />
           </div>
         </div>

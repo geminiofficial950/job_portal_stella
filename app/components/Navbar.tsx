@@ -28,6 +28,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -60,41 +61,33 @@ export default function Navbar() {
       : user?.role === "admin"
         ? "/dashboard/admin"
         : "/dashboard/seeker";
-  const isJobsPage = pathname === "/jobs" || pathname.startsWith("/jobs/");
-  const isLearningPage =
-    pathname.startsWith("/masterclasses") ||
-    pathname.startsWith("/courses") ||
-    pathname.startsWith("/events") ||
-    pathname.startsWith("/verification") ||
-    pathname.startsWith("/employers") ||
-    pathname.startsWith("/profile");
-  const isDarkNav = pathname === "/" || isJobsPage || isLearningPage;
 
   const linkClass = (active?: boolean) =>
     `relative flex items-center h-full px-3 text-sm font-medium transition-colors duration-150 ${
-      isDarkNav
-        ? "text-white hover:text-white"
-        : active
-          ? "text-[#00082C]"
-          : "text-slate-500 hover:text-[#00082C]"
+      active
+        ? "text-[#00082C]"
+        : "text-[#00082C] hover:text-slate-400"
     }`;
 
   return (
     <header
-      className={`w-full sticky top-0 z-50 overflow-visible ${isDarkNav ? "" : "transition-all duration-300"}`}
+      className="w-full sticky top-0 z-50 overflow-visible transition-all duration-300"
       style={{
-        background: isDarkNav ? "#00082C" : "rgba(255,255,255,0.97)",
-        backdropFilter: isDarkNav ? "none" : "blur(16px)",
-        borderBottom: isDarkNav
-          ? "none"
-          : scrolled
-            ? "1px solid rgba(226,232,240,0.9)"
-            : "1px solid rgba(226,232,240,0.5)",
-        boxShadow: isDarkNav
-          ? "none"
-          : scrolled
-            ? "0 2px 20px rgba(0,0,0,0.06)"
-            : "none",
+        background: scrolled
+          ? "rgba(255, 255, 255, 0.72)"
+          : "rgba(255, 255, 255, 0.96)",
+        backdropFilter: scrolled
+          ? "saturate(180%) blur(20px)"
+          : "saturate(160%) blur(12px)",
+        WebkitBackdropFilter: scrolled
+          ? "saturate(180%) blur(20px)"
+          : "saturate(160%) blur(12px)",
+        borderBottom: scrolled
+          ? "1px solid rgba(15, 39, 68, 0.08)"
+          : "1px solid rgba(226, 232, 240, 0.7)",
+        boxShadow: scrolled
+          ? "0 8px 30px rgba(15, 39, 68, 0.08)"
+          : "none",
       }}
     >
       <div className="w-full px-3 sm:px-6 md:px-7 xl:px-10 2xl:px-12">
@@ -107,7 +100,7 @@ export default function Navbar() {
             <img
               src="/logonew.jpeg"
               alt="Stella Careers"
-              className="pointer-events-none h-7 w-auto max-w-full object-contain object-left transition-transform duration-200 sm:h-9 sm:max-w-[min(42vw,280px)] sm:origin-left sm:scale-[1.35] sm:group-hover:scale-[1.4] md:max-w-[320px] md:scale-[1.45] md:group-hover:scale-[1.5]"
+              className="pointer-events-none h-6 w-auto max-w-[140px] object-contain object-left transition-transform duration-200 sm:h-7 sm:max-w-[160px] sm:group-hover:scale-[1.03] md:h-8 md:max-w-[180px]"
             />
           </Link>
 
@@ -116,7 +109,6 @@ export default function Navbar() {
               <Link
                 href="/jobs"
                 className={linkClass(pathname === "/jobs")}
-                style={isDarkNav ? { color: "#ffffff" } : undefined}
               >
                 Find Jobs
               </Link>
@@ -126,7 +118,6 @@ export default function Navbar() {
                   type="button"
                   onClick={() => setCareerOpen((v) => !v)}
                   className={`${linkClass()} gap-1`}
-                  style={isDarkNav ? { color: "#ffffff" } : undefined}
                   aria-expanded={careerOpen}
                 >
                   Career Support
@@ -135,7 +126,7 @@ export default function Navbar() {
                   />
                 </button>
                 {careerOpen && (
-                  <div className="absolute left-0 top-full mt-1 w-72 rounded-xl border border-slate-200 bg-white py-2 shadow-lg">
+                  <div className="absolute left-0 top-full mt-1 w-72 rounded-xl border border-slate-200 bg-white/95 py-2 shadow-lg backdrop-blur-xl">
                     {careerSupportLinks.map((link) => (
                       <Link
                         key={link.href}
@@ -153,7 +144,6 @@ export default function Navbar() {
               <Link
                 href="/employers"
                 className={linkClass(pathname === "/employers")}
-                style={isDarkNav ? { color: "#ffffff" } : undefined}
               >
                 For Employers
               </Link>
@@ -161,11 +151,7 @@ export default function Navbar() {
 
             <Link
               href="/profile/setup"
-              className={`hidden sm:inline-flex items-center px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                isDarkNav
-                  ? "bg-white text-[#00082C] hover:bg-white/90"
-                  : "bg-[#00082C] text-white hover:bg-[#00061F]"
-              }`}
+              className="hidden sm:inline-flex items-center px-3.5 py-2 rounded-lg text-sm font-semibold bg-[#4f6cf5] text-white hover:bg-[#3f5ce8] transition-colors"
             >
               Build my free profile
             </Link>
@@ -173,34 +159,18 @@ export default function Navbar() {
             {user?.role === "recruiter" && (
               <Link
                 href="/dashboard/recruiter/jobs/new"
-                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#00082C] hover:bg-[#00061F] transition-colors"
-                style={
-                  isDarkNav
-                    ? { background: "#ffffff", color: "#00082C" }
-                    : undefined
-                }
+                className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#4f6cf5] hover:bg-[#3f5ce8] transition-colors"
               >
                 Post a job
               </Link>
             )}
 
-            <SignInMenu
-              variant="solid"
-              className={
-                isDarkNav
-                  ? "navbar-account text-white border-white hover:bg-white/10 hover:border-white"
-                  : "navbar-account"
-              }
-            />
+            <SignInMenu variant="solid" className="navbar-account" />
 
             <button
               type="button"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className={`lg:hidden w-9 h-9 shrink-0 flex items-center justify-center rounded-lg transition-colors ${
-                isDarkNav
-                  ? "text-white hover:bg-white/10"
-                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"
-              }`}
+              className="lg:hidden w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
               aria-label="Toggle menu"
             >
               {isMobileOpen ? (
@@ -214,7 +184,7 @@ export default function Navbar() {
       </div>
 
       {isMobileOpen && (
-        <div className="lg:hidden border-t border-slate-100 bg-white px-4 py-3 space-y-0.5 max-h-[80vh] overflow-y-auto">
+        <div className="lg:hidden border-t border-slate-100 bg-white/95 px-4 py-3 space-y-0.5 max-h-[80vh] overflow-y-auto backdrop-blur-xl">
           <Link
             href="/jobs"
             onClick={() => setIsMobileOpen(false)}
@@ -253,7 +223,7 @@ export default function Navbar() {
           <Link
             href="/profile/setup"
             onClick={() => setIsMobileOpen(false)}
-            className="flex w-full px-3 py-2.5 rounded-lg text-sm font-semibold text-[#00082C] bg-[#f0f4ff]"
+            className="flex w-full px-3 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#4f6cf5] hover:bg-[#3f5ce8]"
           >
             Build my free profile
           </Link>

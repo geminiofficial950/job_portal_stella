@@ -16,8 +16,8 @@
 
 .jobs-hero {
   position: relative;
-  z-index: 1;
-  overflow: hidden;
+  z-index: 20;
+  overflow: visible;
   padding: 0.55rem 1.25rem 0.75rem;
   background: rgba(255, 255, 255, 0.42);
   backdrop-filter: saturate(180%) blur(28px);
@@ -298,7 +298,9 @@ html.jobs-search-compact .jobs-search-fixed {
   border: 1px solid rgba(0, 8, 44, 0.14);
   border-radius: 0.85rem;
   box-shadow: 0 6px 20px rgba(0, 8, 44, 0.08);
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+  z-index: 6;
 }
 
 .jobs-search-field {
@@ -326,6 +328,50 @@ html.jobs-search-compact .jobs-search-fixed {
 
 .jobs-search-field input::placeholder {
   color: #9ca3af;
+}
+
+.jobs-search-field--suggest {
+  position: relative;
+  overflow: visible;
+  padding: 0;
+  z-index: 5;
+}
+
+.jobs-search-field--suggest .location-suggest {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  position: relative;
+}
+
+.jobs-search-field--suggest .location-suggest-field {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.9rem;
+  min-width: 0;
+}
+
+.jobs-search-field--suggest .location-suggest-field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.85rem;
+  color: var(--jobs-text);
+  background: transparent;
+  min-width: 0;
+  width: 100%;
+}
+
+.jobs-search-fixed .jobs-search-field--suggest .location-suggest-field {
+  padding: 0.4rem 0.45rem;
+}
+
+.home-location-suggest .location-suggest-field {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
 }
 
 .jobs-search-btn {
@@ -552,6 +598,209 @@ html.jobs-search-compact .jobs-search-fixed {
   margin-left: auto;
   font-size: 0.75rem;
   color: #9ca3af;
+}
+
+/* Seek-style Pay / Type / Remote filter bar */
+.jobs-seek-filters {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.jobs-seek-filters-under-search {
+  margin-top: 0.75rem;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 25;
+  display: flex;
+  justify-content: center;
+}
+
+.jobs-seek-filters-under-search .jobs-seek-filters {
+  margin-bottom: 0;
+  width: auto;
+}
+
+.jobs-seek-filters.is-disabled {
+  opacity: 0.72;
+}
+
+.jobs-seek-filters-bar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: auto;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.jobs-seek-chip-wrap {
+  position: relative;
+}
+
+.jobs-seek-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 39, 68, 0.14);
+  background: rgba(255, 255, 255, 0.88);
+  color: #0f2744;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15, 39, 68, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.jobs-seek-chip:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: rgba(15, 39, 68, 0.22);
+  color: #0f2744;
+  box-shadow: 0 6px 16px rgba(15, 39, 68, 0.1);
+}
+
+.jobs-seek-chip.is-open,
+.jobs-seek-chip.is-active {
+  background: #0f2744;
+  border-color: #0f2744;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(15, 39, 68, 0.22);
+}
+
+.jobs-seek-chip.is-open:hover:not(:disabled),
+.jobs-seek-chip.is-active:hover:not(:disabled) {
+  background: #0f2744;
+  border-color: #0f2744;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(15, 39, 68, 0.22);
+}
+
+.jobs-seek-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.jobs-seek-panel {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  left: 0;
+  z-index: 30;
+  min-width: 14rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.85rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 16px 40px -18px rgba(15, 39, 68, 0.4);
+}
+
+.jobs-seek-panel--pay {
+  min-width: 18rem;
+  padding: 0.85rem;
+}
+
+.jobs-seek-pay-tabs {
+  display: flex;
+  gap: 0.85rem;
+  border-bottom: 1px solid #e8edf5;
+  margin-bottom: 0.85rem;
+}
+
+.jobs-seek-pay-tab {
+  padding: 0.35rem 0.1rem 0.55rem;
+  border: none;
+  background: none;
+  color: #94a3b8;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.jobs-seek-pay-tab.is-selected {
+  color: #0f2744;
+  border-bottom-color: #2261e0;
+}
+
+.jobs-seek-pay-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.jobs-seek-pay-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.jobs-seek-pay-field input {
+  width: 100%;
+  border: 1px solid #dbe3ef;
+  border-radius: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f2744;
+  background: #fff;
+  outline: none;
+}
+
+.jobs-seek-pay-field input:focus {
+  border-color: #2261e0;
+  box-shadow: 0 0 0 3px rgba(34, 97, 224, 0.15);
+}
+
+.jobs-seek-check-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.jobs-seek-check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #0f2744;
+  cursor: pointer;
+}
+
+.jobs-seek-check input {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: #2261e0;
+  border-radius: 0.3rem;
+  cursor: pointer;
+}
+
+.jobs-seek-filters-hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.75rem;
+  color: #64748b;
 }
 
 .jobs-results-header {

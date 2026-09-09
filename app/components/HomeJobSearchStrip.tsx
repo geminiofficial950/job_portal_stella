@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MapPin, Search } from "lucide-react";
+import LocationSuggestInput from "@/app/components/LocationSuggestInput";
+import KeywordSuggestInput from "@/app/components/KeywordSuggestInput";
 
 /** Compact AU job search — same pill styling as the hero search */
 export default function HomeJobSearchStrip() {
@@ -14,7 +16,9 @@ export default function HomeJobSearchStrip() {
     e.preventDefault();
     const params = new URLSearchParams({ country: "au" });
     if (jobQuery.trim()) params.set("q", jobQuery.trim());
-    if (locationQuery.trim()) params.set("location", locationQuery.trim());
+    if (locationQuery.trim()) {
+      params.set("location", locationQuery.trim());
+    }
     router.push(`/jobs?${params.toString()}`);
   }
 
@@ -33,25 +37,25 @@ export default function HomeJobSearchStrip() {
           onSubmit={onSubmit}
           className="mx-auto mt-6 flex w-full max-w-3xl flex-col gap-1.5 rounded-2xl bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(15,39,68,0.18)] sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:p-2 sm:pl-5"
         >
-          <div className="flex min-w-0 flex-1 items-center gap-2.5 px-3 py-2 sm:px-0 sm:py-0">
-            <Search className="h-4 w-4 shrink-0 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Job title"
-              className="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none sm:py-2.5"
+          <div className="relative min-w-0 flex-1 px-3 py-2 sm:px-0 sm:py-0">
+            <KeywordSuggestInput
               value={jobQuery}
-              onChange={(e) => setJobQuery(e.target.value)}
+              onChange={setJobQuery}
+              placeholder="Job title"
+              leading={<Search className="h-4 w-4 shrink-0 text-slate-400" />}
+              inputClassName="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none sm:py-2.5"
+              className="home-location-suggest"
             />
           </div>
           <div className="hidden h-8 w-px shrink-0 bg-slate-200 sm:block" />
-          <div className="flex min-w-0 flex-1 items-center gap-2.5 px-3 py-2 sm:px-4 sm:py-0">
-            <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Suburb / postcode"
-              className="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none sm:py-2.5"
+          <div className="relative min-w-0 flex-1 px-3 py-2 sm:px-4 sm:py-0">
+            <LocationSuggestInput
               value={locationQuery}
-              onChange={(e) => setLocationQuery(e.target.value)}
+              onChange={setLocationQuery}
+              placeholder="Suburb / postcode"
+              leading={<MapPin className="h-4 w-4 shrink-0 text-slate-400" />}
+              inputClassName="w-full bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none sm:py-2.5"
+              className="home-location-suggest"
             />
           </div>
           <button

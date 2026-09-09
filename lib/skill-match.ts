@@ -401,10 +401,33 @@ export function rateSkillMatch(
       transferableHits,
     );
 
+    const jobCoverage = matchedSkills.length / listed.length;
+    const profileHits = profile.filter(
+      (p) =>
+        matchedSkills.some((m) => skillsOverlap(m, p)) ||
+        skillFoundInText(p, text),
+    ).length;
+    const profileCoverage = profileHits / profile.length;
+    // Blend job-requirement coverage with how much of the profile fits.
+    // Thin skill lists (1–2 items) can't honestly claim a perfect match alone.
+    const listConfidence = Math.min(1, listed.length / 4);
+    let score = Math.round(
+      (jobCoverage * 0.7 + profileCoverage * 0.3) *
+        (0.7 + 0.3 * listConfidence) *
+        100,
+    );
+    if (listed.length < 3 && jobCoverage < 1) {
+      score = Math.min(score, 78);
+    }
+    if (listed.length === 1) {
+      score = Math.min(score, 70);
+    }
+    score = Math.max(0, Math.min(100, score));
+
     return {
       tier,
       ...SKILL_MATCH_COPY[tier],
-      score: Math.round((matchedSkills.length / listed.length) * 100),
+      score,
       matchedSkills,
       missingSkills,
       jobSkills: listed,
@@ -441,7 +464,25 @@ export function rateSkillMatch(
       extracted.length,
       transferableHits,
     );
-    const score = Math.round((matchedSkills.length / extracted.length) * 100);
+
+    const jobCoverage = matchedSkills.length / extracted.length;
+    const profileHits = profile.filter(
+      (p) =>
+        matchedSkills.some((m) => skillsOverlap(m, p)) ||
+        skillFoundInText(p, text),
+    ).length;
+    const profileCoverage = profileHits / profile.length;
+    // Sparse extraction (often 1 skill from the title) used to show 100%.
+    const extractionConfidence = Math.min(1, extracted.length / 5);
+    let score = Math.round(
+      (jobCoverage * 0.55 + profileCoverage * 0.45) *
+        (0.5 + 0.5 * extractionConfidence) *
+        100,
+    );
+    if (extracted.length <= 2) {
+      score = Math.min(score, 74);
+    }
+    score = Math.max(0, Math.min(100, score));
 
     return {
       tier,
@@ -475,8 +516,15 @@ export function rateSkillMatch(
     };
   }
 
-  const tier = tierFromRatio(matchedSkills.length, profile.length);
-  const score = Math.round((matchedSkills.length / profile.length) * 100);
+  // Keyword-only evidence — never surface as a perfect 100% match.
+  const coverage = matchedSkills.length / profile.length;
+  const tier =
+    coverage >= 0.75
+      ? "good"
+      : coverage >= 0.4
+        ? "wildcard"
+        : "future";
+  const score = Math.round(Math.min(68, 24 + coverage * 44));
 
   return {
     tier,

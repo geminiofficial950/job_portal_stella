@@ -246,34 +246,29 @@ export async function GET() {
           requirements: job.requirements,
         });
 
-        // Extra boost when a profile skill is clearly named in the role
-        let score = match.score;
-        let matchedSkills = [...match.matchedSkills];
+        // Keep keyword hits visible in chips without inflating % to 100.
+        const matchedSkills = [...match.matchedSkills];
         for (const skill of profileSkills) {
-          if (mentionsSkill(job, skill)) {
-            if (
-              !matchedSkills.some(
-                (m) => m.toLowerCase() === skill.toLowerCase(),
-              )
-            ) {
-              matchedSkills.push(skill);
-            }
-            score = Math.max(score, 55);
+          if (!mentionsSkill(job, skill)) continue;
+          if (
+            matchedSkills.some((m) => m.toLowerCase() === skill.toLowerCase())
+          ) {
+            continue;
           }
+          matchedSkills.push(skill);
         }
 
         return {
           job,
           match: {
             ...match,
-            score,
             matchedSkills,
           },
         };
       })
       .filter(
         (row) =>
-          row.match.score >= 15 ||
+          row.match.score >= 18 ||
           row.match.matchedSkills.length > 0 ||
           profileSkills.some((skill) => mentionsSkill(row.job, skill)),
       )

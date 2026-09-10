@@ -1337,6 +1337,35 @@
   }
 }
 
+@media (min-width: 1024px) {
+  .gemini-home .hero-section .hero-shell {
+    align-items: start !important;
+    min-height: 0 !important;
+  }
+
+  .gemini-home .hero-section .hero-copy {
+    text-align: left !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    align-self: start !important;
+    padding-top: 0 !important;
+  }
+
+  .gemini-home .hero-section .hero-copy h1,
+  .gemini-home .hero-section .hero-copy p,
+  .gemini-home .hero-section .hero-title {
+    text-align: left !important;
+  }
+
+  .gemini-home .hero-section .hero-visual {
+    align-self: start !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: flex-end !important;
+    padding-top: 0 !important;
+  }
+}
+
 .gemini-home .benefits-section a.benefit-card-cta {
   color: inherit !important;
 }
@@ -4661,21 +4690,51 @@
   filter: blur(0);
 }
 
-.gemini-home [data-home-stagger].is-inview > *:nth-child(1)  { transition-delay: 0ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(2)  { transition-delay: 90ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(3)  { transition-delay: 180ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(4)  { transition-delay: 270ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(5)  { transition-delay: 360ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(6)  { transition-delay: 450ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(7)  { transition-delay: 540ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(8)  { transition-delay: 630ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(9)  { transition-delay: 720ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(10) { transition-delay: 810ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(11) { transition-delay: 900ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(12) { transition-delay: 990ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(13) { transition-delay: 1080ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(14) { transition-delay: 1170ms; }
-.gemini-home [data-home-stagger].is-inview > *:nth-child(15) { transition-delay: 1260ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(1) {
+  transition-delay: 0ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(2) {
+  transition-delay: 90ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(3) {
+  transition-delay: 180ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(4) {
+  transition-delay: 270ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(5) {
+  transition-delay: 360ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(6) {
+  transition-delay: 450ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(7) {
+  transition-delay: 540ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(8) {
+  transition-delay: 630ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(9) {
+  transition-delay: 720ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(10) {
+  transition-delay: 810ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(11) {
+  transition-delay: 900ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(12) {
+  transition-delay: 990ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(13) {
+  transition-delay: 1080ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(14) {
+  transition-delay: 1170ms;
+}
+.gemini-home [data-home-stagger].is-inview > *:nth-child(15) {
+  transition-delay: 1260ms;
+}
 
 /* Hero — staggered entrance like Jobright */
 .gemini-home .hero-section .hero-copy-enter > .hero-title {

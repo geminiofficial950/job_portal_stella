@@ -4736,68 +4736,60 @@
   transition-delay: 1260ms;
 }
 
-/* Hero — staggered entrance like Jobright */
+/* Hero — clean load entrance (no blur stuck / no float fighting layout) */
+.gemini-home .hero-section .hero-copy-enter > .hero-title,
+.gemini-home .hero-section .hero-copy-enter > .hero-sub,
+.gemini-home .hero-section .hero-copy-enter > .hero-search-form,
+.gemini-home .hero-section .hero-visual {
+  animation-duration: 0.85s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
 .gemini-home .hero-section .hero-copy-enter > .hero-title {
-  opacity: 0;
-  transform: translate3d(0, 28px, 0);
-  animation: home-hero-rise 1.05s var(--home-ease) 0.05s both;
+  animation-name: home-hero-rise;
+  animation-delay: 0.05s;
 }
 
 .gemini-home .hero-section .hero-copy-enter > .hero-sub {
-  opacity: 0;
-  transform: translate3d(0, 24px, 0);
-  animation: home-hero-rise 1.05s var(--home-ease) 0.22s both;
+  animation-name: home-hero-rise;
+  animation-delay: 0.16s;
 }
 
 .gemini-home .hero-section .hero-copy-enter > .hero-search-form {
-  opacity: 0;
-  transform: translate3d(0, 22px, 0);
-  animation: home-hero-rise 1.05s var(--home-ease) 0.4s both;
+  animation-name: home-hero-rise;
+  animation-delay: 0.28s;
 }
 
 .gemini-home .hero-section .hero-visual {
-  opacity: 0;
-  transform: translate3d(36px, 24px, 0) scale(0.97);
-  animation: home-hero-visual 1.2s var(--home-ease) 0.18s both;
+  animation-name: home-hero-visual;
+  animation-delay: 0.12s;
 }
 
 .gemini-home .hero-section .hero-visual-img {
-  animation: home-hero-float 5.5s ease-in-out 1.45s infinite;
+  /* keep drop-shadow only — no infinite float (breaks alignment feel) */
+  animation: none;
 }
 
 @keyframes home-hero-rise {
   from {
     opacity: 0;
-    transform: translate3d(0, 28px, 0);
-    filter: blur(6px);
+    transform: translate3d(0, 18px, 0);
   }
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
-    filter: blur(0);
   }
 }
 
 @keyframes home-hero-visual {
   from {
     opacity: 0;
-    transform: translate3d(36px, 24px, 0) scale(0.97);
-    filter: blur(8px);
+    transform: translate3d(20px, 12px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes home-hero-float {
-  0%,
-  100% {
     transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -10px, 0);
   }
 }
 
@@ -4832,5 +4824,6 @@
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
+    animation: none !important;
   }
 }

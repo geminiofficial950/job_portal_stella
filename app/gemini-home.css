@@ -1259,12 +1259,12 @@
 }
 
 .gemini-home .hero-section .hero-visual-img {
-  animation: hero-visual-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
   filter: drop-shadow(0 24px 40px rgba(15, 23, 42, 0.18));
 }
 
+/* Parent stays still — children stagger via home motion block below */
 .gemini-home .hero-section .hero-copy-enter {
-  animation: hero-copy-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: none;
 }
 
 @keyframes hero-orb-drift {
@@ -4597,15 +4597,163 @@
   }
 }
 
+/* =========================================================
+   JOBRIGHT-STYLE HOME MOTION
+   ========================================================= */
+
+.gemini-home {
+  --home-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --home-dur: 1s;
+}
+
+.gemini-home [data-home-animate] {
+  opacity: 0;
+  transform: translate3d(0, 48px, 0);
+  filter: blur(8px);
+  transition:
+    opacity var(--home-dur) var(--home-ease),
+    transform var(--home-dur) var(--home-ease),
+    filter 0.85s var(--home-ease);
+  will-change: opacity, transform, filter;
+}
+
+.gemini-home [data-home-animate].is-inview {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+
+.gemini-home [data-home-animate="left"] {
+  transform: translate3d(-40px, 24px, 0);
+}
+
+.gemini-home [data-home-animate="right"] {
+  transform: translate3d(40px, 24px, 0);
+}
+
+.gemini-home [data-home-animate="left"].is-inview,
+.gemini-home [data-home-animate="right"].is-inview {
+  transform: translate3d(0, 0, 0);
+}
+
+.gemini-home [data-home-animate="scale"] {
+  transform: translate3d(0, 28px, 0) scale(0.96);
+}
+
+.gemini-home [data-home-animate="scale"].is-inview {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.gemini-home [data-home-stagger] > * {
+  opacity: 0;
+  transform: translate3d(0, 40px, 0);
+  filter: blur(6px);
+  transition:
+    opacity 0.9s var(--home-ease),
+    transform 0.9s var(--home-ease),
+    filter 0.75s var(--home-ease);
+  will-change: opacity, transform, filter;
+}
+
+.gemini-home [data-home-stagger].is-inview > * {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+
+.gemini-home [data-home-stagger].is-inview > *:nth-child(1)  { transition-delay: 0ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(2)  { transition-delay: 90ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(3)  { transition-delay: 180ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(4)  { transition-delay: 270ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(5)  { transition-delay: 360ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(6)  { transition-delay: 450ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(7)  { transition-delay: 540ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(8)  { transition-delay: 630ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(9)  { transition-delay: 720ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(10) { transition-delay: 810ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(11) { transition-delay: 900ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(12) { transition-delay: 990ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(13) { transition-delay: 1080ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(14) { transition-delay: 1170ms; }
+.gemini-home [data-home-stagger].is-inview > *:nth-child(15) { transition-delay: 1260ms; }
+
+/* Hero — staggered entrance like Jobright */
+.gemini-home .hero-section .hero-copy-enter > .hero-title {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  animation: home-hero-rise 1.05s var(--home-ease) 0.05s both;
+}
+
+.gemini-home .hero-section .hero-copy-enter > .hero-sub {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  animation: home-hero-rise 1.05s var(--home-ease) 0.22s both;
+}
+
+.gemini-home .hero-section .hero-copy-enter > .hero-search-form {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  animation: home-hero-rise 1.05s var(--home-ease) 0.4s both;
+}
+
+.gemini-home .hero-section .hero-visual {
+  opacity: 0;
+  transform: translate3d(36px, 24px, 0) scale(0.97);
+  animation: home-hero-visual 1.2s var(--home-ease) 0.18s both;
+}
+
+.gemini-home .hero-section .hero-visual-img {
+  animation: home-hero-float 5.5s ease-in-out 1.45s infinite;
+}
+
+@keyframes home-hero-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes home-hero-visual {
+  from {
+    opacity: 0;
+    transform: translate3d(36px, 24px, 0) scale(0.97);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes home-hero-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gemini-home * {
     animation: none !important;
     transition: none !important;
   }
 
-  .gemini-home .rv {
-    opacity: 1;
-    transform: none;
+  .gemini-home .rv,
+  .gemini-home [data-home-animate],
+  .gemini-home [data-home-stagger] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 
   .gemini-home .hero-float {
@@ -4615,5 +4763,15 @@
   .gemini-home .hero-next-title,
   .gemini-home .hero-search-pill {
     opacity: 1;
+  }
+
+  .gemini-home .hero-section .hero-copy-enter > .hero-title,
+  .gemini-home .hero-section .hero-copy-enter > .hero-sub,
+  .gemini-home .hero-section .hero-copy-enter > .hero-search-form,
+  .gemini-home .hero-section .hero-visual,
+  .gemini-home .hero-section .hero-visual-img {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 }

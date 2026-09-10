@@ -43,7 +43,10 @@ export default function MemberBenefitsSection() {
       className="benefits-section relative overflow-hidden bg-white pb-6 pt-14 sm:pb-8 sm:pt-16 lg:pb-10 lg:pt-20"
     >
       <div className="relative mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        <div className="benefits-header mx-auto mb-12 w-full max-w-3xl sm:mb-14">
+        <div
+          data-home-animate
+          className="benefits-header mx-auto mb-12 w-full max-w-3xl sm:mb-14"
+        >
           <h2 className="benefits-display-title mx-auto text-center text-[2.35rem] font-bold leading-[1.05] tracking-[-0.03em] text-black sm:text-5xl lg:text-[3.75rem]">
             Five ways
             <br />
@@ -56,7 +59,10 @@ export default function MemberBenefitsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4 xl:gap-5">
+        <div
+          data-home-stagger
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4 xl:gap-5"
+        >
           {BENEFIT_CARDS.map((card, i) => {
             const href =
               card.id === "free-profile" ? profileHref : card.href;

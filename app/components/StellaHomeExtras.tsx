@@ -56,7 +56,7 @@ export function CareerJourneyStrip() {
   return (
     <section className="journey-section relative overflow-hidden bg-white pb-14 pt-6 sm:pb-16 sm:pt-8 lg:pb-20 lg:pt-10">
       <div className="relative mx-auto max-w-6xl px-4 sm:px-8 lg:px-10">
-        <div className="mx-auto max-w-3xl text-center">
+        <div data-home-animate className="mx-auto max-w-3xl text-center">
           <h2 className="journey-display-title mx-auto text-center text-[2.35rem] font-bold leading-[1.05] tracking-[-0.03em] text-black sm:text-5xl lg:text-[3.75rem]">
             Your next step
             <br />
@@ -86,7 +86,7 @@ export function CareerJourneyStrip() {
             />
           </svg>
 
-          <ol className="grid gap-12 md:grid-cols-3 md:gap-8">
+          <ol data-home-stagger className="grid gap-12 md:grid-cols-3 md:gap-8">
             {steps.map((s, i) => {
               const Icon = s.Icon;
               const isFirst = i === 0;
@@ -222,7 +222,7 @@ export function LearningPreviewStrip() {
   return (
     <section className="learning-flow-section relative overflow-hidden bg-white py-14 sm:py-16 lg:py-20">
       <div className="relative mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
+        <div data-home-animate className="mx-auto max-w-3xl text-center">
           <h2 className="learning-display-title mx-auto text-center text-[2.35rem] font-bold leading-[1.05] tracking-[-0.03em] text-black sm:text-5xl lg:text-[3.75rem]">
             Sessions, courses
             <br />
@@ -234,7 +234,10 @@ export function LearningPreviewStrip() {
           </p>
         </div>
 
-        <div className="mt-14 flex flex-col items-stretch gap-10 lg:flex-row lg:items-stretch lg:justify-center lg:gap-0">
+        <div
+          data-home-stagger
+          className="mt-14 flex flex-col items-stretch gap-10 lg:flex-row lg:items-stretch lg:justify-center lg:gap-0"
+        >
           {columns.map((col, i) => {
             const Icon = col.Icon;
             return (
@@ -456,7 +459,7 @@ export function HomeFaqStrip() {
       />
 
       <div className="relative mx-auto max-w-3xl px-4 sm:px-8">
-        <div className="text-center">
+        <div data-home-animate className="text-center">
           <h2 className="faq-display-title text-[2rem] font-bold leading-[1.08] tracking-[-0.03em] text-black sm:text-4xl lg:text-[2.75rem]">
             Frequently asked
             <br />
@@ -468,7 +471,7 @@ export function HomeFaqStrip() {
           </p>
         </div>
 
-        <div className="mt-10 space-y-3">
+        <div data-home-stagger className="mt-10 space-y-3">
           {FAQ_ITEMS.map((item) => (
             <details
               key={item.q}
@@ -487,7 +490,7 @@ export function HomeFaqStrip() {
           ))}
         </div>
 
-        <div className="mt-10 text-center">
+        <div data-home-animate className="mt-10 text-center">
           <Link
             href={signupHref}
             className="faq-primary-cta inline-flex items-center justify-center rounded-lg bg-[#4f6cf5] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3f5ce8]"

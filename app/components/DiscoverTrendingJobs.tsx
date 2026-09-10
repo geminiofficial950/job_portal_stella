@@ -111,7 +111,7 @@ export default function DiscoverTrendingJobs() {
       />
 
       <div className="relative mx-auto w-full max-w-[1200px] px-4 sm:px-8 lg:px-10">
-        <div className="max-w-3xl text-left">
+        <div data-home-animate className="max-w-3xl text-left">
           <h2 className="text-[2rem] font-bold leading-[1.08] tracking-[-0.03em] text-black sm:text-4xl lg:text-[2.75rem]">
             Discover trending{" "}
             <span className="italic text-[#4f6cf5]">jobs</span>
@@ -122,7 +122,10 @@ export default function DiscoverTrendingJobs() {
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2 rounded-2xl border border-black/10 bg-white/70 p-1.5 backdrop-blur-sm sm:gap-1 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+        <div
+          data-home-animate
+          className="mt-6 flex flex-wrap gap-2 rounded-2xl border border-black/10 bg-white/70 p-1.5 backdrop-blur-sm sm:gap-1 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
+        >
           {TABS.map(({ id, label, Icon }) => {
             const active = tab === id;
             return (
@@ -148,7 +151,10 @@ export default function DiscoverTrendingJobs() {
 
         <div className="mt-2 hidden border-b-2 border-black/15 sm:block" />
 
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          data-home-stagger
+          className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {items.map((item) => (
             <Link
               key={item.href + item.label}

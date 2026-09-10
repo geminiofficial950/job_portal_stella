@@ -24,19 +24,42 @@ export default function Navbar() {
   const [careerOpen, setCareerOpen] = useState(false);
   const [mobileCareerOpen, setMobileCareerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [darkSurface, setDarkSurface] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const isHome = pathname === "/";
   const careerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    setIsMobileOpen(false);
-    setCareerOpen(false);
-    setMobileCareerOpen(false);
+    let frame = 0;
+    const updateSurface = () => {
+      frame = 0;
+      setScrolled(window.scrollY > 8);
+      const sampleY = (headerRef.current?.getBoundingClientRect().height ?? 72) / 2;
+      // Explicit section themes also work for gradients and photographic backgrounds.
+      const sections = document.querySelectorAll<HTMLElement>("[data-nav-theme]");
+      let dark = false;
+      for (const section of sections) {
+        const bounds = section.getBoundingClientRect();
+        if (bounds.top <= sampleY && bounds.bottom > sampleY) {
+          dark = section.dataset.navTheme === "dark";
+        }
+      }
+      setDarkSurface(dark);
+    };
+    const scheduleUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateSurface);
+    };
+    scheduleUpdate();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    const observer = new ResizeObserver(scheduleUpdate);
+    observer.observe(document.body);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      observer.disconnect();
+    };
   }, [pathname]);
 
   useEffect(() => {
@@ -63,44 +86,26 @@ export default function Navbar() {
         : "/dashboard/seeker";
 
   const linkClass = (active?: boolean) =>
-    `relative flex items-center h-full px-3 text-sm font-medium transition-colors duration-150 ${
-      active
-        ? "text-[#00082C]"
-        : "text-[#00082C] hover:text-slate-400"
-    }`;
+    `navbar-link relative flex items-center h-full px-3 text-sm font-medium transition-colors duration-150 ${active ? "navbar-link--active" : ""}`;
 
   return (
     <header
-      className="w-full sticky top-0 z-50 overflow-visible transition-all duration-300"
-      style={{
-        background: scrolled
-          ? "rgba(255, 255, 255, 0.72)"
-          : "rgba(255, 255, 255, 0.96)",
-        backdropFilter: scrolled
-          ? "saturate(180%) blur(20px)"
-          : "saturate(160%) blur(12px)",
-        WebkitBackdropFilter: scrolled
-          ? "saturate(180%) blur(20px)"
-          : "saturate(160%) blur(12px)",
-        borderBottom: scrolled
-          ? "1px solid rgba(15, 39, 68, 0.08)"
-          : "1px solid rgba(226, 232, 240, 0.7)",
-        boxShadow: scrolled
-          ? "0 8px 30px rgba(15, 39, 68, 0.08)"
-          : "none",
-      }}
+      ref={headerRef}
+      className={`site-navbar w-full sticky top-0 z-50 overflow-visible ${isHome ? "site-navbar--home" : ""}`}
+      data-scrolled={scrolled}
+      data-tone={darkSurface ? "dark" : "light"}
     >
       <div className="w-full px-3 sm:px-6 md:px-7 xl:px-10 2xl:px-12">
-        <div className="relative flex w-full items-center gap-2 h-12 sm:h-14 overflow-visible">
+        <div className="relative flex w-full items-center gap-2 h-16 sm:h-[4.5rem] overflow-visible">
           <Link
             href="/"
-            className="relative z-10 flex h-full min-h-0 min-w-0 flex-1 items-center overflow-hidden select-none group"
+            className="relative z-10 flex h-full min-h-0 min-w-0 flex-1 items-center overflow-visible select-none group"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logonew.jpeg"
-              alt="Stella Careers"
-              className="pointer-events-none h-6 w-auto max-w-[140px] object-contain object-left transition-transform duration-200 sm:h-7 sm:max-w-[160px] sm:group-hover:scale-[1.03] md:h-8 md:max-w-[180px]"
+              src="/Geminijobscomblack.png"
+              alt="Gemini Jobs"
+              className="navbar-logo pointer-events-none h-12 w-auto max-w-[300px] object-contain object-left transition-transform duration-200 sm:h-14 sm:max-w-[360px] sm:group-hover:scale-[1.03] md:h-16 md:max-w-[420px]"
             />
           </Link>
 
@@ -165,13 +170,15 @@ export default function Navbar() {
               </Link>
             )}
 
-            <SignInMenu variant="solid" className="navbar-account" />
+            <SignInMenu variant="solid" tone={darkSurface ? "dark" : "light"} className="navbar-account" />
 
             <button
               type="button"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className="lg:hidden w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+              className="navbar-menu-toggle lg:hidden w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
               aria-label="Toggle menu"
+              aria-expanded={isMobileOpen}
+              aria-controls="navbar-mobile-menu"
             >
               {isMobileOpen ? (
                 <X className="w-5 h-5" />
@@ -184,7 +191,7 @@ export default function Navbar() {
       </div>
 
       {isMobileOpen && (
-        <div className="lg:hidden border-t border-slate-100 bg-white/95 px-4 py-3 space-y-0.5 max-h-[80vh] overflow-y-auto backdrop-blur-xl">
+        <div id="navbar-mobile-menu" className="absolute top-full inset-x-0 lg:hidden border-t border-slate-100 bg-white/95 px-4 py-3 space-y-0.5 max-h-[80vh] overflow-y-auto backdrop-blur-xl">
           <Link
             href="/jobs"
             onClick={() => setIsMobileOpen(false)}

@@ -1,0 +1,5 @@
+Tool: built-in image_gen
+Asset: public/hero-sydney-woman-v4.png
+
+Prompt:
+Use case: photorealistic-natural. Generate a new website hero photograph inspired by the provided reference. Only generate the photographic asset, no UI no text no cards. A smiling adult woman in her mid twenties with long flowing dark brown hair, cream knit sweater and black backpack, hugging a silver laptop vertically against her chest, looking up to the right optimistically. Waist-up portrait, head entirely visible with room above. Sydney harbour and Opera House recognizable behind her on the right, bright soft blue sky. Woman placed at 55 percent horizontal center, occupies most height. Leftmost quarter soft pale lavender-white atmospheric negative space fading into blue Sydney backdrop. Natural premium editorial photography, authentic skin detail, daylight, similar pose and styling to reference. Landscape 3:2 composition. No text, no watermark.

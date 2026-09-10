@@ -448,57 +448,61 @@ export function HomeFaqStrip() {
       : "/register?role=user&next=/profile/setup";
 
   return (
-    <section className="home-faq-section relative overflow-hidden bg-white py-14 sm:py-16 lg:py-20">
+    <section className="home-faq-section relative overflow-hidden bg-[#f4f7fb]">
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 50% 55% at 50% 0%, rgba(79,108,245,0.08), transparent 55%), radial-gradient(ellipse 40% 45% at 100% 100%, rgba(200,240,102,0.18), transparent 50%)",
+            "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.92) 12%, rgba(244,247,251,0.55) 28%, #f4f7fb 48%), radial-gradient(ellipse 55% 60% at 12% 40%, rgba(196,181,253,0.14), transparent 58%), radial-gradient(ellipse 45% 50% at 92% 90%, rgba(59,89,255,0.05), transparent 55%)",
         }}
       />
 
-      <div className="relative mx-auto max-w-3xl px-4 sm:px-8">
-        <div data-home-animate className="text-center">
-          <h2 className="faq-display-title text-[2rem] font-bold leading-[1.08] tracking-[-0.03em] text-black sm:text-4xl lg:text-[2.75rem]">
-            Frequently asked
-            <br />
-            questions.
-          </h2>
-          <p className="faq-intro mx-auto mt-4 max-w-xl text-center text-[15px] leading-relaxed text-[#666666] sm:text-base">
-            Quick answers about profiles, verification, learning and how Stella
-            Careers works.
-          </p>
-        </div>
-
-        <div data-home-stagger className="mt-10 space-y-3">
-          {FAQ_ITEMS.map((item) => (
-            <details
-              key={item.q}
-              className="group faq-item rounded-2xl border-2 border-slate-200/90 bg-white px-4 py-1 transition-all duration-200 open:border-[#4f6cf5] open:shadow-[0_14px_30px_-18px_rgba(79,108,245,0.35)] hover:border-[#4f6cf5]"
+      <div className="relative z-[2] mx-auto max-w-[1450px] px-5 pb-8 pt-10 sm:px-8 sm:pb-9 sm:pt-12 lg:px-12 lg:pb-10 lg:pt-14">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:gap-12 xl:gap-16">
+          <div data-home-animate className="max-w-md lg:pt-1">
+            <h2 className="faq-display-title text-[2rem] font-bold leading-[1.05] tracking-[-0.04em] text-[#06143b] sm:text-[2.35rem] lg:text-[2.65rem]">
+              Frequently asked
+              <br />
+              questions.
+            </h2>
+            <p className="faq-intro mt-4 max-w-sm text-[15px] font-medium leading-relaxed text-[#667085] sm:text-[16px]">
+              Quick answers about profiles, verification, learning and how
+              Stella Careers works.
+            </p>
+            <Link
+              href={signupHref}
+              className="faq-primary-cta group mt-7 inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-[14px] bg-[#246BFD] px-6 text-[14.5px] font-semibold text-white transition hover:bg-[#1758df]"
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3.5 font-semibold text-[#0f172a] marker:content-none [&::-webkit-details-marker]:hidden">
-                <span className="text-left text-[15px] sm:text-base">
-                  {item.q}
-                </span>
-                <ChevronDown className="h-4 w-4 shrink-0 text-[#4f6cf5] transition-transform duration-300 group-open:rotate-180" />
-              </summary>
-              <p className="border-t border-slate-100 pb-4 pt-3 text-sm leading-relaxed text-slate-600">
-                {item.a}
-              </p>
-            </details>
-          ))}
-        </div>
+              Build my free profile
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                strokeWidth={2.3}
+              />
+            </Link>
+          </div>
 
-        <div data-home-animate className="mt-10 text-center">
-          <Link
-            href={signupHref}
-            className="faq-primary-cta inline-flex items-center justify-center rounded-lg bg-[#4f6cf5] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3f5ce8]"
-          >
-            Build my free profile
-          </Link>
+          <div data-home-stagger className="space-y-2.5">
+            {FAQ_ITEMS.map((item) => (
+              <details
+                key={item.q}
+                className="group faq-item rounded-2xl border-0 bg-white px-4 py-0.5"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3.5 font-semibold text-[#0b1b3a] outline-none marker:content-none focus:outline-none focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+                  <span className="text-left text-[14.5px] sm:text-[15px]">
+                    {item.q}
+                  </span>
+                  <ChevronDown className="h-4 w-4 shrink-0 text-[#246BFD] transition-transform duration-300 group-open:rotate-180" />
+                </summary>
+                <p className="border-t border-slate-100 pb-4 pt-3 text-[13.5px] leading-relaxed text-slate-600 sm:text-sm">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
+

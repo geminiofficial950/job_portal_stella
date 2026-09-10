@@ -456,3 +456,41 @@ body {
 .location-suggest-option.is-active {
   background: #f1f5f9;
 }
+
+/* The home header shares the hero canvas, then picks up the content beneath it. */
+:root { --site-nav-height: 64px; }
+@media (min-width: 640px) {
+  :root { --site-nav-height: 72px; }
+}
+.site-navbar {
+  flex-shrink: 0;
+  color: #071b3e;
+  background: rgb(255 255 255 / 90%);
+  transition: background-color 250ms ease, color 250ms ease, box-shadow 250ms ease;
+}
+.site-navbar--home {
+  margin-bottom: calc(-1 * var(--site-nav-height));
+  background: transparent;
+}
+.site-navbar[data-scrolled="true"] {
+  background: rgb(255 255 255 / 72%);
+  backdrop-filter: saturate(140%) blur(20px);
+  -webkit-backdrop-filter: saturate(140%) blur(20px);
+  box-shadow: 0 1px 0 rgb(15 23 42 / 5%);
+}
+.site-navbar[data-tone="dark"] {
+  color: #fff;
+  background: rgb(4 12 29 / 65%);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 10%);
+}
+.site-navbar .navbar-link,
+.site-navbar .navbar-menu-toggle { color: inherit; }
+.site-navbar .navbar-link:hover { opacity: .65; }
+.site-navbar .navbar-link--active { font-weight: 700; }
+.site-navbar .navbar-logo { transition: filter 250ms ease; }
+.site-navbar[data-tone="dark"] .navbar-logo { filter: brightness(0) invert(1); }
+.site-navbar[data-tone="dark"] .navbar-menu-toggle:hover { background: rgb(255 255 255 / 12%); }
+.site-navbar :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .site-navbar, .site-navbar .navbar-logo { transition: none; }
+}

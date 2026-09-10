@@ -9,12 +9,30 @@ import {
   jobMatchesLocationQuery,
   locationSearchValue,
 } from "@/lib/auLocations";
+import {
+  browseSnapshotKey,
+  getBrowseSnapshot,
+  setBrowseSnapshot,
+  type BrowseJobsPayload,
+} from "@/lib/browse-jobs-snapshot";
 
 export const maxDuration = 60;
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
+    const snapKey = browseSnapshotKey(searchParams);
+    const cached = getBrowseSnapshot(snapKey);
+    if (cached) {
+      // Instant path — data already warmed on the server
+      return NextResponse.json(cached, {
+        headers: {
+          "Cache-Control": "private, max-age=300, stale-while-revalidate=600",
+          "X-Jobs-Snapshot": "HIT",
+        },
+      });
+    }
+
     const q = searchParams.get("q")?.trim() || "";
     const locationRaw = searchParams.get("location")?.trim() || "";
     const location = locationSearchValue(locationRaw);
@@ -519,31 +537,33 @@ export async function GET(request: Request) {
       return tb - ta;
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        jobs: uniqueJobs,
-        companies: filterCompanies,
-        categories,
-        countries: ADZUNA_COUNTRIES.map((c) => ({
-          code: c.code,
-          label: c.label,
-          flag: c.flag,
-        })),
-        jobCounts: {
-          loaded: uniqueJobs.length,
-          available: uniqueJobs.length,
-        },
-        adzuna: adzunaMeta,
-        himalayas: himalayasMeta,
-        jooble: joobleMeta,
+    const payload: BrowseJobsPayload = {
+      success: true,
+      jobs: uniqueJobs,
+      companies: filterCompanies,
+      categories,
+      countries: ADZUNA_COUNTRIES.map((c) => ({
+        code: c.code,
+        label: c.label,
+        flag: c.flag,
+      })),
+      jobCounts: {
+        loaded: uniqueJobs.length,
+        available: uniqueJobs.length,
       },
-      {
-        headers: {
-          "Cache-Control": "private, max-age=300, stale-while-revalidate=600",
-        },
+      adzuna: adzunaMeta,
+      himalayas: himalayasMeta,
+      jooble: joobleMeta,
+    };
+
+    setBrowseSnapshot(snapKey, payload);
+
+    return NextResponse.json(payload, {
+      headers: {
+        "Cache-Control": "private, max-age=300, stale-while-revalidate=600",
+        "X-Jobs-Snapshot": "MISS",
       },
-    );
+    });
   } catch (error) {
     console.error("Browse jobs GET error:", error);
     return NextResponse.json(

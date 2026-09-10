@@ -10,5 +10,5 @@ export default function ConditionalNavbar() {
   if (HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     return null;
   }
-  return <Navbar />;
+  return <Navbar key={pathname} />;
 }

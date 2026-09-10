@@ -2,15 +2,19 @@
 
 import HeroSection from "./HeroSection";
 import MemberBenefitsSection from "./MemberBenefitsSection";
-import DiscoverTrendingJobs from "./DiscoverTrendingJobs";
+import TalentNetworkSection from "./TalentNetworkSection";
+// import DiscoverTrendingJobs from "./DiscoverTrendingJobs";
 import {
-  CareerJourneyStrip,
-  LearningPreviewStrip,
+  // CareerJourneyStrip,
+  // LearningPreviewStrip,
   HomeFaqStrip,
 } from "./StellaHomeExtras";
 import { useHomeMotion } from "../hooks/useHomeMotion";
 import "../gemini-home.css";
 import "../reveal.css";
+import CareerAppSection from "./CareerAppSection";
+import TrustedJobPlatforms from "./TrustedJobPlatforms";
+import FeaturedJobsSection from "./FeaturedJobsSection";
 
 /**
  * Homepage built to H01–H16 only (existing Stella visual language).
@@ -24,18 +28,23 @@ export default function GeminiHomePage() {
       <main id="top">
         {/* H02–H03 */}
         <HeroSection />
+        <TrustedJobPlatforms />
 
         {/* H04, H06–H10 — immediately below hero */}
         <MemberBenefitsSection />
 
-        {/* H11 */}
+        <FeaturedJobsSection />
+
+        {/* Talent network feature band */}
+        <TalentNetworkSection />
+
+        <CareerAppSection />
+
+        {/* Hidden for now — keep in codebase, re-enable later
         <CareerJourneyStrip />
-
-        {/* H12 */}
         <LearningPreviewStrip />
-
-        {/* H15 — trending discovery */}
         <DiscoverTrendingJobs />
+        */}
 
         {/* H16 */}
         <HomeFaqStrip />

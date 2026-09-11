@@ -1297,7 +1297,7 @@
 
 .gemini-home .hero-section--v2 .hero-search-fields:focus-within {
   box-shadow:
-    0 10px 40px -12px rgba(15, 23, 42, 0.22),
+    0 12px 36px -14px rgba(15, 23, 42, 0.22),
     0 0 0 3px rgba(59, 89, 255, 0.14);
 }
 
@@ -5566,7 +5566,7 @@
 }
 .gemini-home .hero-reference .hero-v2-title {
   font-family: Arial, Helvetica, sans-serif !important;
-  font-size: clamp(44px, 5.3vw, 110px) !important;
+  font-size: clamp(40px, 4.6vw, 92px) !important;
   line-height: 1.02 !important;
   letter-spacing: -0.045em !important;
   color: #071b3e !important;
@@ -5581,24 +5581,26 @@
   );
 }
 .gemini-home .hero-reference .hero-sub {
-  margin: 24px 0 0 !important;
-  font-size: clamp(15px, 1.48vw, 30px);
+  margin: 16px 0 0 !important;
+  font-size: clamp(14px, 1.3vw, 26px);
   line-height: 1.4;
   letter-spacing: -0.025em;
 }
 .gemini-home .hero-reference .hero-search-form {
-  margin: 30px 0 0 !important;
+  margin: 20px 0 0 !important;
   width: 100%;
   position: relative;
   z-index: 40;
 }
 .gemini-home .hero-reference .hero-search-fields {
-  border: 1px solid #f1eff8;
-  box-shadow: 0 6px 24px #4036660c;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 12px 36px -14px rgba(15, 23, 42, 0.2);
 }
 .gemini-home .hero-reference .hero-search-fields button {
   background: #3454ff;
   min-height: 48px;
+  box-shadow: none;
 }
 .gemini-home .hero-reference .hero-search-fields button:focus-visible,
 .gemini-home .hero-reference .hero-v2-popular button:focus-visible {
@@ -5606,7 +5608,7 @@
   outline-offset: 3px;
 }
 .gemini-home .hero-reference .hero-v2-popular {
-  margin-top: 22px;
+  margin-top: 14px;
   gap: 8px;
 }
 .gemini-home .hero-reference .hero-v2-popular button {
@@ -5615,7 +5617,7 @@
   white-space: nowrap;
 }
 .gemini-home .hero-reference .hero-v2-benefits {
-  margin-top: 30px;
+  margin-top: 20px;
   justify-content: space-between;
   gap: 14px;
 }
@@ -5653,17 +5655,17 @@
   }
 }
 .gemini-home .hero-reference .hero-v2-float--skills {
-  left: 7%;
-  top: 25%;
+  left: 28%;
+  top: 38%;
   width: 215px;
 }
 .gemini-home .hero-reference .hero-v2-float--people {
   right: 4%;
-  top: 55%;
+  top: 42%;
   width: 210px;
 }
 .gemini-home .hero-reference .hero-v2-float--count {
-  bottom: 3%;
+  bottom: 5%;
   right: 4%;
   width: 330px;
   max-width: 90%;
@@ -5679,8 +5681,8 @@
 @media (min-width: 1024px) {
   .gemini-home .hero-reference .hero-shell {
     min-height: 0 !important;
-    padding-top: 3.6vw;
-    padding-bottom: 32px !important;
+    padding-top: 2.4vw;
+    padding-bottom: 24px !important;
   }
   .gemini-home .hero-reference .hero-copy {
     width: 59%;
@@ -5696,9 +5698,10 @@
   .gemini-home .hero-reference .hero-v2-photo {
     position: absolute;
     right: 0;
+    top: 44px;
     bottom: 0;
     width: 92%;
-    height: 92%;
+    height: auto;
     mask-image: linear-gradient(to right, transparent, #000 32%);
   }
   .gemini-home .hero-reference .hero-v2-photo-img {
@@ -5710,11 +5713,11 @@
     mask-image: linear-gradient(to bottom, transparent, #000 96px);
   }
   .gemini-home .hero-reference .hero-sub {
-    margin-top: 1.5vw !important;
+    margin-top: 1.1vw !important;
     white-space: nowrap;
   }
   .gemini-home .hero-reference .hero-search-form {
-    margin-top: 2vw !important;
+    margin-top: 1.4vw !important;
   }
   .gemini-home .hero-reference .hero-search-fields {
     padding: 6px 6px 6px 22px;
@@ -5731,7 +5734,7 @@
   .gemini-home .hero-reference .hero-v2-popular {
     flex-wrap: nowrap;
     gap: 0.45vw;
-    margin-top: 1.5vw;
+    margin-top: 1vw;
   }
   .gemini-home .hero-reference .hero-v2-popular > span {
     white-space: nowrap;
@@ -5742,7 +5745,7 @@
     padding: 0.45vw 0.65vw;
   }
   .gemini-home .hero-reference .hero-v2-benefits {
-    margin-top: 2.2vw;
+    margin-top: 1.5vw;
   }
   .gemini-home .hero-reference .hero-v2-benefits li {
     font-size: clamp(10px, 0.95vw, 19px);
@@ -5791,7 +5794,7 @@
     margin-bottom: 0;
   }
   .gemini-home .hero-reference .hero-v2-photo-img {
-    height: 390px;
+    height: 340px;
     object-position: center;
   }
 }
@@ -5827,12 +5830,12 @@
   }
   .gemini-home .hero-reference .hero-v2-float--people {
     right: 0;
-    top: 54%;
+    top: 40%;
     width: 160px;
   }
   .gemini-home .hero-reference .hero-v2-float--count {
     right: 3%;
-    bottom: 3%;
+    bottom: 5%;
   }
 }
 

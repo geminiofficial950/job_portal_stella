@@ -15,6 +15,7 @@ import "../reveal.css";
 import CareerAppSection from "./CareerAppSection";
 import TrustedJobPlatforms from "./TrustedJobPlatforms";
 import FeaturedJobsSection from "./FeaturedJobsSection";
+import JobsPrefetch from "./JobsPrefetch";
 
 /**
  * Homepage built to H01–H16 only (existing Gemini Jobs visual language).
@@ -25,6 +26,7 @@ export default function GeminiHomePage() {
 
   return (
     <div className="gemini-home">
+      <JobsPrefetch />
       <main id="top">
         {/* H02–H03 */}
         <HeroSection />

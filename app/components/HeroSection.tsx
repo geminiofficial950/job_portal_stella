@@ -8,6 +8,7 @@ import {
   Brain,
   CheckCircle2,
   ChevronRight,
+  HeartHandshake,
   MapPin,
   Search,
   ShieldCheck,
@@ -108,28 +109,51 @@ export default function HeroSection() {
         aria-hidden
       />
 
-      <div className="hero-shell relative mx-auto grid w-full max-w-[1400px] items-center gap-6 px-5 pb-0 pt-12 sm:px-8 sm:pb-0 sm:pt-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-6 lg:px-10 lg:pb-0 lg:pt-16 xl:gap-8 xl:px-12">
+      <div className="hero-shell relative mx-auto grid w-full max-w-[1400px] items-center gap-6 px-5 pb-0 pt-8 sm:px-8 sm:pb-0 sm:pt-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-6 lg:px-10 lg:pb-0 lg:pt-12 xl:gap-8 xl:px-12">
         {/* LEFT */}
         <div className="hero-copy hero-copy-enter relative z-20 flex w-full min-w-0 flex-col items-start lg:max-w-[620px] xl:max-w-[660px]">
           <h1 className="hero-v2-title">
-            Your Next
-            <br />
-            <RotatingCareerWord />
+            Your Next <RotatingCareerWord />
             <br />
             Starts Here.
           </h1>
 
-          <p className="hero-sub mt-5 text-[15px] font-medium leading-[1.55] text-[#334155] sm:text-[16px]">
-            AI-POWERED, HUMAN-SUPPORTED, BUILT FOR AUSTRALIA
+          <p className="hero-sub mt-4 text-[15px] font-medium leading-[1.55] text-[#334155] sm:text-[16px]">
+            <span className="inline-flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
+              <span className="inline-flex items-center gap-1.5">
+                <Brain
+                  className="h-[1em] w-[1em] shrink-0 text-[#3b59ff]"
+                  strokeWidth={2.25}
+                  aria-hidden
+                />
+                AI-POWERED
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <HeartHandshake
+                  className="h-[1em] w-[1em] shrink-0 text-[#3b59ff]"
+                  strokeWidth={2.25}
+                  aria-hidden
+                />
+                HUMAN-SUPPORTED
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin
+                  className="h-[1em] w-[1em] shrink-0 text-[#3b59ff]"
+                  strokeWidth={2.25}
+                  aria-hidden
+                />
+                BUILT FOR AUSTRALIA
+              </span>
+            </span>
             <br />
             Connecting Aussie’s to opportunities - locally & globally
           </p>
 
           <form
             onSubmit={onSubmit}
-            className="hero-search-form hero-v2-search mt-7 w-full sm:mt-8"
+            className="hero-search-form hero-v2-search mt-5 w-full sm:mt-6"
           >
-            <div className="hero-search-fields flex w-full flex-col gap-2 rounded-[1.35rem] bg-white p-2 shadow-[0_10px_40px_-12px_rgba(15,23,42,0.22)] sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:p-[6px] sm:pl-5">
+            <div className="hero-search-fields flex w-full flex-col gap-2 rounded-[1.35rem] border border-slate-200/80 bg-white p-2 shadow-[0_12px_36px_-14px_rgba(15,23,42,0.2)] sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:p-[6px] sm:pl-5">
               <div className="relative min-w-0 flex-[1.25] px-2 sm:px-0">
                 <KeywordSuggestInput
                   value={jobQuery}
@@ -187,7 +211,7 @@ export default function HeroSection() {
             ))}
           </div>
 
-          <ul className="hero-v2-benefits relative z-50 mt-8 flex w-full flex-wrap gap-x-5 gap-y-3 sm:mt-10 sm:gap-x-6">
+          <ul className="hero-v2-benefits relative z-50 mt-6 flex w-full flex-wrap gap-x-5 gap-y-3 sm:mt-7 sm:gap-x-6">
             {BENEFITS.map(({ icon: Icon, label, tone }) => (
               <li
                 key={label}
@@ -213,7 +237,7 @@ export default function HeroSection() {
             <br />A Brighter You
           </p>
 
-          <div className="hero-v2-float hero-v2-float--skills absolute left-[2%] top-[18%] z-30 lg:left-0 lg:top-[16%]">
+          <div className="hero-v2-float hero-v2-float--skills absolute left-[28%] top-[32%] z-30 lg:left-[28%] lg:top-[38%]">
             <span className="hero-v2-float-icon hero-v2-float-icon--violet">
               <Brain className="h-4 w-4" strokeWidth={2.2} />
             </span>
@@ -227,7 +251,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          <div className="hero-v2-float hero-v2-float--people absolute right-[4%] top-[42%] z-30 lg:right-[2%] lg:top-[40%]">
+          <div className="hero-v2-float hero-v2-float--people absolute right-[4%] top-[42%] z-30 lg:right-[2%] lg:top-[42%]">
             <span className="hero-v2-float-icon hero-v2-float-icon--blue">
               <Users className="h-4 w-4" strokeWidth={2.2} />
             </span>
@@ -241,7 +265,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          <div className="hero-v2-float hero-v2-float--count absolute bottom-[8%] right-[3%] z-30 max-w-[min(100%,300px)] lg:bottom-[7%] lg:right-[2%]">
+          <div className="hero-v2-float hero-v2-float--count absolute bottom-[8%] right-[3%] z-30 max-w-[min(100%,300px)] lg:bottom-[5%] lg:right-[2%]">
             <div className="flex items-center gap-2.5">
               <div className="flex shrink-0 -space-x-2">
                 {JOURNEY_AVATARS.map((src) => (
@@ -273,7 +297,7 @@ export default function HeroSection() {
               preload
               sizes="(min-width: 1024px) 58vw, 100vw"
               alt="Professional starting her next career move in Australia"
-              className="hero-v2-photo-img relative z-10 block h-[400px] w-full object-cover object-[center_12%] sm:h-[460px] lg:h-full lg:min-h-0"
+              className="hero-v2-photo-img relative z-10 block h-[340px] w-full object-cover object-[center_12%] sm:h-[400px] lg:h-full lg:min-h-0"
             />
           </div>
         </div>

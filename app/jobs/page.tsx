@@ -14,8 +14,9 @@ function first(v: string | string[] | undefined): string {
 }
 
 /**
- * Server page — loads default AU jobs on the server (from warm snapshot or live browse)
- * so the user sees listings immediately with no client wait.
+ * Server page — always seed from warm default browse snapshot so /jobs
+ * paints immediately (including when arriving from homepage search).
+ * Keyword/location refine happens on the client without a blank loading screen.
  */
 export default async function JobsPage({
   searchParams,
@@ -23,40 +24,35 @@ export default async function JobsPage({
   searchParams: Promise<SearchParams>;
 }) {
   const sp = await searchParams;
-  const q = first(sp.q).trim();
-  const location = (first(sp.location) || first(sp.suburb)).trim();
-  const country = (first(sp.country).trim().toLowerCase() || "au");
+  const country = first(sp.country).trim().toLowerCase() || "au";
 
   let initialBrowse: Record<string, unknown> | null = null;
 
-  // Only SSR the default board (no live search) — searches stay client-driven
-  if (!q && !location) {
-    try {
-      const params = new URLSearchParams();
-      params.set("fast", "1");
-      if (country && country !== "all") params.set("country", country);
+  try {
+    const params = new URLSearchParams();
+    params.set("fast", "1");
+    if (country && country !== "all") params.set("country", country);
 
-      const key = browseSnapshotKey(params);
-      const snap = getBrowseSnapshot(key);
-      if (snap) {
-        initialBrowse = snap;
-      } else {
-        const { GET } = await import("@/app/api/jobs/browse/route");
-        const res = await GET(
-          new Request(`http://localhost/api/jobs/browse?${params.toString()}`),
-        );
-        const data = await res.json();
-        if (data?.success && Array.isArray(data.jobs) && data.jobs.length > 0) {
-          initialBrowse = data;
-        }
-        // Keep caches warm for the next visitor
-        void import("@/lib/warm-jobs-cache")
-          .then(({ warmJobsCache }) => warmJobsCache())
-          .catch(() => {});
+    const key = browseSnapshotKey(params);
+    const snap = getBrowseSnapshot(key);
+    if (snap) {
+      initialBrowse = snap;
+    } else {
+      const { GET } = await import("@/app/api/jobs/browse/route");
+      const res = await GET(
+        new Request(`http://localhost/api/jobs/browse?${params.toString()}`),
+      );
+      const data = await res.json();
+      if (data?.success && Array.isArray(data.jobs) && data.jobs.length > 0) {
+        initialBrowse = data;
       }
-    } catch (err) {
-      console.warn("[jobs page] server preload failed:", err);
     }
+
+    void import("@/lib/warm-jobs-cache")
+      .then(({ warmJobsCache }) => warmJobsCache())
+      .catch(() => {});
+  } catch (err) {
+    console.warn("[jobs page] server preload failed:", err);
   }
 
   return <JobsBoardClient initialBrowse={initialBrowse} />;

@@ -28,6 +28,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/app/components/AuthProvider";
 import { useAuthModal } from "@/app/components/AuthModalProvider";
+import {
+  browseCacheKey,
+  getClientBrowseCache,
+  setClientBrowseCache,
+} from "@/lib/client-browse-cache";
 import SignInMenu from "@/app/components/SignInMenu";
 import LocationSuggestInput from "@/app/components/LocationSuggestInput";
 import KeywordSuggestInput from "@/app/components/KeywordSuggestInput";
@@ -35,7 +40,7 @@ import JobsSeekFilters, {
   jobMatchesPayRange,
   type PayPeriod,
 } from "@/app/components/JobsSeekFilters";
-import { locationSearchValue } from "@/lib/auLocations";
+import { locationSearchValue, jobMatchesLocationQuery } from "@/lib/auLocations";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import {
@@ -137,6 +142,59 @@ function isAustraliaJob(job: JobItem) {
     hay.includes("perth") ||
     hay.includes("adelaide")
   );
+}
+
+function normalizeJobItem(job: JobItem): JobItem {
+  return {
+    ...job,
+    title: job.title || "",
+    description: job.description || "",
+    requirements: job.requirements || "",
+    responsibilities: job.responsibilities || "",
+    location: job.location || "",
+    category: job.category || "",
+    employmentType: job.employmentType || "",
+    workMode: job.workMode || "",
+    experienceLevel: job.experienceLevel || "",
+    skills: Array.isArray(job.skills) ? job.skills : [],
+    benefits: job.benefits || "",
+    country: job.country || (isAustraliaJob(job) ? "au" : undefined),
+  };
+}
+
+/** Local filter over a seeded browse list — used when API search returns empty. */
+function jobMatchesTextQuery(job: JobItem, q: string, loc: string): boolean {
+  const query = q.trim().toLowerCase();
+  const location = loc.trim();
+
+  if (location && !jobMatchesLocationQuery(job.location || "", location)) {
+    return false;
+  }
+
+  if (!query) return true;
+
+  const hay = [
+    job.title,
+    job.category,
+    job.company?.name,
+    job.location,
+    ...(Array.isArray(job.skills) ? job.skills : []),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (hay.includes(query)) return true;
+
+  const tokens = query.split(/[\s/&,+-]+/).filter((t) => t.length >= 2);
+  if (tokens.length === 0) return true;
+  const hits = tokens.filter((t) => hay.includes(t)).length;
+  return hits >= Math.ceil(tokens.length * 0.6);
+}
+
+function filterJobsBySearch(jobs: JobItem[], q: string, loc: string): JobItem[] {
+  if (!q.trim() && !loc.trim()) return jobs;
+  return jobs.filter((job) => jobMatchesTextQuery(job, q, loc));
 }
 
 /** Prefer jobs with fuller posting content (description, skills, etc.) */
@@ -704,6 +762,34 @@ type InitialBrowse = {
   adzuna?: { configured?: boolean; error?: string };
 };
 
+function readSeedBrowse(
+  initialBrowse: InitialBrowse | null | undefined,
+  countryHint: string,
+): InitialBrowse | null {
+  if (
+    initialBrowse?.success &&
+    Array.isArray(initialBrowse.jobs) &&
+    initialBrowse.jobs.length > 0
+  ) {
+    return initialBrowse;
+  }
+
+  const country = (countryHint || "au").trim().toLowerCase() || "au";
+  const cached =
+    getClientBrowseCache(browseCacheKey({ country, fast: true })) ||
+    getClientBrowseCache(browseCacheKey({ country, fast: false })) ||
+    getClientBrowseCache(browseCacheKey({ country: "au", fast: true }));
+
+  if (!cached) return null;
+  return {
+    success: true,
+    jobs: cached.jobs as JobItem[],
+    companies: (cached.companies as CompanyOption[]) ?? [],
+    categories: cached.categories ?? [],
+    countries: (cached.countries as CountryOption[]) ?? [],
+  };
+}
+
 function JobSearchInner({
   initialBrowse = null,
 }: {
@@ -721,41 +807,52 @@ function JobSearchInner({
   const { user, loading: authLoading } = useAuth();
   const { openAuth } = useAuthModal();
 
-  const hasServerJobs = Boolean(
-    initialBrowse?.success &&
-      Array.isArray(initialBrowse.jobs) &&
-      initialBrowse.jobs.length > 0 &&
-      !qFromUrl &&
-      !locationFromUrl,
+  const seedBrowse = readSeedBrowse(
+    initialBrowse,
+    countryFromUrl || "au",
   );
+  const seedJobs = (seedBrowse?.jobs ?? []).map(normalizeJobItem);
+  const hasSeedJobs = seedJobs.length > 0;
+  const initialJobs = hasSeedJobs
+    ? (() => {
+        const matched = filterJobsBySearch(
+          seedJobs,
+          qFromUrl,
+          locationFromUrl,
+        );
+        // Prefer matched results; if query is too narrow locally, keep seed
+        // until the API responds so the list never flashes empty.
+        return matched.length > 0 ? matched : seedJobs;
+      })()
+    : [];
 
-  const [jobs, setJobs] = useState<JobItem[]>(() =>
-    hasServerJobs ? (initialBrowse?.jobs ?? []) : [],
-  );
-  const [popularSeedJobs, setPopularSeedJobs] = useState<JobItem[]>(() =>
-    hasServerJobs ? (initialBrowse?.jobs ?? []) : [],
-  );
+  const [jobs, setJobs] = useState<JobItem[]>(initialJobs);
+  const [popularSeedJobs, setPopularSeedJobs] = useState<JobItem[]>(seedJobs);
   const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>(() =>
-    hasServerJobs ? (initialBrowse?.companies ?? []) : [],
+    hasSeedJobs ? (seedBrowse?.companies ?? []) : [],
   );
   const [countryOptions, setCountryOptions] = useState<CountryOption[]>(() =>
-    hasServerJobs ? (initialBrowse?.countries ?? []) : [],
+    hasSeedJobs ? (seedBrowse?.countries ?? []) : [],
   );
   const [categories, setCategories] = useState<string[]>(() =>
-    hasServerJobs
-      ? ["All", ...((initialBrowse?.categories as string[]) ?? [])]
+    hasSeedJobs
+      ? ["All", ...((seedBrowse?.categories as string[]) ?? [])]
       : ["All"],
   );
-  const [loading, setLoading] = useState(!hasServerJobs);
+  const [loading, setLoading] = useState(!hasSeedJobs);
   const [error, setError] = useState("");
   const [adzunaWarning, setAdzunaWarning] = useState("");
   const [applying, setApplying] = useState(false);
   const [visibleCount, setVisibleCount] = useState(JOBS_PAGE_SIZE);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const searchReqIdRef = useRef(0);
+  const jobsCountRef = useRef(initialJobs.length);
+  const popularSeedRef = useRef<JobItem[]>(seedJobs);
 
   const [searchQuery, setSearchQuery] = useState(qFromUrl);
-  const [filtersEnabled, setFiltersEnabled] = useState(false);
+  const [filtersEnabled, setFiltersEnabled] = useState(
+    Boolean(qFromUrl || locationFromUrl),
+  );
   const [payPeriod, setPayPeriod] = useState<PayPeriod>("year");
   const [payMin, setPayMin] = useState("");
   const [payMax, setPayMax] = useState("");
@@ -895,7 +992,9 @@ function JobSearchInner({
   const loadJobs = useCallback(
     async (opts?: { q?: string; location?: string; country?: string }) => {
       const reqId = ++searchReqIdRef.current;
-      setLoading(true);
+      // Keep current list visible — never flash a blank loading screen when we
+      // already have jobs (homepage cache / SSR seed / previous search).
+      setLoading(jobsCountRef.current === 0);
       setError("");
       setVisibleCount(JOBS_PAGE_SIZE);
 
@@ -913,6 +1012,7 @@ function JobSearchInner({
       };
 
       const applyBrowsePayload = (data: {
+        success?: boolean;
         jobs?: JobItem[];
         companies?: CompanyOption[];
         categories?: string[];
@@ -920,22 +1020,55 @@ function JobSearchInner({
         adzuna?: { configured?: boolean; error?: string };
       }) => {
         if (reqId !== searchReqIdRef.current) return;
-        const nextJobs = data.jobs ?? [];
+        let nextJobs = (data.jobs ?? []).map(normalizeJobItem);
+
+        // Never wipe a visible list with an empty API response — fall back to
+        // filtering the seeded browse cache so homepage/popular search never
+        // lands on a false "No Jobs Found".
+        if (nextJobs.length === 0 && (q || loc)) {
+          const pool =
+            popularSeedRef.current.length > 0
+              ? popularSeedRef.current
+              : seedJobs;
+          const fallback = filterJobsBySearch(pool, q, loc);
+          if (fallback.length > 0) {
+            nextJobs = fallback;
+          } else if (jobsCountRef.current > 0) {
+            // Keep whatever is already on screen — don't flash Not Found
+            setLoading(false);
+            return;
+          }
+        }
+
+        jobsCountRef.current = nextJobs.length;
         setJobs(nextJobs);
         // Keep Popular tags seeded from broad browse results (lots of jobs).
         if (!q && !loc && nextJobs.length > 0) {
           setPopularSeedJobs(nextJobs);
+          popularSeedRef.current = nextJobs;
+          setClientBrowseCache(
+            {
+              success: true,
+              jobs: nextJobs,
+              companies: data.companies ?? [],
+              categories: data.categories ?? [],
+              countries: data.countries ?? [],
+            },
+            browseCacheKey({ country, fast: true }),
+          );
         }
-        setCompanyOptions(data.companies ?? []);
-        setCategories(["All", ...((data.categories as string[]) ?? [])]);
-        setCountryOptions(data.countries ?? []);
+        if (data.companies) setCompanyOptions(data.companies);
+        if (data.categories) {
+          setCategories(["All", ...data.categories]);
+        }
+        if (data.countries?.length) setCountryOptions(data.countries);
         if (
           data.adzuna &&
           data.adzuna.configured === false &&
           data.adzuna.error
         ) {
           setAdzunaWarning(data.adzuna.error);
-        } else {
+        } else if (data.adzuna) {
           setAdzunaWarning("");
         }
       };
@@ -969,7 +1102,7 @@ function JobSearchInner({
       } catch (err) {
         if (reqId !== searchReqIdRef.current) return;
         setError(err instanceof Error ? err.message : "Failed to load jobs");
-        setJobs([]);
+        if (jobsCountRef.current === 0) setJobs([]);
         setLoading(false);
       }
     },
@@ -992,27 +1125,14 @@ function JobSearchInner({
   }, [searchQuery, locationQuery, selectedCountry, loadJobs, router]);
 
   useEffect(() => {
-    // Server already sent jobs — show them immediately, refresh quietly in background
-    if (hasServerJobs) {
+    // Seeded from SSR / homepage cache — show immediately, refine in background
+    if (hasSeedJobs) {
       setLoading(false);
-      const country = countryFromUrl || selectedCountry || "au";
-      const params = new URLSearchParams();
-      if (country && country !== "all") params.set("country", country);
-      void fetch(`/api/jobs/browse?${params.toString()}`)
-        .then(async (res) => {
-          const data = await res.json();
-          if (!res.ok || !data.success) return;
-          const nextJobs = (data.jobs ?? []) as JobItem[];
-          if (nextJobs.length === 0) return;
-          setJobs(nextJobs);
-          setPopularSeedJobs(nextJobs);
-          setCompanyOptions(data.companies ?? []);
-          setCategories(["All", ...((data.categories as string[]) ?? [])]);
-          setCountryOptions(data.countries ?? []);
-        })
-        .catch((err) => {
-          console.warn("Background jobs refresh failed:", err);
-        });
+      void loadJobs({
+        q: qFromUrl,
+        location: locationFromUrl,
+        country: countryFromUrl || selectedCountry,
+      });
       return;
     }
 
@@ -1246,14 +1366,17 @@ function JobSearchInner({
   const matchesSelectedCountry = useCallback(
     (job: JobItem) => {
       if (selectedCountry === "all") return true;
+      if (job.country && job.country === selectedCountry) return true;
+      if (selectedCountry === "au" && isAustraliaJob(job)) return true;
       if (
         job.source === "adzuna" ||
         job.source === "himalayas" ||
         job.source === "jooble"
       ) {
+        // External jobs without a country tag still pass AU via isAustraliaJob above
         return job.country === selectedCountry;
       }
-      const loc = job.location.toLowerCase();
+      const loc = (job.location || "").toLowerCase();
       const label =
         countryOptions
           .find((c) => c.code === selectedCountry)
@@ -1367,7 +1490,7 @@ function JobSearchInner({
     for (const job of source.slice(0, 120)) {
       if (job.title) terms.push(job.title);
       if (job.category) terms.push(job.category);
-      for (const skill of job.skills.slice(0, 3)) terms.push(skill);
+      for (const skill of (job.skills || []).slice(0, 3)) terms.push(skill);
     }
     for (const item of popularKeywords) terms.push(item.label);
     return terms;
@@ -2624,13 +2747,24 @@ export default function JobSearchPage({
 }: {
   initialBrowse?: InitialBrowse | null;
 }) {
+  const hasSeed =
+    Boolean(
+      initialBrowse?.success &&
+        Array.isArray(initialBrowse.jobs) &&
+        initialBrowse.jobs.length > 0,
+    ) || Boolean(getClientBrowseCache()?.jobs?.length);
+
   return (
     <Suspense
       fallback={
-        <div className="jobs-page flex min-h-screen items-center justify-center gap-2 text-sm text-slate-500">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          Loading jobs…
-        </div>
+        hasSeed ? (
+          <div className="jobs-page min-h-screen bg-[#f6f7fb]" aria-hidden />
+        ) : (
+          <div className="jobs-page flex min-h-screen items-center justify-center gap-2 text-sm text-slate-500">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            Loading jobs…
+          </div>
+        )
       }
     >
       <JobSearchInner initialBrowse={initialBrowse} />

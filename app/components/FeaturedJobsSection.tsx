@@ -6,6 +6,12 @@ import { MapPin } from "lucide-react";
 import HomeJobDetailModal, {
   type HomeModalJob,
 } from "@/app/components/HomeJobDetailModal";
+import {
+  browseCacheKey,
+  getClientBrowseCache,
+  setClientBrowseCache,
+  prefetchClientBrowse,
+} from "@/lib/client-browse-cache";
 
 type FeaturedJob = {
   id: string;
@@ -93,8 +99,18 @@ function toModalJob(job: FeaturedJob): HomeModalJob {
 }
 
 export default function FeaturedJobsSection() {
-  const [jobs, setJobs] = useState<FeaturedJob[]>([]);
-  const [loading, setLoading] = useState(true);
+  const seedJobs = (() => {
+    const cached = getClientBrowseCache(
+      browseCacheKey({ country: "au", fast: true }),
+    );
+    if (!cached?.jobs?.length) return [] as FeaturedJob[];
+    return (cached.jobs as FeaturedJob[])
+      .filter((job) => hasSalary(job))
+      .slice(0, FEATURED_LIMIT);
+  })();
+
+  const [jobs, setJobs] = useState<FeaturedJob[]>(seedJobs);
+  const [loading, setLoading] = useState(seedJobs.length === 0);
   const [selectedJob, setSelectedJob] = useState<HomeModalJob | null>(null);
 
   useEffect(() => {
@@ -102,14 +118,30 @@ export default function FeaturedJobsSection() {
 
     async function load() {
       try {
-        const res = await fetch("/api/jobs/browse?country=au&fast=1");
-        if (!res.ok) throw new Error("Failed to load jobs");
-        const data = (await res.json()) as { jobs?: FeaturedJob[] };
-        const paidAu = (data.jobs || [])
-          .filter((job) => hasSalary(job))
-          .slice(0, FEATURED_LIMIT);
+        const data =
+          getClientBrowseCache(browseCacheKey({ country: "au", fast: true })) ||
+          (await prefetchClientBrowse({ country: "au" }));
 
-        if (!cancelled) setJobs(paidAu);
+        if (!data?.jobs?.length) {
+          const res = await fetch("/api/jobs/browse?country=au&fast=1");
+          if (!res.ok) throw new Error("Failed to load jobs");
+          const json = await res.json();
+          setClientBrowseCache(json, browseCacheKey({ country: "au", fast: true }));
+          if (!cancelled) {
+            const paidAu = ((json.jobs || []) as FeaturedJob[])
+              .filter((job) => hasSalary(job))
+              .slice(0, FEATURED_LIMIT);
+            setJobs(paidAu);
+          }
+          return;
+        }
+
+        if (!cancelled) {
+          const paidAu = (data.jobs as FeaturedJob[])
+            .filter((job) => hasSalary(job))
+            .slice(0, FEATURED_LIMIT);
+          setJobs(paidAu);
+        }
       } catch {
         if (!cancelled) setJobs([]);
       } finally {

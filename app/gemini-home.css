@@ -2628,6 +2628,7 @@
 .gemini-home .trusted-platforms-eyebrow {
   font-family: var(--ui);
   color: #0a0f1c !important;
+  margin-bottom: 16px;
 }
 
 .gemini-home .benefits-section {
@@ -5693,7 +5694,11 @@
     height: auto;
   }
   .gemini-home .hero-reference .hero-v2-photo {
-    height: 100%;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 95%;
+    height: 95%;
     mask-image: linear-gradient(to right, transparent, #000 32%);
   }
   .gemini-home .hero-reference .hero-v2-photo-img {
@@ -5702,6 +5707,7 @@
     width: 100%;
     object-fit: cover;
     object-position: 57% center;
+    mask-image: linear-gradient(to bottom, transparent, #000 96px);
   }
   .gemini-home .hero-reference .hero-sub {
     margin-top: 1.5vw !important;
@@ -5785,7 +5791,7 @@
     margin-bottom: 0;
   }
   .gemini-home .hero-reference .hero-v2-photo-img {
-    height: 420px;
+    height: 390px;
     object-position: center;
   }
 }
@@ -5807,7 +5813,7 @@
     font-size: 11px;
   }
   .gemini-home .hero-reference .hero-v2-photo-img {
-    height: 360px;
+    height: 330px;
     object-position: 55% center;
   }
   .gemini-home .hero-reference .hero-v2-float {
@@ -5832,18 +5838,18 @@
 
 /* Reserve navigation space inside the hero so its canvas runs behind the header. */
 .gemini-home .hero-reference .hero-shell {
-  padding-top: calc(68px + var(--site-nav-height)) !important;
+  padding-top: calc(48px + var(--site-nav-height)) !important;
   padding-bottom: 28px !important;
 }
 @media (min-width: 1024px) {
   .gemini-home .hero-reference .hero-shell {
-    padding-top: calc(3.6vw + var(--site-nav-height) + 20px) !important;
+    padding-top: calc(2.6vw + var(--site-nav-height)) !important;
     padding-bottom: 32px !important;
   }
 }
 @media (max-width: 639px) {
   .gemini-home .hero-reference .hero-shell {
-    padding-top: calc(50px + var(--site-nav-height)) !important;
+    padding-top: calc(34px + var(--site-nav-height)) !important;
     padding-bottom: 24px !important;
   }
 }

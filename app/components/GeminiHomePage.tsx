@@ -17,7 +17,7 @@ import TrustedJobPlatforms from "./TrustedJobPlatforms";
 import FeaturedJobsSection from "./FeaturedJobsSection";
 
 /**
- * Homepage built to H01–H16 only (existing Stella visual language).
+ * Homepage built to H01–H16 only (existing Gemini Jobs visual language).
  * Old marketing sections (four things, demand board, demo tickers) removed.
  */
 export default function GeminiHomePage() {

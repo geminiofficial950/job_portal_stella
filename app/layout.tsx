@@ -29,7 +29,7 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stella Careers — Build your profile. Grow your skills. Get noticed.",
+  title: "Gemini Jobs — Build your profile. Grow your skills. Get noticed.",
   description:
     "Create your free profile, learn from industry experts, access professional development and career events, and get qualifications and work experience checked for employers.",
 };

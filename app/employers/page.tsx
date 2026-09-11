@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Briefcase, Search } from "lucide-react";
 import { STELLA_CONTACT } from "@/lib/stellaContent";
 
-export const metadata = { title: "For Employers — Stella Careers" };
+export const metadata = { title: "For Employers — Gemini Jobs" };
 
 export default function EmployersPage() {
   return (

@@ -1,3 +1,4 @@
+import { brandText } from "@/app/components/brandText";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -14,7 +15,7 @@ import {
 } from "@/lib/learningCardThemes";
 import { ProfessionalEvent } from "@/models/Learning";
 
-export const metadata = { title: "Events — Stella Careers" };
+export const metadata = { title: "Events — Gemini Jobs" };
 
 type Props = {
   searchParams: Promise<{ industry?: string; format?: string; region?: string }>;
@@ -69,7 +70,7 @@ export default async function EventsPage({ searchParams }: Props) {
           </h1>
           <p className="mt-2 text-[15px] leading-relaxed text-slate-500">
             Filter by industry, format and region. External bookings are
-            labelled — external clicks are not Stella attendance.
+            labelled — external clicks are not Gemini Jobs attendance.
           </p>
         </div>
 
@@ -106,7 +107,7 @@ export default async function EventsPage({ searchParams }: Props) {
                 ev.timeZone,
               );
               const hostedLabel =
-                ev.hostedBy === "stella" ? "Stella hosted" : "External booking";
+                ev.hostedBy === "stella" ? "Gemini Jobs hosted" : "External booking";
               return (
                 <article
                   key={String(ev._id)}
@@ -147,7 +148,7 @@ export default async function EventsPage({ searchParams }: Props) {
                   <div className="relative mt-4 space-y-2 text-sm text-slate-600">
                     <p className="flex items-start gap-2">
                       <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
-                      <span>{ev.organiser}</span>
+                      <span>{brandText(ev.organiser)}</span>
                     </p>
                     <p className="flex items-start gap-2">
                       <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />

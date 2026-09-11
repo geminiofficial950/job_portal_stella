@@ -6,7 +6,7 @@ import { Company } from "@/models/Company";
 
 type Props = { params: Promise<{ id: string }> };
 
-/** J05 — permanent job detail URL for Stella-listed vacancies */
+/** J05 — permanent job detail URL for Gemini Jobs-listed vacancies */
 export default async function JobDetailPage({ params }: Props) {
   const { id } = await params;
 
@@ -52,7 +52,7 @@ export default async function JobDetailPage({ params }: Props) {
         ← Jobs
       </Link>
       <p className="mt-3 text-xs font-bold uppercase text-[#2563eb]">
-        Stella employer listing
+        Gemini Jobs employer listing
       </p>
       <h1 className="mt-1 text-3xl font-bold text-[#0f2744]">{job.title}</h1>
       <p className="mt-2 text-slate-500">
@@ -71,8 +71,8 @@ export default async function JobDetailPage({ params }: Props) {
         <p className="mt-3 whitespace-pre-wrap">{job.description}</p>
       </div>
       <p className="mt-4 text-xs text-slate-500">
-        Applying here creates a Stella application. External imported jobs show
-        their own destination on the board and are not counted as Stella
+        Applying here creates a Gemini Jobs application. External imported jobs show
+        their own destination on the board and are not counted as Gemini Jobs
         applications without confirmation.
       </p>
     </main>

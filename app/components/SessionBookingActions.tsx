@@ -69,7 +69,7 @@ export default function SessionBookingActions({
   if (!bookingOpen) {
     return (
       <p className="mt-4 text-sm text-amber-800">
-        Live booking opens when Stella publishes confirmed speakers and fees.
+        Live booking opens when Gemini Jobs publishes confirmed speakers and fees.
         Use interest registration below in the meantime.
       </p>
     );

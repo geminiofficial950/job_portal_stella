@@ -1,3 +1,4 @@
+import { brandText } from "@/app/components/brandText";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ensureLearningSeeded } from "@/lib/learningStore";
@@ -29,11 +30,11 @@ export default async function EventDetailPage({ params }: Props) {
       <h1 className="mt-4 text-3xl font-bold text-[#0f2744]">{event.title}</h1>
       <p className="mt-2 text-slate-500">
         {external
-          ? "External event — booking is with the organiser. Clicks are not counted as Stella bookings or attendance."
-          : "Hosted by Stella Careers."}
+          ? "External event — booking is with the organiser. Clicks are not counted as Gemini Jobs bookings or attendance."
+          : "Hosted by Gemini Jobs."}
       </p>
       <div className="mt-6 rounded-[22px] border border-slate-100 bg-white p-5 text-sm text-slate-600 shadow-sm">
-        <p>Organiser: {event.organiser}</p>
+        <p>Organiser: {brandText(event.organiser)}</p>
         <p>Industry: {event.industry}</p>
         <p>Location: {event.location}</p>
         <p>
@@ -62,7 +63,7 @@ export default async function EventDetailPage({ params }: Props) {
 
       <div className="mt-8">
         <h2 className="text-lg font-bold text-[#0f2744]">
-          Register interest / contact organiser via Stella
+          Register interest / contact organiser via Gemini Jobs
         </h2>
         <InterestForm
           kind="event"

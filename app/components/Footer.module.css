@@ -16,8 +16,8 @@
 .handwriting svg { width: 75px; flex-shrink: 0; margin-right: -4px; transform: translateY(23px); color: #ca70d9; }
 .body { max-width: 2048px; margin: auto; padding: 38px 5% 22px; }
 .grid { display: grid; grid-template-columns: 1.9fr .85fr .85fr .75fr 1.05fr 1.85fr; gap: 30px; }
-.logo { display: block; position: relative; width: 230px; height: 89px; overflow: hidden; margin-top: -10px; }
-.logo img { position: absolute; width: 708px; max-width: none; height: auto; left: -235px; top: -81px; filter: brightness(0) invert(1); }
+.logo { display: block; width: 230px; max-width: 100%; margin-bottom: 18px; }
+.logo svg { width: 100%; height: auto; filter: brightness(0) invert(1); }
 .footer .brand p { margin: 11px 0 0; font-size: clamp(12px, .9vw, 17px); line-height: 1.5; color: #b3bfd2; }
 .footer h3 { margin: 0 0 18px; color: #dde3ee; font-size: clamp(13px, .9vw, 18px); font-weight: 650; line-height: 1.3; }
 .column ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }

@@ -201,7 +201,7 @@ export default function VerificationPage() {
                     </span>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-200">
-                        Stella Careers
+                        Gemini Jobs
                       </p>
                       <p className="mt-0.5 text-sm font-bold text-white">
                         Verification profile
@@ -519,7 +519,7 @@ export default function VerificationPage() {
                     onChange={(e) => setConsentChecking(e.target.checked)}
                   />
                   <span>
-                    I consent to Stella checking the selected claims.{" "}
+                    I consent to Gemini Jobs checking the selected claims.{" "}
                     <strong className="text-slate-900">Required</strong>
                   </span>
                 </label>

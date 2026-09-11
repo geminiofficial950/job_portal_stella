@@ -1,5 +1,6 @@
 "use client";
 
+import BrandLogo from "@/app/components/BrandLogo";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, X } from "lucide-react";
@@ -128,9 +129,10 @@ export default function AuthModal() {
         </div>
 
         <div className="auth-modal-panel">
+          <div className="mb-5"><BrandLogo /></div>
           <h2 id="auth-modal-title" className="auth-brand">
             {isLogin ? "Sign in to" : "Join"}{" "}
-            <span>Stella Careers</span>
+            <span>Gemini Jobs</span>
           </h2>
           <p className="auth-sub">
             {isLogin

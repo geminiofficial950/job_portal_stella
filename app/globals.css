@@ -472,6 +472,14 @@ body {
   margin-bottom: calc(-1 * var(--site-nav-height));
   background: transparent;
 }
+.site-navbar--home .navbar-shell {
+  padding-left: calc(4% + max(0px, (100% - 2048px) / 2));
+}
+@media (max-width: 639px) {
+  .site-navbar--home .navbar-shell {
+    padding-left: 20px;
+  }
+}
 .site-navbar[data-scrolled="true"] {
   background: rgb(255 255 255 / 72%);
   backdrop-filter: saturate(140%) blur(20px);
@@ -487,6 +495,10 @@ body {
 .site-navbar .navbar-menu-toggle { color: inherit; }
 .site-navbar .navbar-link:hover { opacity: .65; }
 .site-navbar .navbar-link--active { font-weight: 700; }
+.brand-logo { display: block; width: 180px; max-width: 100%; height: auto; flex-shrink: 0; }
+@media (min-width: 640px) {
+  .brand-logo { width: 200px; }
+}
 .site-navbar .navbar-logo { transition: filter 250ms ease; }
 .site-navbar[data-tone="dark"] .navbar-logo { filter: brightness(0) invert(1); }
 .site-navbar[data-tone="dark"] .navbar-menu-toggle:hover { background: rgb(255 255 255 / 12%); }

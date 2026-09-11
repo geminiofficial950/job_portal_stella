@@ -1,5 +1,6 @@
 "use client";
 
+import { brandText } from "@/app/components/brandText";
 import { Fragment, type CSSProperties } from "react";
 import Link from "next/link";
 import {
@@ -468,7 +469,7 @@ export function HomeFaqStrip() {
             </h2>
             <p className="faq-intro mt-4 max-w-sm text-[15px] font-medium leading-relaxed text-[#667085] sm:text-[16px]">
               Quick answers about profiles, verification, learning and how
-              Stella Careers works.
+              Gemini Jobs works.
             </p>
             <Link
               href={signupHref}
@@ -495,7 +496,7 @@ export function HomeFaqStrip() {
                   <ChevronDown className="h-4 w-4 shrink-0 text-[#246BFD] transition-transform duration-300 group-open:rotate-180" />
                 </summary>
                 <p className="border-t border-slate-100 pb-4 pt-3 text-[13.5px] leading-relaxed text-slate-600 sm:text-sm">
-                  {item.a}
+                  {brandText(item.a)}
                 </p>
               </details>
             ))}

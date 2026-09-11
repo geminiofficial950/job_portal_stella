@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import BrandLogo from "@/app/components/BrandLogo";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { toast } from "react-toastify";
@@ -34,9 +35,11 @@ export default function Navbar() {
     const updateSurface = () => {
       frame = 0;
       setScrolled(window.scrollY > 8);
-      const sampleY = (headerRef.current?.getBoundingClientRect().height ?? 72) / 2;
+      const sampleY =
+        (headerRef.current?.getBoundingClientRect().height ?? 72) / 2;
       // Explicit section themes also work for gradients and photographic backgrounds.
-      const sections = document.querySelectorAll<HTMLElement>("[data-nav-theme]");
+      const sections =
+        document.querySelectorAll<HTMLElement>("[data-nav-theme]");
       let dark = false;
       for (const section of sections) {
         const bounds = section.getBoundingClientRect();
@@ -95,26 +98,18 @@ export default function Navbar() {
       data-scrolled={scrolled}
       data-tone={darkSurface ? "dark" : "light"}
     >
-      <div className="w-full px-3 sm:px-6 md:px-7 xl:px-10 2xl:px-12">
+      <div className="navbar-shell w-full px-3 sm:px-6 md:px-7 xl:px-10 2xl:px-12">
         <div className="relative flex w-full items-center gap-2 h-16 sm:h-[4.5rem] overflow-visible">
           <Link
             href="/"
             className="relative z-10 flex h-full min-h-0 min-w-0 flex-1 items-center overflow-visible select-none group"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/Geminijobscomblack.png"
-              alt="Gemini Jobs"
-              className="navbar-logo pointer-events-none h-12 w-auto max-w-[300px] object-contain object-left transition-transform duration-200 sm:h-14 sm:max-w-[360px] sm:group-hover:scale-[1.03] md:h-16 md:max-w-[420px]"
-            />
+              <BrandLogo className="navbar-logo" />
           </Link>
 
           <div className="relative z-20 flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3">
             <nav className="hidden lg:flex items-center gap-0.5">
-              <Link
-                href="/jobs"
-                className={linkClass(pathname === "/jobs")}
-              >
+              <Link href="/jobs" className={linkClass(pathname === "/jobs")}>
                 Find Jobs
               </Link>
 
@@ -170,7 +165,11 @@ export default function Navbar() {
               </Link>
             )}
 
-            <SignInMenu variant="solid" tone={darkSurface ? "dark" : "light"} className="navbar-account" />
+            <SignInMenu
+              variant="solid"
+              tone={darkSurface ? "dark" : "light"}
+              className="navbar-account"
+            />
 
             <button
               type="button"
@@ -191,7 +190,10 @@ export default function Navbar() {
       </div>
 
       {isMobileOpen && (
-        <div id="navbar-mobile-menu" className="absolute top-full inset-x-0 lg:hidden border-t border-slate-100 bg-white/95 px-4 py-3 space-y-0.5 max-h-[80vh] overflow-y-auto backdrop-blur-xl">
+        <div
+          id="navbar-mobile-menu"
+          className="absolute top-full inset-x-0 lg:hidden border-t border-slate-100 bg-white/95 px-4 py-3 space-y-0.5 max-h-[80vh] overflow-y-auto backdrop-blur-xl"
+        >
           <Link
             href="/jobs"
             onClick={() => setIsMobileOpen(false)}

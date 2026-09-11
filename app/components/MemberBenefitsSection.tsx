@@ -52,7 +52,7 @@ export default function MemberBenefitsSection() {
             </h2>
 
             <p className="mt-6 max-w-[390px] text-[16px] font-medium leading-[1.55] text-[#667085] sm:text-[17px]">
-              Stella Careers gives you the tools, support and opportunities to
+              Gemini Jobs gives you the tools, support and opportunities to
               build a brighter future.
             </p>
 

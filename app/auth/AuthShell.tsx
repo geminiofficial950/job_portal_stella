@@ -1,5 +1,6 @@
 "use client";
 
+import BrandLogo from "@/app/components/BrandLogo";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
@@ -45,6 +46,7 @@ export function AuthShell({
               <img src="/auth/hero.png" alt="" />
             </div>
 
+          <div className="mb-5"><BrandLogo /></div>
             <h1 className="auth-brand">
               {titlePrefix} <span>{titleAccent}</span>
             </h1>

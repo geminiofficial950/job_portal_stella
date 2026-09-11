@@ -74,7 +74,7 @@ function RegisterForm() {
     <AuthShell
       role={role}
       titlePrefix="Join"
-      titleAccent="Stella Careers"
+      titleAccent="Gemini Jobs"
       subtitle={
         isRecruiter
           ? "Create an employer account to post jobs."

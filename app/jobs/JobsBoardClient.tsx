@@ -9,6 +9,7 @@ import React, {
   Suspense,
 } from "react";
 import Link from "next/link";
+import BrandLogo from "@/app/components/BrandLogo";
 import { useSearchParams } from "next/navigation";
 import {
   Search,
@@ -1968,12 +1969,7 @@ function JobSearchInner({
       <div className="jobs-search-fixed">
         <div className="jobs-search-fixed-row">
           <Link href="/" className="jobs-search-fixed-logo" tabIndex={-1}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/Geminijobscomblack.png"
-              alt="Gemini Jobs"
-              className="h-12 w-auto max-w-[300px] object-contain object-left sm:h-14 sm:max-w-[360px]"
-            />
+              <BrandLogo />
           </Link>
 
           <div className="jobs-search-fixed-inner">
@@ -2344,7 +2340,7 @@ function JobSearchInner({
               >
                 Adzuna dashboard
               </a>
-              . Gemini Education and Careers jobs still show below.
+              . Gemini Jobs jobs still show below.
             </div>
           ) : null}
           {loading ? (

@@ -14,7 +14,7 @@ import {
 } from "@/lib/learningCardThemes";
 import { Course } from "@/models/Learning";
 
-export const metadata = { title: "Courses — Stella Careers" };
+export const metadata = { title: "Courses — Gemini Jobs" };
 
 export default async function CoursesPage() {
   await ensureLearningSeeded();

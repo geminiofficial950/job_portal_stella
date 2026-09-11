@@ -14,7 +14,7 @@ import {
 } from "@/lib/learningCardThemes";
 import { Masterclass } from "@/models/Learning";
 
-export const metadata = { title: "Masterclasses — Stella Careers" };
+export const metadata = { title: "Masterclasses — Gemini Jobs" };
 
 type Props = { searchParams: Promise<{ topic?: string; view?: string }> };
 

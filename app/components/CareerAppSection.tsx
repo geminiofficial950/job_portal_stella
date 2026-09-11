@@ -16,7 +16,7 @@ const TESTIMONIALS = [
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
     quote:
-      "Stella Careers made it so easy to find opportunities that match my skills. The support from the team has been amazing!",
+      "Gemini Jobs made it so easy to find opportunities that match my skills. The support from the team has been amazing!",
     name: "James T.",
     role: "Administration Officer, NSW",
   },
@@ -24,7 +24,7 @@ const TESTIMONIALS = [
     image:
       "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
     quote:
-      "I found the right opportunity much faster than I expected. Stella made the whole job search process simple.",
+      "I found the right opportunity much faster than I expected. Gemini Jobs made the whole job search process simple.",
     name: "Sarah M.",
     role: "Customer Service Officer, VIC",
   },
@@ -192,7 +192,7 @@ export default function CareerAppSection() {
             "
               >
                 <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#6758d9] xl:text-[10px]">
-                  Stella Careers
+                  Gemini Jobs
                 </p>
 
                 <h2
@@ -212,7 +212,7 @@ export default function CareerAppSection() {
                 xl:text-[28px]
               "
                 >
-                  Take your career further with the Stella app
+                  Take your career further with the Gemini Jobs app
                 </h2>
 
                 {/* FEATURES */}
@@ -382,7 +382,7 @@ function PhoneMockup({ type }: { type: "jobs" | "profile" }) {
             {/* Header */}
             <div className="flex items-center justify-between">
               <span className="text-[7px] font-bold text-[#6959de]">
-                ✦ Stella Careers
+                ✦ Gemini Jobs
               </span>
 
               <UserRound size={11} />
@@ -459,7 +459,7 @@ function JobRow({ title }: { title: string }) {
         </p>
 
         <p className="mt-0.5 truncate text-[4.5px] text-slate-400">
-          Stella Careers • Melbourne, VIC
+          Gemini Jobs • Melbourne, VIC
         </p>
       </div>
     </div>

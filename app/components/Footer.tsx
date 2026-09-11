@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import BrandLogo from "@/app/components/BrandLogo";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Mail, Share2 } from "lucide-react";
 import { STELLA_CONTACT } from "@/lib/stellaContent";
@@ -66,8 +67,7 @@ export default function Footer() {
         <div className={styles.grid}>
           <div className={styles.brand}>
             <Link href="/" className={styles.logo} aria-label="Gemini Jobs home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/Geminijobscomblack.png" alt="Gemini Jobs" width={1200} height={413} />
+              <BrandLogo />
             </Link>
             <p>AI for opportunity. People for progress.</p>
           </div>

@@ -120,7 +120,7 @@ export default function SignInMenu({
             </span>
             <span>
               <strong>Logout</strong>
-              <em>Sign out of Gemini Education and Careers</em>
+              <em>Sign out of Gemini Jobs</em>
             </span>
           </button>
         </div>

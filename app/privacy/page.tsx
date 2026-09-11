@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { STELLA_CONTACT } from "@/lib/stellaContent";
 
-export const metadata = { title: "Privacy — Stella Careers" };
+export const metadata = { title: "Privacy — Gemini Jobs" };
 
 export default function PrivacyPage() {
   return (

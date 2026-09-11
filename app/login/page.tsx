@@ -75,7 +75,7 @@ function LoginForm() {
     <AuthShell
       role={role}
       titlePrefix="Sign in to"
-      titleAccent="Stella Careers"
+      titleAccent="Gemini Jobs"
       subtitle={
         isRecruiter
           ? "Post roles and review verified candidates."

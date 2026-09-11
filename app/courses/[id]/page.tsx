@@ -1,3 +1,4 @@
+import { brandText } from "@/app/components/brandText";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ensureLearningSeeded } from "@/lib/learningStore";
@@ -35,12 +36,12 @@ export default async function CourseDetailPage({ params }: Props) {
         <p>Provider: {course.provider}</p>
         <p>Duration: {course.duration}</p>
         <p>Mode: {course.mode}</p>
-        <p>Prerequisites: {course.prerequisites}</p>
+        <p>Prerequisites: {brandText(course.prerequisites)}</p>
         <p>
           <strong>Training type:</strong> {trainingLabel}
         </p>
         <p>Price: {formatPrice(course.price)}</p>
-        <p className="mt-2">{course.accessInstructions}</p>
+        <p className="mt-2">{brandText(course.accessInstructions)}</p>
       </div>
 
       <CourseEnrolActions slug={course.slug} />

@@ -12,6 +12,7 @@ import {
   MapPin,
   Search,
   ShieldCheck,
+  Cpu,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -121,7 +122,7 @@ export default function HeroSection() {
           <p className="hero-sub mt-4 text-[15px] font-medium leading-[1.55] text-[#334155] sm:text-[16px]">
             <span className="inline-flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
               <span className="inline-flex items-center gap-1.5">
-                <Brain
+                <Cpu
                   className="h-[1em] w-[1em] shrink-0 text-[#3b59ff]"
                   strokeWidth={2.25}
                   aria-hidden

@@ -5608,8 +5608,9 @@
   outline-offset: 3px;
 }
 .gemini-home .hero-reference .hero-v2-popular {
-  margin-top: 14px;
+  margin-top: 8px;
   gap: 8px;
+  font-style: italic;
 }
 .gemini-home .hero-reference .hero-v2-popular button {
   border-color: #e9e7f0;
@@ -5617,7 +5618,7 @@
   white-space: nowrap;
 }
 .gemini-home .hero-reference .hero-v2-benefits {
-  margin-top: 20px;
+  margin-top: 12px;
   justify-content: space-between;
   gap: 14px;
 }
@@ -5748,7 +5749,7 @@
   .gemini-home .hero-reference .hero-v2-popular {
     flex-wrap: nowrap;
     gap: 0.45vw;
-    margin-top: 1vw;
+    margin-top: 8px;
   }
   .gemini-home .hero-reference .hero-v2-popular > span {
     white-space: nowrap;
@@ -5759,7 +5760,7 @@
     padding: 0.45vw 0.65vw;
   }
   .gemini-home .hero-reference .hero-v2-benefits {
-    margin-top: 1.5vw;
+    margin-top: 12px;
   }
   .gemini-home .hero-reference .hero-v2-benefits li {
     font-size: clamp(10px, 0.95vw, 19px);

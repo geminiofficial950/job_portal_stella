@@ -6,13 +6,13 @@ import { ArrowRight, Building2, Network, Pause, Play, Shapes } from "lucide-reac
 import styles from "./TalentNetworkSection.module.css";
 
 const members = [
-  { label: "Designers", x: 22, y: 24, size: 10, tone: "#eea6e9", clip: "collaboration", portrait: "09-trust-avatar-01.png" },
+  { label: "Designers", x: 22, y: 24, size: 10, tone: "#eea6e9", clip: "designer", portrait: "09-trust-avatar-01.png" },
   { label: "Engineers", x: 59, y: 15, size: 10, tone: "#9be6fa", clip: "engineering", portrait: "09-trust-avatar-04.png" },
   { label: "Product", x: 89, y: 21, size: 9, tone: "#f4c7ca", clip: "team", portrait: "09-trust-avatar-05.png" },
-  { label: "Engineers", x: 12, y: 62, size: 12, tone: "#81deef", clip: "engineering", portrait: "09-trust-avatar-02.png" },
-  { label: "Data Scientists", x: 77, y: 41, size: 11, tone: "#d99adf", clip: "engineering", portrait: "09-trust-avatar-05.png" },
-  { label: "Creators", x: 61, y: 62, size: 11, tone: "#e4b1e8", clip: "collaboration", portrait: "09-trust-avatar-03.png" },
-  { label: "Marketers", x: 41, y: 84, size: 9, tone: "#f0bb99", clip: "team", portrait: "09-trust-avatar-01.png" },
+  { label: "Engineers", x: 12, y: 62, size: 12, tone: "#81deef", clip: "developer", portrait: "09-trust-avatar-02.png" },
+  { label: "Data Scientists", x: 77, y: 41, size: 11, tone: "#d99adf", clip: "data", portrait: "09-trust-avatar-05.png" },
+  { label: "Creators", x: 61, y: 62, size: 11, tone: "#e4b1e8", clip: "creator", portrait: "09-trust-avatar-03.png" },
+  { label: "Marketers", x: 41, y: 84, size: 9, tone: "#f0bb99", clip: "marketing", portrait: "09-trust-avatar-01.png" },
 ];
 const stats = [
   { value: "50K+", label: "Skilled professionals", Icon: Network },

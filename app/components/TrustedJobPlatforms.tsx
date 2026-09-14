@@ -38,7 +38,7 @@ const PLATFORMS = [
 export default function TrustedJobPlatforms() {
   return (
     <section className="trusted-platforms w-full">
-      <div className="trusted-platforms-inner mx-auto max-w-[1450px] px-5 pb-5 pt-0 sm:px-8 sm:pb-6 lg:px-12 lg:pb-7">
+      <div className="trusted-platforms-inner w-full px-5 pb-5 pt-0 sm:px-8 sm:pb-6 lg:px-12 lg:pb-7">
         <p className="trusted-platforms-eyebrow mb-5 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-black sm:mb-6 sm:text-[11px] sm:tracking-[0.22em]">
           Jobs from top employers and leading platforms, all in one place
         </p>

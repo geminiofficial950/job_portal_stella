@@ -2,7 +2,7 @@
 .banner { position: relative; isolation: isolate; background: #102c65; border-bottom: 1px solid #3a4b713d; }
 .banner::before { content: ""; position: absolute; z-index: -2; inset: 0; background: url('/footer-mountains.jpg') center 61% / cover no-repeat; }
 .banner::after { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(100deg, #1247a99c 0%, #061d46a6 47%, #25146091 100%), linear-gradient(0deg, #031027a6, transparent 70%); }
-.bannerInner { max-width: 2048px; margin: auto; min-height: clamp(180px, 12vw, 244px); padding: 32px 5%; display: grid; grid-template-columns: 41% 1fr 13%; align-items: center; gap: 2%; }
+.bannerInner { width: 100%; margin: auto; min-height: clamp(180px, 12vw, 244px); padding: 32px 5%; display: grid; grid-template-columns: 41% 1fr 13%; align-items: center; gap: 2%; }
 .footer .banner h2 { margin: 0; font-size: clamp(34px, 2.8vw, 58px); font-weight: 750; line-height: 1.08; letter-spacing: -.03em; color: #fff; }
 .banner h2 span { color: #e550dc; }
 .footer .invitation p { margin: 0 0 25px; font-size: clamp(14px, 1.05vw, 21px); color: #c1cbe0; line-height: 1.5; }
@@ -14,7 +14,7 @@
 .handwriting { display: flex; justify-content: end; align-items: end; gap: 0; color: #bb91df; }
 .handwriting span { transform: rotate(-12deg); font-family: 'Segoe Print', 'Comic Sans MS', cursive; font-style: italic; font-size: clamp(23px, 1.75vw, 37px); line-height: 1.2; }
 .handwriting svg { width: 75px; flex-shrink: 0; margin-right: -4px; transform: translateY(23px); color: #ca70d9; }
-.body { max-width: 2048px; margin: auto; padding: 38px 5% 22px; }
+.body { width: 100%; margin: auto; padding: 38px 5% 22px; }
 .grid { display: grid; grid-template-columns: 1.9fr .85fr .85fr .75fr 1.05fr 1.85fr; gap: 30px; }
 .logo { display: block; width: 230px; max-width: 100%; margin-bottom: 18px; }
 .logo svg { width: 100%; height: auto; filter: brightness(0) invert(1); }

@@ -9,7 +9,7 @@
   background: radial-gradient(ellipse at 56% 36%, #072b67 0%, #03142e 46%, #020c1d 85%);
   border-block: none;
 }
-.shell { width: 100%; max-width: 2048px; margin: auto; display: grid; grid-template-columns: 28% minmax(0, 1fr) 17.5%; align-items: center; gap: 1.5%; padding: 22px 3.4% 22px 4.7%; }
+.shell { width: 100%; margin: auto; display: grid; grid-template-columns: 28% minmax(0, 1fr) 17.5%; align-items: center; gap: 1.5%; padding: 22px 3.4% 22px 4.7%; }
 .copy { position: relative; z-index: 2; }
 .section .copy h2 { margin: 0; color: #fff; font-size: clamp(28px, 2.65vw, 54px); line-height: 1.08; letter-spacing: -.035em; font-weight: 750; }
 .section .copy > p { margin: 28px 0 30px; max-width: 520px; font-size: clamp(14px, 1.13vw, 23px); line-height: 1.45; color: #bbc5d7; font-weight: 500; }

@@ -459,7 +459,7 @@ export function HomeFaqStrip() {
         }}
       />
 
-      <div className="relative z-[2] mx-auto max-w-[1450px] px-5 pb-8 pt-10 sm:px-8 sm:pb-9 sm:pt-12 lg:px-12 lg:pb-10 lg:pt-14">
+      <div className="relative z-[2] w-full px-5 pb-8 pt-10 sm:px-8 sm:pb-9 sm:pt-12 lg:px-12 lg:pb-10 lg:pt-14">
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:gap-12 xl:gap-16">
           <div data-home-animate className="max-w-md lg:pt-1">
             <h2 className="faq-display-title text-[2rem] font-bold leading-[1.05] tracking-[-0.04em] text-[#06143b] sm:text-[2.35rem] lg:text-[2.65rem]">
@@ -506,4 +506,3 @@ export function HomeFaqStrip() {
     </section>
   );
 }
-

@@ -42,7 +42,7 @@ export default function MemberBenefitsSection() {
 
   return (
     <section id="benefits" className="benefits-section relative overflow-hidden bg-white py-7 sm:py-8 lg:py-9">
-      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[430px_minmax(0,1fr)] xl:gap-14">
           {/* LEFT SIDE */}
           <div className="relative z-20 max-w-[440px]">

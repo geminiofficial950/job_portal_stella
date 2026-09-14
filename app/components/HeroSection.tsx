@@ -237,6 +237,7 @@ export default function HeroSection() {
             <br />A Brighter You
           </p>
 
+          <div className="hero-v2-skills-anchor">
           <div className="hero-v2-float hero-v2-float--skills absolute left-[28%] top-[32%] z-30 lg:left-[28%] lg:top-[38%]">
             <span className="hero-v2-float-icon hero-v2-float-icon--violet">
               <Brain className="h-4 w-4" strokeWidth={2.2} />
@@ -249,6 +250,8 @@ export default function HeroSection() {
                 Smarter opportunities, faster.
               </p>
             </div>
+          </div>
+
           </div>
 
           <div className="hero-v2-float hero-v2-float--people absolute right-[4%] top-[42%] z-30 lg:right-[2%] lg:top-[42%]">

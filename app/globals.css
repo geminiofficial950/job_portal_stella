@@ -473,7 +473,7 @@ body {
   background: transparent;
 }
 .site-navbar--home .navbar-shell {
-  padding-left: calc(4% + max(0px, (100% - 2048px) / 2));
+  padding-left: 4%;
 }
 @media (max-width: 639px) {
   .site-navbar--home .navbar-shell {

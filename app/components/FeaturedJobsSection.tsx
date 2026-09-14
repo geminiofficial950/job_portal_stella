@@ -159,7 +159,7 @@ export default function FeaturedJobsSection() {
 
   return (
     <section className="featured-jobs-section w-full bg-[#f4f7fb]">
-      <div className="mx-auto max-w-[1450px] px-5 py-7 sm:px-8 sm:py-8 lg:px-12 lg:py-9">
+      <div className="w-full px-5 py-7 sm:px-8 sm:py-8 lg:px-12 lg:py-9">
         <div className="mb-5 flex flex-col gap-2 sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-3">
             <h2 className="text-[1.45rem] font-bold tracking-tight text-[#0a1628] sm:text-[1.65rem]">

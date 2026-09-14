@@ -62,7 +62,7 @@ export default function CareerAppSection() {
 
   return (
     <section className="career-app-section w-full bg-white py-6 sm:py-7 lg:py-8">
-      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* LEFT TESTIMONIAL */}
           <div className="relative h-[390px] overflow-hidden rounded-[22px] sm:h-[410px] lg:h-[360px] xl:h-[380px]">

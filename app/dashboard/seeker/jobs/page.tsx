@@ -1,17 +1,11 @@
 import SeekerJobsList from "@/app/components/SeekerJobsList";
+import SeekerPageHeader from "@/app/components/SeekerPageHeader";
+import styles from "../seeker.module.css";
 
-export default function SeekerJobsPage() {
+export default function Page() {
   return (
-    <main className="px-5 py-8 sm:px-8 lg:px-10">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-[#0f172a]">
-          Open Roles
-        </h1>
-        <p className="mt-1 text-sm text-[#64748b]">
-          Live openings from approved employers on Gemini Jobs.
-        </p>
-      </div>
-
+    <main className={styles.subpage}>
+      <SeekerPageHeader title="Open Roles" subtitle="Live openings from approved employers on Gemini Jobs." section="FIND YOUR NEXT CHAPTER" icon="jobs" />
       <SeekerJobsList />
     </main>
   );

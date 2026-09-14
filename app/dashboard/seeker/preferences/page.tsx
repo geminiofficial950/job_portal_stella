@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styles from "../seeker.module.css";
+import SeekerPageHeader from "@/app/components/SeekerPageHeader";
+import { Bell, Save } from "lucide-react";
 import { toast } from "react-toastify";
 
 export default function SeekerPreferencesPage() {
@@ -52,21 +55,18 @@ export default function SeekerPreferencesPage() {
 
   if (loading) {
     return (
-      <main className="px-5 py-8">
-        <p className="text-sm text-slate-500">Loading…</p>
+      <main className={styles.subpage}>
+        <p className={styles.loadingState}>Loading…</p>
       </main>
     );
   }
 
   return (
-    <main className="px-5 py-8 sm:px-8 lg:px-10">
-      <h1 className="text-2xl font-bold text-[#0f172a]">Reminder preferences</h1>
-      <p className="mt-1 max-w-2xl text-sm text-slate-500">
-        L07 — control job, session, course and event reminders. Service
-        confirmations stay separate from optional marketing. Learning records
-        remain private to authorised users.
-      </p>
-      <form onSubmit={save} className="mt-6 max-w-md space-y-3">
+    <main className={styles.subpage}>
+      <SeekerPageHeader title="Reminder preferences" subtitle="Control job, session, course and event reminders." section="STAY IN THE LOOP, ON YOUR TERMS" icon="preferences" />
+      <div className={styles.preferencesGrid}>
+      <form onSubmit={save} className={styles.preferencesForm}>
+        <div className={styles.formSectionHeading}><Bell size={19} /><div><h2>Your reminders</h2><p>Choose which updates you’d like to receive.</p></div></div>
         {(
           [
             ["jobs", "Job alerts"],
@@ -76,7 +76,7 @@ export default function SeekerPreferencesPage() {
             ["marketing", "Optional marketing (opt-in)"],
           ] as const
         ).map(([key, label]) => (
-          <label key={key} className="flex items-center gap-2 text-sm">
+          <label key={key} className={styles.preferenceRow}>
             <input
               type="checkbox"
               checked={prefs[key]}
@@ -87,7 +87,7 @@ export default function SeekerPreferencesPage() {
             {label}
           </label>
         ))}
-        <label className="block text-sm font-medium">
+        <label className={styles.frequencyField}>
           Frequency
           <select
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"
@@ -104,11 +104,13 @@ export default function SeekerPreferencesPage() {
         </label>
         <button
           type="submit"
-          className="rounded-lg bg-[#00082C] px-4 py-2.5 text-sm font-semibold text-white"
+          className={styles.formButton}
         >
-          Save preferences
+          <Save size={16} /> Save preferences
         </button>
       </form>
+      <aside className={styles.preferencesNote}><span className={styles.pageIcon}><Bell size={24} /></span><h2>A little less noise.<br />More of what matters.</h2><p>Service confirmations stay separate from optional marketing. Learning records remain private to authorised users.</p></aside>
+      </div>
     </main>
   );
 }

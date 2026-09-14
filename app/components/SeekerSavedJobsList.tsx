@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "@/app/dashboard/seeker/seeker.module.css";
+
 import {
   useCallback,
   useEffect,
@@ -163,7 +165,7 @@ export default function SeekerSavedJobsList() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-[#6b7a9e]">
+      <div className={`${styles.loadingState} flex items-center gap-2 text-[#a1b0c7]`}>
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading saved jobs…
       </div>
@@ -172,17 +174,17 @@ export default function SeekerSavedJobsList() {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#cdd3e0] bg-white px-6 py-16 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f1f5f9] text-[#64748b]">
+      <div className={`${styles.emptyState} rounded-2xl border border-dashed border-[#2d4463] bg-[#131d30] px-6 py-16 text-center`}>
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#19283e] text-[#a1b0c7]">
           <BookmarkX className="h-7 w-7" />
         </div>
-        <p className="text-lg font-bold text-[#1e293b]">No saved jobs</p>
-        <p className="mt-2 text-sm text-[#6b7a9e]">
+        <p className="text-lg font-bold text-[#e5edf9]">No saved jobs</p>
+        <p className="mt-2 text-sm text-[#a1b0c7]">
           Bookmark roles from Find Jobs and they&apos;ll land here.
         </p>
         <Link
           href="/jobs"
-          className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0f2744]"
+          className={`${styles.formButton} mt-5 inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#2563eb]`}
         >
           <Briefcase className="h-4 w-4" />
           Find jobs
@@ -267,7 +269,7 @@ export default function SeekerSavedJobsList() {
                     ) : null}
                   </div>
                   {item.createdAt ? (
-                    <p className="mt-2 text-xs text-[#94a3b8]">
+                    <p className="mt-2 text-xs text-[#a1b0c7]">
                       Saved{" "}
                       {new Date(item.createdAt).toLocaleDateString("en-AU", {
                         day: "numeric",
@@ -310,7 +312,7 @@ export default function SeekerSavedJobsList() {
 
               <div className="jobs-card-actions">
                 <div className="flex items-stretch gap-2">
-                  <span className="inline-flex flex-1 items-center justify-center rounded-full border border-[#fbcfe8] bg-[#fdf2f8] px-3 py-2 text-xs font-bold text-[#9d174d]">
+                  <span className="inline-flex flex-1 items-center justify-center rounded-full border border-[#2d4463] bg-[#19283e] px-3 py-2 text-xs font-bold text-[#a1b0c7]">
                     Saved
                   </span>
                   <button
@@ -319,7 +321,7 @@ export default function SeekerSavedJobsList() {
                     onClick={() => void removeSaved(item)}
                     title="Remove"
                     aria-label="Remove saved job"
-                    className="inline-flex shrink-0 items-center justify-center rounded-full border border-[#fecdd3] bg-[#fff1f2] px-2.5 text-[#9f1239] hover:bg-[#ffe4e6] disabled:opacity-60"
+                    className="inline-flex shrink-0 items-center justify-center rounded-full border border-[#2d4463] bg-[#19283e] px-2.5 text-[#a1b0c7] hover:bg-[#19283e] disabled:opacity-60"
                   >
                     {removing ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -342,6 +344,7 @@ export default function SeekerSavedJobsList() {
       </div>
 
       <HomeJobDetailModal
+        className={styles.jobModal}
         job={selectedJob}
         onClose={() => setSelectedJob(null)}
       />

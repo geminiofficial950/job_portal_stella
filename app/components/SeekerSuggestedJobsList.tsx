@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "@/app/dashboard/seeker/seeker.module.css";
+
 import {
   useCallback,
   useEffect,
@@ -8,7 +10,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { Loader2, Sparkles, Briefcase, UserRound } from "lucide-react";
+import { Loader2, Search, Briefcase, UserRound } from "lucide-react";
 import { jobOffersVisaSponsorship } from "@/lib/visa-sponsorship";
 import HomeJobDetailModal, {
   type HomeModalJob,
@@ -158,7 +160,7 @@ export default function SeekerSuggestedJobsList() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-[#6b7a9e]">
+      <div className={`${styles.loadingState} flex items-center gap-2 text-[#a1b0c7]`}>
         <Loader2 className="h-4 w-4 animate-spin" />
         Finding roles that match your skills…
       </div>
@@ -167,18 +169,18 @@ export default function SeekerSuggestedJobsList() {
 
   if (!hasSkills) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#cdd3e0] bg-white px-6 py-16 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f1f5f9] text-[#64748b]">
+      <div className={`${styles.emptyState} rounded-2xl border border-dashed border-[#2d4463] bg-[#131d30] px-6 py-16 text-center`}>
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#19283e] text-[#a1b0c7]">
           <UserRound className="h-7 w-7" />
         </div>
-        <p className="text-lg font-bold text-[#1e293b]">Add skills first</p>
-        <p className="mt-2 text-sm text-[#6b7a9e]">
+        <p className="text-lg font-bold text-[#e5edf9]">Add skills first</p>
+        <p className="mt-2 text-sm text-[#a1b0c7]">
           Suggested jobs are based on your profile skills. Add a few to unlock
           matches.
         </p>
         <Link
           href="/dashboard/seeker/profile"
-          className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0f2744]"
+          className={`${styles.formButton} mt-5 inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#2563eb]`}
         >
           <UserRound className="h-4 w-4" />
           Complete profile
@@ -189,26 +191,26 @@ export default function SeekerSuggestedJobsList() {
 
   if (jobs.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#cdd3e0] bg-white px-6 py-16 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f1f5f9] text-[#64748b]">
-          <Sparkles className="h-7 w-7" />
+      <div className={`${styles.emptyState} rounded-2xl border border-dashed border-[#2d4463] bg-[#131d30] px-6 py-16 text-center`}>
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#19283e] text-[#a1b0c7]">
+          <Search className="h-7 w-7" />
         </div>
-        <p className="text-lg font-bold text-[#1e293b]">No matches yet</p>
-        <p className="mt-2 text-sm text-[#6b7a9e]">
+        <p className="text-lg font-bold text-[#e5edf9]">No matches yet</p>
+        <p className="mt-2 text-sm text-[#a1b0c7]">
           We couldn&apos;t find open roles for your current skills. Browse all
           jobs or update your profile.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/jobs"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0f2744]"
+            className={`${styles.formButton} inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#2563eb]`}
           >
             <Briefcase className="h-4 w-4" />
             Browse all jobs
           </Link>
           <Link
             href="/dashboard/seeker/profile"
-            className="inline-flex items-center gap-2 rounded-xl border border-[#cdd3e0] bg-white px-4 py-2.5 text-sm font-semibold text-[#1e3a5f] hover:bg-[#f8fafc]"
+            className="inline-flex items-center gap-2 rounded-xl border border-[#2d4463] bg-[#131d30] px-4 py-2.5 text-sm font-semibold text-[#8ab4ff] hover:bg-[#19283e]"
           >
             Update skills
           </Link>
@@ -339,8 +341,8 @@ export default function SeekerSuggestedJobsList() {
                 <span
                   className={`inline-flex items-center justify-center rounded-full border px-3 py-2 text-xs font-bold ${
                     job.applied
-                      ? "border-[#a7f3d0] bg-[#d1fae5] text-[#065f46]"
-                      : "border-[#bfdbfe] bg-[#dbeafe] text-[#1e40af]"
+                      ? "border-[#2d4463] bg-[#173e38] text-[#83d8bf]"
+                      : "border-[#2d4463] bg-[#19283e] text-[#8ab4ff]"
                   }`}
                 >
                   {job.applied ? "Applied" : matchLabel}
@@ -359,6 +361,7 @@ export default function SeekerSuggestedJobsList() {
       </div>
 
       <HomeJobDetailModal
+        className={styles.jobModal}
         job={selectedJob}
         alreadyApplied={Boolean(
           selectedJob &&

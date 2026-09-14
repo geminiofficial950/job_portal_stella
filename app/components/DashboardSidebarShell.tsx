@@ -37,6 +37,8 @@ type Props = {
   brandIcon: LucideIcon;
   groups: DashNavGroup[];
   footer?: React.ReactNode;
+  sidebarClassName?: string;
+  menuButtonClassName?: string;
 };
 
 export default function DashboardSidebarShell({
@@ -45,6 +47,8 @@ export default function DashboardSidebarShell({
   brandIcon: BrandIcon,
   groups,
   footer,
+  sidebarClassName = "",
+  menuButtonClassName = "",
 }: Props) {
   const pathname = usePathname();
   const router = useRouter();
@@ -69,7 +73,7 @@ export default function DashboardSidebarShell({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 left-5 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full text-white shadow-xl lg:hidden"
+        className={`${menuButtonClassName} fixed bottom-5 left-5 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full text-white shadow-xl lg:hidden`}
         style={{ background: DASH.accent }}
         aria-label="Open menu"
       >
@@ -86,7 +90,7 @@ export default function DashboardSidebarShell({
       ) : null}
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-[250px] flex-col border-r border-white/5 transition-transform duration-300 lg:sticky lg:z-0 lg:translate-x-0 ${
+        className={`${sidebarClassName} fixed left-0 top-0 z-50 flex h-screen w-[250px] flex-col border-r border-white/5 transition-transform duration-300 lg:sticky lg:z-0 lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{ background: DASH.panel }}
@@ -103,7 +107,7 @@ export default function DashboardSidebarShell({
           </button>
         </div>
 
-        <div className="hidden items-center gap-3 border-b border-white/10 px-5 py-5 lg:flex">
+        <div data-sidebar-brand className="hidden items-center gap-3 border-b border-white/10 px-5 py-5 lg:flex">
           <div
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-white"
             style={{ background: DASH.accent }}
@@ -134,6 +138,7 @@ export default function DashboardSidebarShell({
                     <li key={item.href}>
                       <Link
                         href={item.href}
+                        aria-current={active ? "page" : undefined}
                         onClick={() => setOpen(false)}
                         className={`group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-[13.5px] font-semibold transition-all ${
                           active
@@ -166,7 +171,7 @@ export default function DashboardSidebarShell({
           ))}
         </nav>
 
-        <div className="space-y-2 border-t border-white/10 px-3 py-4">
+        <div data-sidebar-footer className="space-y-2 border-t border-white/10 px-3 py-4">
           <Link
             href="/"
             onClick={() => setOpen(false)}

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { isValidSalaryExpectation } from "@/lib/salaryRange";
+import { validateHistory, type EducationEntry } from "@/lib/seekerHistory";
 import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
 import {
@@ -31,23 +33,6 @@ function isValidLinkedInUrl(value: string) {
   }
 }
 
-function isValidSalaryExpectation(value: string) {
-  const options = [
-    "AUD 40k–50k / year",
-    "AUD 50k–60k / year",
-    "AUD 60k–70k / year",
-    "AUD 70k–80k / year",
-    "AUD 80k–95k / year",
-    "AUD 95k–110k / year",
-    "AUD 110k–130k / year",
-    "AUD 130k–150k / year",
-    "AUD 150k–180k / year",
-    "AUD 180k–220k / year",
-    "AUD 220k+ / year",
-    "Negotiable",
-  ];
-  return options.includes(value.trim());
-}
 
 export async function GET() {
   const result = await requireApiAuth(["user"]);
@@ -118,7 +103,13 @@ export async function PATCH(request: Request) {
       const headline = String(p.headline ?? "").trim().slice(0, 120);
       const location = String(p.location ?? "").trim().slice(0, 120);
       const about = String(p.about ?? "").trim().slice(0, 2000);
-      const education = String(p.education ?? "").trim().slice(0, 200);
+      const experiences = p.experiences ?? user.seekerProfile?.experiences ?? [];
+      const educations = p.educations ?? user.seekerProfile?.educations ?? [];
+      const historyError = validateHistory(experiences, educations);
+      if (historyError) return badRequest(historyError);
+      const education = (p.educations !== undefined
+        ? educations.map((entry: EducationEntry) => [entry.degree, entry.institution].filter(Boolean).join(" - ")).join("; ")
+        : String(p.education ?? "")).trim().slice(0, 200);
       const salaryExpectation = String(p.salaryExpectation ?? "").trim().slice(0, 80);
       const linkedin = String(p.linkedin ?? "").trim().slice(0, 200);
       const portfolio = String(p.portfolio ?? "").trim().slice(0, 200);
@@ -146,7 +137,7 @@ export async function PATCH(request: Request) {
         return badRequest("Salary expectation is required");
       }
       if (!isValidSalaryExpectation(salaryExpectation)) {
-        return badRequest("Please select a salary expectation from the list");
+        return badRequest("Enter a valid minimum and maximum salary (maximum must be at least minimum)");
       }
       if (!resumeUrl) {
         return badRequest("Resume URL is required");
@@ -170,13 +161,15 @@ export async function PATCH(request: Request) {
         return badRequest("Select at least one work mode");
       }
 
-      $set.seekerProfile = {
+      const profileUpdates = {
         headline,
         location,
         about,
         skills,
         experienceLevel,
         education,
+        experiences,
+        educations,
         preferredEmploymentTypes,
         preferredWorkModes,
         salaryExpectation,
@@ -185,6 +178,8 @@ export async function PATCH(request: Request) {
         resumeUrl,
         openToWork: Boolean(p.openToWork ?? true),
       };
+      // Update only editable fields, preserving photo and discovery settings.
+      for (const [key, value] of Object.entries(profileUpdates)) $set[`seekerProfile.${key}`] = value;
     } else if (section === "notifications") {
       const n = body.notifications || {};
       $set["settings.seekerNotifications"] = {

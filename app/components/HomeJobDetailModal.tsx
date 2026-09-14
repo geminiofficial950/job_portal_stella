@@ -302,14 +302,19 @@ type Props = {
   job: HomeModalJob | null;
   onClose: () => void;
   alreadyApplied?: boolean;
+  className?: string;
   onApplied?: (jobId: string) => void;
+  /** Render into this node instead of document.body (needed inside native <dialog>). */
+  portalContainer?: HTMLElement | null;
 };
 
 export default function HomeJobDetailModal({
   job,
   onClose,
   alreadyApplied = false,
+  className = "",
   onApplied,
+  portalContainer = null,
 }: Props) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -758,7 +763,7 @@ export default function HomeJobDetailModal({
 
   return createPortal(
     <div
-      className="job-detail-modal home-job-detail-modal"
+      className={`job-detail-modal home-job-detail-modal ${className}`}
       role="dialog"
       aria-modal="true"
       aria-label="Job details"
@@ -1058,6 +1063,6 @@ export default function HomeJobDetailModal({
         </div>
       </div>
     </div>,
-    document.body,
+    portalContainer || document.body,
   );
 }

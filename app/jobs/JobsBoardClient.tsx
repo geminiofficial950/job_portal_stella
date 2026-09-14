@@ -43,6 +43,7 @@ import JobsSeekFilters, {
 import { locationSearchValue, jobMatchesLocationQuery } from "@/lib/auLocations";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import ResumeDiscoveryPopup from "@/app/components/ResumeDiscoveryPopup";
 import {
   formatAdzunaDescriptionPreview,
   stripHtmlToText,
@@ -762,9 +763,8 @@ type InitialBrowse = {
   adzuna?: { configured?: boolean; error?: string };
 };
 
-function readSeedBrowse(
+function readServerSeedBrowse(
   initialBrowse: InitialBrowse | null | undefined,
-  countryHint: string,
 ): InitialBrowse | null {
   if (
     initialBrowse?.success &&
@@ -773,7 +773,10 @@ function readSeedBrowse(
   ) {
     return initialBrowse;
   }
+  return null;
+}
 
+function readClientSeedBrowse(countryHint: string): InitialBrowse | null {
   const country = (countryHint || "au").trim().toLowerCase() || "au";
   const cached =
     getClientBrowseCache(browseCacheKey({ country, fast: true })) ||
@@ -807,10 +810,8 @@ function JobSearchInner({
   const { user, loading: authLoading } = useAuth();
   const { openAuth } = useAuthModal();
 
-  const seedBrowse = readSeedBrowse(
-    initialBrowse,
-    countryFromUrl || "au",
-  );
+  // Only SSR props during first render — never sessionStorage (hydration-safe).
+  const seedBrowse = readServerSeedBrowse(initialBrowse);
   const seedJobs = (seedBrowse?.jobs ?? []).map(normalizeJobItem);
   const hasSeedJobs = seedJobs.length > 0;
   const initialJobs = hasSeedJobs
@@ -820,8 +821,6 @@ function JobSearchInner({
           qFromUrl,
           locationFromUrl,
         );
-        // Prefer matched results; if query is too narrow locally, keep seed
-        // until the API responds so the list never flashes empty.
         return matched.length > 0 ? matched : seedJobs;
       })()
     : [];
@@ -1125,15 +1124,26 @@ function JobSearchInner({
   }, [searchQuery, locationQuery, selectedCountry, loadJobs, router]);
 
   useEffect(() => {
-    // Seeded from SSR / homepage cache — show immediately, refine in background
-    if (hasSeedJobs) {
-      setLoading(false);
-      void loadJobs({
-        q: qFromUrl,
-        location: locationFromUrl,
-        country: countryFromUrl || selectedCountry,
-      });
-      return;
+    // After mount: if SSR had no seed, try session cache before network fetch.
+    if (!hasSeedJobs) {
+      const cached = readClientSeedBrowse(countryFromUrl || "au");
+      if (cached?.jobs?.length) {
+        const normalized = cached.jobs.map(normalizeJobItem);
+        const matched = filterJobsBySearch(
+          normalized,
+          qFromUrl,
+          locationFromUrl,
+        );
+        const next = matched.length > 0 ? matched : normalized;
+        setJobs(next);
+        setPopularSeedJobs(normalized);
+        popularSeedRef.current = normalized;
+        jobsCountRef.current = next.length;
+        setCompanyOptions(cached.companies ?? []);
+        setCategories(["All", ...(cached.categories ?? [])]);
+        setCountryOptions(cached.countries ?? []);
+        setLoading(false);
+      }
     }
 
     void loadJobs({
@@ -2747,12 +2757,11 @@ export default function JobSearchPage({
 }: {
   initialBrowse?: InitialBrowse | null;
 }) {
-  const hasSeed =
-    Boolean(
-      initialBrowse?.success &&
-        Array.isArray(initialBrowse.jobs) &&
-        initialBrowse.jobs.length > 0,
-    ) || Boolean(getClientBrowseCache()?.jobs?.length);
+  const hasSeed = Boolean(
+    initialBrowse?.success &&
+      Array.isArray(initialBrowse.jobs) &&
+      initialBrowse.jobs.length > 0,
+  );
 
   return (
     <Suspense
@@ -2767,6 +2776,7 @@ export default function JobSearchPage({
         )
       }
     >
+      <ResumeDiscoveryPopup delayMs={0} surface="jobs" />
       <JobSearchInner initialBrowse={initialBrowse} />
     </Suspense>
   );

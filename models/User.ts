@@ -87,6 +87,10 @@ const UserSchema = new Schema(
         required: false,
       },
       education: { type: String, trim: true, maxlength: 200, default: "" },
+      photoUrl: { type: String, default: "" },
+      photoPublicId: { type: String, default: "" },
+      experiences: { type: [{ _id: false, company: String, title: String, description: String, skills: [String] }], default: [] },
+      educations: { type: [{ _id: false, institution: String, degree: String, description: String, skills: [String] }], default: [] },
       preferredEmploymentTypes: { type: [String], default: [] },
       preferredWorkModes: { type: [String], default: [] },
       salaryExpectation: { type: String, trim: true, maxlength: 80, default: "" },
@@ -272,6 +276,9 @@ export function serializeRecruiterSettings(user: {
 
 export function defaultSeekerProfile() {
   return {
+    photoUrl: "",
+    experiences: [] as import("@/lib/seekerHistory").ExperienceEntry[],
+    educations: [] as import("@/lib/seekerHistory").EducationEntry[],
     headline: "",
     location: "",
     about: "",
@@ -320,6 +327,9 @@ export function serializeSeekerProfile(user: {
   authProvider?: string | null;
   role: string;
   seekerProfile?: {
+    photoUrl?: string | null;
+    experiences?: import("@/lib/seekerHistory").ExperienceEntry[] | null;
+    educations?: import("@/lib/seekerHistory").EducationEntry[] | null;
     headline?: string | null;
     location?: string | null;
     about?: string | null;
@@ -369,6 +379,9 @@ export function serializeSeekerProfile(user: {
       role: user.role,
     },
     profile: {
+      photoUrl: p?.photoUrl ?? "",
+      experiences: p?.experiences ?? [],
+      educations: p?.educations?.length ? p.educations : p?.education ? [{ institution: p.education, degree: "", description: "", skills: [] }] : [],
       headline: p?.headline ?? d.headline,
       location: p?.location ?? d.location,
       about: p?.about ?? d.about,

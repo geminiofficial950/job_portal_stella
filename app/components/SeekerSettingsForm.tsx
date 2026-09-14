@@ -1,11 +1,13 @@
 "use client";
 
+import styles from "@/app/dashboard/seeker/seeker.module.css";
+
 import { FormEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Loader2, Save, Bell, UserRound, Lock } from "lucide-react";
 
 const inputClass =
-  "w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626]";
+  "w-full rounded-lg border border-[#2d4463] px-3.5 py-3 text-[15px] outline-none focus:border-[#2d4463]";
 
 function Toggle({
   checked,
@@ -19,24 +21,25 @@ function Toggle({
   hint?: string;
 }) {
   return (
-    <label className="flex items-start justify-between gap-4 rounded-xl border border-[#eef1f7] px-4 py-3">
+    <label className="flex items-start justify-between gap-4 rounded-xl border border-[#2d4463] px-4 py-3">
       <span>
-        <span className="block text-sm font-medium text-[#1e293b]">{label}</span>
+        <span className="block text-sm font-medium text-[#e5edf9]">{label}</span>
         {hint ? (
-          <span className="mt-0.5 block text-xs text-[#6b7a9e]">{hint}</span>
+          <span className="mt-0.5 block text-xs text-[#a1b0c7]">{hint}</span>
         ) : null}
       </span>
       <button
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-label={label}
         onClick={() => onChange(!checked)}
         className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors ${
-          checked ? "bg-[#dc2626]" : "bg-[#cdd3e0]"
+          checked ? "bg-[#2563eb]" : "bg-[#19283e]"
         }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
+          className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-[#131d30] transition-transform ${
             checked ? "translate-x-5" : "translate-x-0"
           }`}
         />
@@ -117,7 +120,7 @@ export default function SeekerSettingsForm() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-[#6b7a9e]">
+      <div className={`${styles.loadingState} flex items-center gap-2 text-[#a1b0c7]`}>
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading settings…
       </div>
@@ -125,10 +128,10 @@ export default function SeekerSettingsForm() {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-[#e6eaf2] bg-white p-5 sm:p-6">
+    <div className={styles.settingsGrid}>
+      <section className={`${styles.surface} rounded-2xl border border-[#2d4463] bg-[#131d30] p-5 sm:p-6`}>
         <div className="mb-4 flex items-center gap-2">
-          <UserRound className="h-4 w-4 text-[#6b7a9e]" />
+          <UserRound className="h-4 w-4 text-[#a1b0c7]" />
           <h2 className="font-semibold">Account</h2>
         </div>
         <form
@@ -163,7 +166,7 @@ export default function SeekerSettingsForm() {
           <button
             type="submit"
             disabled={saving === "account"}
-            className="inline-flex w-fit items-center gap-2 rounded-lg bg-[#dc2626] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+            className={`${styles.formButton} inline-flex w-fit items-center gap-2 rounded-lg bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60`}
           >
             {saving === "account" ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -175,9 +178,9 @@ export default function SeekerSettingsForm() {
         </form>
       </section>
 
-      <section className="rounded-2xl border border-[#e6eaf2] bg-white p-5 sm:p-6">
+      <section className={`${styles.surface} rounded-2xl border border-[#2d4463] bg-[#131d30] p-5 sm:p-6`}>
         <div className="mb-4 flex items-center gap-2">
-          <Bell className="h-4 w-4 text-[#6b7a9e]" />
+          <Bell className="h-4 w-4 text-[#a1b0c7]" />
           <h2 className="font-semibold">Notifications</h2>
         </div>
         <div className="space-y-2">
@@ -216,7 +219,7 @@ export default function SeekerSettingsForm() {
           type="button"
           disabled={saving === "notifications"}
           onClick={() => save("notifications", { notifications })}
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#dc2626] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          className={`${styles.formButton} mt-4 inline-flex items-center gap-2 rounded-lg bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60`}
         >
           {saving === "notifications" ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -228,9 +231,9 @@ export default function SeekerSettingsForm() {
       </section>
 
       {authProvider === "local" ? (
-        <section className="rounded-2xl border border-[#e6eaf2] bg-white p-5 sm:p-6">
+        <section className={`${styles.surface} rounded-2xl border border-[#2d4463] bg-[#131d30] p-5 sm:p-6`}>
           <div className="mb-4 flex items-center gap-2">
-            <Lock className="h-4 w-4 text-[#6b7a9e]" />
+            <Lock className="h-4 w-4 text-[#a1b0c7]" />
             <h2 className="font-semibold">Password</h2>
           </div>
           <form
@@ -268,7 +271,7 @@ export default function SeekerSettingsForm() {
             <button
               type="submit"
               disabled={saving === "password"}
-              className="inline-flex w-fit items-center gap-2 rounded-lg border border-[#cdd3e0] bg-white px-4 py-2.5 text-sm font-semibold disabled:opacity-60"
+              className="inline-flex w-fit items-center gap-2 rounded-lg border border-[#2d4463] bg-[#131d30] px-4 py-2.5 text-sm font-semibold disabled:opacity-60"
             >
               {saving === "password" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

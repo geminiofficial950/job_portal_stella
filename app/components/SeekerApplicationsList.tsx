@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "@/app/dashboard/seeker/seeker.module.css";
+
 import {
   useCallback,
   useEffect,
@@ -87,11 +89,11 @@ function appToModalJob(app: AppItem): HomeModalJob | null {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  pending: "bg-[#fef3c7] text-[#92400e] border-[#fde68a]",
-  reviewing: "bg-[#dbeafe] text-[#1e40af] border-[#bfdbfe]",
-  shortlisted: "bg-[#d1fae5] text-[#065f46] border-[#a7f3d0]",
-  rejected: "bg-[#fee2e2] text-[#991b1b] border-[#fecaca]",
-  hired: "bg-[#ede9fe] text-[#5b21b6] border-[#ddd6fe]",
+  pending: "bg-[#3e332c] text-[#e1bd95] border-[#2d4463]",
+  reviewing: "bg-[#19283e] text-[#8ab4ff] border-[#2d4463]",
+  shortlisted: "bg-[#173e38] text-[#83d8bf] border-[#2d4463]",
+  rejected: "bg-[#402a38] text-[#f0a8b4] border-[#2d4463]",
+  hired: "bg-[#25385b] text-[#8ab4ff] border-[#2d4463]",
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -178,7 +180,7 @@ export default function SeekerApplicationsList() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-[#6b7a9e]">
+      <div className={`${styles.loadingState} flex items-center gap-2 text-[#a1b0c7]`}>
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading applications…
       </div>
@@ -187,17 +189,17 @@ export default function SeekerApplicationsList() {
 
   if (apps.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#cdd3e0] bg-white px-6 py-16 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f1f5f9] text-[#64748b]">
+      <div className={`${styles.emptyState} rounded-2xl border border-dashed border-[#2d4463] bg-[#131d30] px-6 py-16 text-center`}>
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#19283e] text-[#a1b0c7]">
           <Inbox className="h-7 w-7" />
         </div>
-        <p className="text-lg font-bold text-[#1e293b]">No applications yet</p>
-        <p className="mt-2 text-sm text-[#6b7a9e]">
+        <p className="text-lg font-bold text-[#e5edf9]">No applications yet</p>
+        <p className="mt-2 text-sm text-[#a1b0c7]">
           Browse open roles and apply — they&apos;ll show up here.
         </p>
         <Link
           href="/jobs"
-          className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0f2744]"
+          className={`${styles.formButton} mt-5 inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#2563eb]`}
         >
           <Briefcase className="h-4 w-4" />
           Find jobs
@@ -282,7 +284,7 @@ export default function SeekerApplicationsList() {
                     ) : null}
                   </div>
                   {app.createdAt ? (
-                    <p className="mt-2 text-xs text-[#94a3b8]">
+                    <p className="mt-2 text-xs text-[#a1b0c7]">
                       Applied{" "}
                       {new Date(app.createdAt).toLocaleDateString("en-AU", {
                         day: "numeric",
@@ -292,7 +294,7 @@ export default function SeekerApplicationsList() {
                     </p>
                   ) : null}
                   {app.statusNote ? (
-                    <p className="mt-1 text-sm text-[#475569]">
+                    <p className="mt-1 text-sm text-[#e5edf9]">
                       Note: {app.statusNote}
                     </p>
                   ) : null}
@@ -332,7 +334,7 @@ export default function SeekerApplicationsList() {
                 <span
                   className={`inline-flex items-center justify-center rounded-full border px-3 py-2 text-xs font-bold ${
                     STATUS_STYLE[app.status] ||
-                    "border-[#e2e8f0] bg-[#f8fafc] text-[#475569]"
+                    "border-[#2d4463] bg-[#19283e] text-[#e5edf9]"
                   }`}
                 >
                   {app.statusLabel}
@@ -415,6 +417,7 @@ export default function SeekerApplicationsList() {
       </div>
 
       <HomeJobDetailModal
+        className={styles.jobModal}
         job={selectedJob}
         onClose={() => setSelectedJob(null)}
         alreadyApplied

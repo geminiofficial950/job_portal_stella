@@ -99,48 +99,50 @@ function toModalJob(job: FeaturedJob): HomeModalJob {
 }
 
 export default function FeaturedJobsSection() {
-  const seedJobs = (() => {
-    const cached = getClientBrowseCache(
-      browseCacheKey({ country: "au", fast: true }),
-    );
-    if (!cached?.jobs?.length) return [] as FeaturedJob[];
-    return (cached.jobs as FeaturedJob[])
-      .filter((job) => hasSalary(job))
-      .slice(0, FEATURED_LIMIT);
-  })();
-
-  const [jobs, setJobs] = useState<FeaturedJob[]>(seedJobs);
-  const [loading, setLoading] = useState(seedJobs.length === 0);
+  // Start empty on server + client so SSR HTML matches hydration.
+  // sessionStorage is only read after mount (avoids hydration mismatch).
+  const [jobs, setJobs] = useState<FeaturedJob[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<HomeModalJob | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
+    function toFeatured(list: FeaturedJob[]) {
+      return list.filter((job) => hasSalary(job)).slice(0, FEATURED_LIMIT);
+    }
+
     async function load() {
       try {
+        const cached = getClientBrowseCache(
+          browseCacheKey({ country: "au", fast: true }),
+        );
+        if (cached?.jobs?.length) {
+          if (!cancelled) {
+            setJobs(toFeatured(cached.jobs as FeaturedJob[]));
+            setLoading(false);
+          }
+        }
+
         const data =
-          getClientBrowseCache(browseCacheKey({ country: "au", fast: true })) ||
-          (await prefetchClientBrowse({ country: "au" }));
+          cached || (await prefetchClientBrowse({ country: "au" }));
 
         if (!data?.jobs?.length) {
           const res = await fetch("/api/jobs/browse?country=au&fast=1");
           if (!res.ok) throw new Error("Failed to load jobs");
           const json = await res.json();
-          setClientBrowseCache(json, browseCacheKey({ country: "au", fast: true }));
+          setClientBrowseCache(
+            json,
+            browseCacheKey({ country: "au", fast: true }),
+          );
           if (!cancelled) {
-            const paidAu = ((json.jobs || []) as FeaturedJob[])
-              .filter((job) => hasSalary(job))
-              .slice(0, FEATURED_LIMIT);
-            setJobs(paidAu);
+            setJobs(toFeatured((json.jobs || []) as FeaturedJob[]));
           }
           return;
         }
 
         if (!cancelled) {
-          const paidAu = (data.jobs as FeaturedJob[])
-            .filter((job) => hasSalary(job))
-            .slice(0, FEATURED_LIMIT);
-          setJobs(paidAu);
+          setJobs(toFeatured(data.jobs as FeaturedJob[]));
         }
       } catch {
         if (!cancelled) setJobs([]);

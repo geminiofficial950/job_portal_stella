@@ -11,7 +11,7 @@ import {
   Settings,
 } from "lucide-react";
 import DashboardSidebarShell from "./DashboardSidebarShell";
-import { DASH } from "@/app/lib/dashboardTheme";
+import styles from "@/app/dashboard/seeker/seeker.module.css";
 import type { RecruiterCompanyAccess } from "@/lib/recruiterCompanyAccess";
 
 export default function RecruiterSidebar({
@@ -37,6 +37,8 @@ export default function RecruiterSidebar({
 
   return (
     <DashboardSidebarShell
+      sidebarClassName={styles.sidebar}
+      menuButtonClassName={styles.menuButton}
       brandEyebrow="Hiring Workspace"
       brandTitle="Recruiter Panel"
       brandIcon={Briefcase}
@@ -101,8 +103,8 @@ export default function RecruiterSidebar({
       ]}
       footer={
         <div
-          className="overflow-hidden rounded-2xl border border-white/10 p-4"
-          style={{ background: DASH.panelSoft }}
+          className="overflow-hidden rounded-lg border p-4"
+          style={{ background: "var(--seeker-surface)", borderColor: "var(--seeker-line)" }}
         >
           <div className="flex items-center gap-2">
             <span
@@ -114,9 +116,9 @@ export default function RecruiterSidebar({
                     : "bg-[#fbbf24] shadow-[0_0_8px_#fbbf24]"
               }`}
             />
-            <p className="text-xs font-bold text-white">{footerTitle}</p>
+            <p className="text-xs font-bold" style={{ color: "var(--seeker-text)" }}>{footerTitle}</p>
           </div>
-          <p className="mt-1.5 text-[11px] leading-relaxed text-white/50">
+          <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: "var(--seeker-muted)" }}>
             {footerCopy}
           </p>
         </div>

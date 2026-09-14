@@ -11,11 +11,14 @@ import {
   Briefcase,
   Bell,
 } from "lucide-react";
+import styles from "@/app/dashboard/seeker/seeker.module.css";
 import DashboardSidebarShell from "./DashboardSidebarShell";
 
 export default function SeekerSidebar() {
   return (
     <DashboardSidebarShell
+      sidebarClassName={styles.sidebar}
+      menuButtonClassName={styles.menuButton}
       brandEyebrow="Career Workspace"
       brandTitle="Job Seeker Panel"
       brandIcon={Briefcase}

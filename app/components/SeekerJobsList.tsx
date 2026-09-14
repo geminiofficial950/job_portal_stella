@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "@/app/dashboard/seeker/seeker.module.css";
+
 import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -105,15 +107,15 @@ function SeekerJobsListInner() {
   return (
     <div>
       {matchedMode ? (
-        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#c5d0e0] bg-[#f1f5f9] px-4 py-3 text-sm text-[#1e3a5f]">
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-[#2d4463] bg-[#19283e] px-4 py-3 text-sm text-[#8ab4ff]">
           <Check className="h-4 w-4 shrink-0" />
           Showing jobs that match your profile skills.
         </div>
       ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]">
+      <div className={`${styles.searchBar} grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]`}>
         <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#6b7a9e]" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#a1b0c7]" />
           <input
             value={q}
             onChange={(e) => {
@@ -121,11 +123,11 @@ function SeekerJobsListInner() {
               setQ(e.target.value);
             }}
             placeholder="Title, skill, category..."
-            className="w-full rounded-lg border border-[#cdd3e0] bg-white py-2.5 pr-3 pl-9 text-sm outline-none focus:border-[#1e3a5f]"
+            className="w-full rounded-lg border border-[#2d4463] bg-[#131d30] py-2.5 pr-3 pl-9 text-sm outline-none focus:border-[#2d4463]"
           />
         </div>
         <div className="relative">
-          <MapPin className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#6b7a9e]" />
+          <MapPin className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#a1b0c7]" />
           <input
             value={location}
             onChange={(e) => {
@@ -133,7 +135,7 @@ function SeekerJobsListInner() {
               setLocation(e.target.value);
             }}
             placeholder="Location"
-            className="w-full rounded-lg border border-[#cdd3e0] bg-white py-2.5 pr-3 pl-9 text-sm outline-none focus:border-[#1e3a5f]"
+            className="w-full rounded-lg border border-[#2d4463] bg-[#131d30] py-2.5 pr-3 pl-9 text-sm outline-none focus:border-[#2d4463]"
           />
         </div>
         <button
@@ -142,23 +144,23 @@ function SeekerJobsListInner() {
             setLoading(true);
             void load();
           }}
-          className="rounded-lg bg-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-white"
+          className={`${styles.formButton} rounded-lg bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white`}
         >
           Search
         </button>
       </div>
 
       {loading ? (
-        <div className="mt-8 flex items-center gap-2 text-[#6b7a9e]">
+        <div className={`${styles.loadingState} mt-8 flex items-center gap-2 text-[#a1b0c7]`}>
           <Loader2 className="h-4 w-4 animate-spin" />
           Loading jobs…
         </div>
       ) : jobs.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-[#cdd3e0] bg-white px-6 py-16 text-center">
-          <p className="font-semibold text-[#1e293b]">
+        <div className={`${styles.emptyState} mt-8 rounded-2xl border border-dashed border-[#2d4463] bg-[#131d30] px-6 py-16 text-center`}>
+          <p className="font-semibold text-[#e5edf9]">
             {matchedMode ? "No skill matches right now" : "No open jobs yet"}
           </p>
-          <p className="mt-2 text-sm text-[#6b7a9e]">
+          <p className="mt-2 text-sm text-[#a1b0c7]">
             {matchedMode
               ? "Add more skills to your profile or browse all open roles."
               : "Check back soon — approved employers post roles here."}
@@ -169,7 +171,7 @@ function SeekerJobsListInner() {
           {jobs.map((job) => (
             <li
               key={job.id}
-              className="rounded-2xl border border-[#e6eaf2] bg-white p-5"
+              className={`${styles.surface} rounded-2xl border border-[#2d4463] bg-[#131d30] p-5`}
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex gap-3">
@@ -178,20 +180,20 @@ function SeekerJobsListInner() {
                     <img
                       src={job.company.logoUrl}
                       alt=""
-                      className="h-12 w-12 rounded-xl border border-[#e6eaf2] object-cover"
+                      className="h-12 w-12 rounded-xl border border-[#2d4463] object-cover"
                     />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#f1f5f9] text-sm font-semibold text-[#1e293b]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#19283e] text-sm font-semibold text-[#e5edf9]">
                       {(job.company?.name || "J").slice(0, 1)}
                     </div>
                   )}
                   <div>
-                    <p className="font-semibold text-[#1e293b]">{job.title}</p>
-                    <p className="mt-1 text-sm text-[#6b7a9e]">
+                    <p className="font-semibold text-[#e5edf9]">{job.title}</p>
+                    <p className="mt-1 text-sm text-[#a1b0c7]">
                       {job.company?.name || "Company"} · {job.location} ·{" "}
                       {job.employmentType} · {job.workMode}
                     </p>
-                    <p className="mt-1 text-sm text-[#4a5878]">
+                    <p className="mt-1 text-sm text-[#a1b0c7]">
                       {job.salaryCurrency} {job.salaryMin}–{job.salaryMax}/
                       {job.salaryPeriod} · {job.experienceLevel} ·{" "}
                       {job.category}
@@ -201,7 +203,7 @@ function SeekerJobsListInner() {
                         {job.skills.slice(0, 6).map((skill) => (
                           <span
                             key={skill}
-                            className="rounded-full bg-[#f1f5f9] px-2.5 py-0.5 text-xs text-[#4a5878]"
+                            className="rounded-full bg-[#19283e] px-2.5 py-0.5 text-xs text-[#a1b0c7]"
                           >
                             {skill}
                           </span>
@@ -213,7 +215,7 @@ function SeekerJobsListInner() {
                 {job.applied ? (
                   <Link
                     href="/dashboard/seeker/applications"
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#c5d0e0] bg-[#f8fafc] px-3.5 py-2 text-sm font-semibold text-[#1e3a5f]"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#2d4463] bg-[#19283e] px-3.5 py-2 text-sm font-semibold text-[#8ab4ff]"
                   >
                     <Check className="h-4 w-4" />
                     Applied
@@ -223,7 +225,7 @@ function SeekerJobsListInner() {
                     type="button"
                     disabled={applyingId === job.id}
                     onClick={() => void applyToJob(job.id)}
-                    className="shrink-0 rounded-lg bg-[#1e3a5f] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#0f2744] disabled:opacity-60"
+                    className={`${styles.formButton} shrink-0 rounded-lg bg-[#2563eb] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#2563eb] disabled:opacity-60`}
                   >
                     {applyingId === job.id ? "Applying…" : "Apply"}
                   </button>
@@ -241,7 +243,7 @@ export default function SeekerJobsList() {
   return (
     <Suspense
       fallback={
-        <div className="mt-8 flex items-center gap-2 text-[#6b7a9e]">
+        <div className={`${styles.loadingState} mt-8 flex items-center gap-2 text-[#a1b0c7]`}>
           <Loader2 className="h-4 w-4 animate-spin" />
           Loading jobs…
         </div>

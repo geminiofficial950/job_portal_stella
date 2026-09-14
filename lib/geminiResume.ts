@@ -1,11 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
+import type { ExperienceEntry } from "@/lib/seekerHistory";
 
 export type ExtractedSeekerProfile = {
+  name?: string;
+  email?: string;
+  phone?: string;
   headline: string;
   location: string;
   about: string;
   skills: string[];
   experienceLevel: "" | "entry" | "mid" | "senior";
+  experiences: ExperienceEntry[];
   education: string;
   preferredEmploymentTypes: string[];
   preferredWorkModes: string[];
@@ -23,15 +28,26 @@ The source may be a classic resume OR a LinkedIn "Save to PDF" profile. Prioriti
 - Skills / Top skills / Featured skills → skills
 - Education (highest or most recent) → education (Degree · School · Year)
 - Headline / current role title → headline
-- Experience history → experienceLevel
+- Work history / Experience section → experiences (each role) AND experienceLevel
 
 Return ONLY valid JSON (no markdown) matching this exact shape:
 {
+  "name": "full name if present else empty string",
+  "email": "email if present else empty string",
+  "phone": "phone if present else empty string",
   "headline": "short professional title, max 120 chars",
   "location": "city/region/country if present else empty string",
   "about": "2-4 sentence professional summary based on the document",
   "skills": ["skill1", "skill2"],
   "experienceLevel": "entry" | "mid" | "senior" | "",
+  "experiences": [
+    {
+      "company": "employer name",
+      "title": "job title",
+      "description": "1-3 sentence summary of the role",
+      "skills": ["skill used in this role"]
+    }
+  ],
   "education": "highest education as Degree · School · Year (or best available)",
   "preferredEmploymentTypes": [],
   "preferredWorkModes": [],
@@ -46,6 +62,7 @@ Rules:
 - about: prefer the About/Summary section text; if missing, synthesize 2-4 sentences from experience without inventing facts
 - location: use the profile location line when present
 - education: prefer Education section; one concise line
+- experiences: up to 8 roles from work history, most recent first; include company + title whenever present; description optional but preferred; do not invent employers
 - experienceLevel: entry (<2y), mid (2-6y), senior (6y+) based on work history; "" if unclear
 - preferredEmploymentTypes may only include: full-time, part-time, casual, contract
 - preferredWorkModes may only include: onsite, hybrid, remote
@@ -149,12 +166,41 @@ function normalizeExtracted(raw: unknown): ExtractedSeekerProfile {
     ? level
     : "") as ExtractedSeekerProfile["experienceLevel"];
 
+  const experiences: ExperienceEntry[] = Array.isArray(obj.experiences)
+    ? obj.experiences
+        .map((entry) => {
+          if (!entry || typeof entry !== "object") return null;
+          const row = entry as Record<string, unknown>;
+          const company = String(row.company || "").trim().slice(0, 200);
+          const title = String(row.title || "").trim().slice(0, 200);
+          if (!company && !title) return null;
+          const skills = Array.isArray(row.skills)
+            ? row.skills
+                .map((s) => String(s).trim())
+                .filter(Boolean)
+                .slice(0, 30)
+            : [];
+          return {
+            company: company || title,
+            title,
+            description: String(row.description || "").trim().slice(0, 2000),
+            skills,
+          } satisfies ExperienceEntry;
+        })
+        .filter((entry): entry is ExperienceEntry => Boolean(entry))
+        .slice(0, 8)
+    : [];
+
   return {
+    name: String(obj.name || "").trim().slice(0, 80),
+    email: String(obj.email || "").trim().toLowerCase().slice(0, 200),
+    phone: String(obj.phone || "").trim().slice(0, 40),
     headline: String(obj.headline || "").trim().slice(0, 120),
     location: String(obj.location || "").trim().slice(0, 120),
     about: String(obj.about || "").trim().slice(0, 2000),
     skills,
     experienceLevel,
+    experiences,
     education: String(obj.education || "").trim().slice(0, 200),
     preferredEmploymentTypes: employment,
     preferredWorkModes: modes,
@@ -277,6 +323,14 @@ Instructions:
   "about": "2-4 sentence professional summary",
   "skills": ["skill1", "skill2"],
   "experienceLevel": "entry" | "mid" | "senior" | "",
+  "experiences": [
+    {
+      "company": "employer name",
+      "title": "job title",
+      "description": "1-3 sentence summary of the role",
+      "skills": ["skill used in this role"]
+    }
+  ],
   "education": "highest education as Degree · School · Year (or best available)",
   "preferredEmploymentTypes": [],
   "preferredWorkModes": [],
@@ -288,6 +342,7 @@ Instructions:
 
 Rules:
 - skills: max 20 distinct skills
+- experiences: up to 8 roles from work history when available
 - about: min ~30 chars when any bio/experience exists
 - Do not invent employers, degrees, or skills that are not supported by retrieved content
 - If a field is unknown, use "" or []

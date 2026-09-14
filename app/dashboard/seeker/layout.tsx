@@ -1,8 +1,10 @@
+import { cookies } from "next/headers";
+import { SeekerThemeProvider } from "@/app/components/SeekerTheme";
 import { requireAuth } from "@/lib/requireAuth";
 import SeekerSidebar from "@/app/components/SeekerSidebar";
 import MatchedJobsNotification from "@/app/components/MatchedJobsNotification";
 import ApplicationNotifications from "@/app/components/ApplicationNotifications";
-import { DASH } from "@/app/lib/dashboardTheme";
+import styles from "./seeker.module.css";
 
 export default async function SeekerDashboardLayout({
   children,
@@ -11,10 +13,12 @@ export default async function SeekerDashboardLayout({
 }) {
   await requireAuth(["user"]);
 
+  const theme = (await cookies()).get("seeker-theme")?.value === "light" ? "light" : "dark";
+
   return (
+    <SeekerThemeProvider initialTheme={theme}>
     <div
-      className="min-h-screen text-[#0f172a] font-[family-name:var(--font-ui)]"
-      style={{ background: DASH.bg }}
+      className={`${styles.workspace} min-h-screen font-[family-name:var(--font-ui)]`}
     >
       <div className="flex min-h-screen">
         <SeekerSidebar />
@@ -23,5 +27,6 @@ export default async function SeekerDashboardLayout({
       <MatchedJobsNotification />
       <ApplicationNotifications />
     </div>
+    </SeekerThemeProvider>
   );
 }

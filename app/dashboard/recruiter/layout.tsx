@@ -3,7 +3,10 @@ import { getRecruiterCompanyAccess } from "@/lib/recruiterCompanyAccess";
 import RecruiterSidebar from "@/app/components/RecruiterSidebar";
 import RecruiterAccessShell from "@/app/components/RecruiterAccessShell";
 import ApplicationNotifications from "@/app/components/ApplicationNotifications";
-import { DASH } from "@/app/lib/dashboardTheme";
+import { cookies } from "next/headers";
+import SeekerThemeToggle, { SeekerThemeProvider } from "@/app/components/SeekerTheme";
+import seekerStyles from "../seeker/seeker.module.css";
+import styles from "./recruiter.module.css";
 
 export default async function RecruiterDashboardLayout({
   children,
@@ -12,19 +15,23 @@ export default async function RecruiterDashboardLayout({
 }) {
   const auth = await requireAuth(["recruiter"]);
   const access = await getRecruiterCompanyAccess(auth.sub);
+  const preferences = await cookies();
+  const theme = (preferences.get("recruiter-theme") ?? preferences.get("seeker-theme"))?.value === "light" ? "light" : "dark";
 
   return (
-    <div
-      className="min-h-screen text-[#0f172a] font-[family-name:var(--font-ui)]"
-      style={{ background: DASH.bg }}
-    >
+    <SeekerThemeProvider initialTheme={theme} cookieName="recruiter-theme">
+    <div className={`${seekerStyles.workspace} min-h-screen font-[family-name:var(--font-ui)]`}>
       <div className="flex min-h-screen">
         <RecruiterSidebar access={access} />
         <div className="min-w-0 flex-1 overflow-x-hidden">
+          <div className={styles.toolbar}><SeekerThemeToggle /></div>
+          <div className={styles.content}>
           <RecruiterAccessShell access={access}>{children}</RecruiterAccessShell>
+          </div>
         </div>
       </div>
       {access.approved ? <ApplicationNotifications /> : null}
     </div>
+    </SeekerThemeProvider>
   );
 }

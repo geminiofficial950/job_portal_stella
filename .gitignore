@@ -21,6 +21,7 @@
 /build
 
 # misc
+/SF-Pro.dmg
 .DS_Store
 *.pem
 .cache/

@@ -15,6 +15,7 @@ export type AuthUser = {
   email: string;
   role: "user" | "recruiter" | "admin";
   phone?: string;
+  photoUrl?: string;
 };
 
 type AuthContextValue = {
@@ -41,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: data.user.email,
           role: data.user.role,
           phone: data.user.phone,
+          photoUrl: data.user.photoUrl || "",
         });
       } else {
         setUser(null);

@@ -13,12 +13,14 @@ import {
 import { useState } from "react";
 import { DASH } from "@/app/lib/dashboardTheme";
 import { useAuth } from "./AuthProvider";
+import BrandLogo from "./BrandLogo";
 
 export type DashNavItem = {
   label: string;
   href: string;
   icon: LucideIcon;
   exact?: boolean;
+  iconTone?: "sky" | "violet" | "amber" | "rose" | "emerald" | "orange" | "cyan" | "indigo";
 };
 
 export type DashNavGroup = {
@@ -32,9 +34,11 @@ function isActive(pathname: string, href: string, exact?: boolean) {
 }
 
 type Props = {
-  brandEyebrow: string;
-  brandTitle: string;
-  brandIcon: LucideIcon;
+  brandEyebrow?: string;
+  brandTitle?: string;
+  brandIcon?: LucideIcon;
+  /** Use the site BrandLogo instead of icon + title text */
+  brandLogo?: boolean;
   groups: DashNavGroup[];
   footer?: React.ReactNode;
   sidebarClassName?: string;
@@ -45,6 +49,7 @@ export default function DashboardSidebarShell({
   brandEyebrow,
   brandTitle,
   brandIcon: BrandIcon,
+  brandLogo = false,
   groups,
   footer,
   sidebarClassName = "",
@@ -68,6 +73,40 @@ export default function DashboardSidebarShell({
     }
   }
 
+  const brandMark = brandLogo ? (
+    <Link
+      href="/"
+      aria-label="Gemini Jobs home"
+      className="block min-w-0"
+      onClick={() => setOpen(false)}
+    >
+      <BrandLogo className="sidebar-brand-logo" onDark />
+    </Link>
+  ) : (
+    <>
+      {BrandIcon ? (
+        <div
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-white"
+          style={{ background: DASH.accent }}
+        >
+          <BrandIcon className="h-5 w-5" />
+        </div>
+      ) : null}
+      <div>
+        {brandEyebrow ? (
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+            {brandEyebrow}
+          </p>
+        ) : null}
+        {brandTitle ? (
+          <p className="text-[14px] font-bold leading-tight text-white">
+            {brandTitle}
+          </p>
+        ) : null}
+      </div>
+    </>
+  );
+
   return (
     <>
       <button
@@ -90,13 +129,13 @@ export default function DashboardSidebarShell({
       ) : null}
 
       <aside
-        className={`${sidebarClassName} fixed left-0 top-0 z-50 flex h-screen w-[250px] flex-col border-r border-white/5 transition-transform duration-300 lg:sticky lg:z-0 lg:translate-x-0 ${
+        className={`${sidebarClassName} fixed left-0 top-0 z-50 flex h-screen w-[250px] flex-col transition-transform duration-300 lg:sticky lg:z-0 lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
-        }`}
-        style={{ background: DASH.panel }}
+        } ${sidebarClassName ? "" : "border-r border-white/5"}`}
+        style={sidebarClassName ? undefined : { background: DASH.panel }}
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 lg:hidden">
-          <p className="text-sm font-bold text-white">{brandTitle}</p>
+          <div className="min-w-0 flex-1 pr-2">{brandMark}</div>
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -107,27 +146,23 @@ export default function DashboardSidebarShell({
           </button>
         </div>
 
-        <div data-sidebar-brand className="hidden items-center gap-3 border-b border-white/10 px-5 py-5 lg:flex">
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-white"
-            style={{ background: DASH.accent }}
-          >
-            <BrandIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
-              {brandEyebrow}
-            </p>
-            <p className="text-[14px] font-bold leading-tight text-white">
-              {brandTitle}
-            </p>
-          </div>
+        <div
+          data-sidebar-brand
+          data-brand-logo={brandLogo ? "true" : undefined}
+          className={`hidden border-b border-white/10 px-5 lg:flex ${
+            brandLogo ? "items-center py-2.5" : "items-center gap-3 py-5"
+          }`}
+        >
+          {brandMark}
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Dashboard">
+        <nav
+          className="flex-1 overflow-y-auto px-3 py-4"
+          aria-label="Dashboard"
+        >
           {groups.map((group) => (
             <div key={group.label} className="mb-5">
-              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white/35">
+              <p className="mb-2 px-3 text-[12px] font-bold uppercase tracking-[0.12em]">
                 {group.label}
               </p>
               <ul className="space-y-1">
@@ -139,24 +174,38 @@ export default function DashboardSidebarShell({
                       <Link
                         href={item.href}
                         aria-current={active ? "page" : undefined}
+                        data-icon-tone={item.iconTone}
                         onClick={() => setOpen(false)}
                         className={`group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-[13.5px] font-semibold transition-all ${
                           active
-                            ? "text-white"
-                            : "text-white/55 hover:bg-white/5 hover:text-white"
+                            ? sidebarClassName
+                              ? "text-inherit"
+                              : "text-white"
+                            : sidebarClassName
+                              ? "text-inherit hover:bg-white/10"
+                              : "text-white/55 hover:bg-white/5 hover:text-white"
                         }`}
                         style={
-                          active ? { background: DASH.accent } : undefined
+                          active && !sidebarClassName
+                            ? { background: DASH.accent }
+                            : undefined
                         }
                       >
                         <span
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
-                            active
-                              ? "bg-white/20 text-white"
-                              : "bg-white/5 text-white/70"
+                          className={`flex shrink-0 items-center justify-center ${
+                            sidebarClassName
+                              ? "h-[34px] w-[34px] rounded-[12px] text-inherit"
+                              : `h-8 w-8 rounded-xl ${
+                                  active
+                                    ? "bg-white/20 text-white"
+                                    : "bg-white/5 text-white/70"
+                                }`
                           }`}
                         >
-                          <Icon className="h-[15px] w-[15px]" />
+                          <Icon
+                            className={sidebarClassName ? "h-4 w-4" : "h-[15px] w-[15px]"}
+                            strokeWidth={sidebarClassName ? 1.75 : 2.1}
+                          />
                         </span>
                         <span className="flex-1">{item.label}</span>
                         {active ? (
@@ -171,14 +220,17 @@ export default function DashboardSidebarShell({
           ))}
         </nav>
 
-        <div data-sidebar-footer className="space-y-2 border-t border-white/10 px-3 py-4">
+        <div
+          data-sidebar-footer
+          className="space-y-2 border-t border-white/10 px-3 py-4"
+        >
           <Link
             href="/"
             onClick={() => setOpen(false)}
             className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-[13.5px] font-semibold text-white/70 transition-all hover:bg-white/5 hover:text-white"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/5 text-white/80">
-              <Home className="h-[15px] w-[15px]" />
+            <span className={`flex shrink-0 items-center justify-center ${sidebarClassName ? "h-[34px] w-[34px] rounded-[12px]" : "h-8 w-8 rounded-xl bg-white/5 text-white/80"}`}>
+              <Home className={sidebarClassName ? "h-4 w-4" : "h-[15px] w-[15px]"} strokeWidth={sidebarClassName ? 1.75 : 2} />
             </span>
             Home
           </Link>
@@ -188,8 +240,8 @@ export default function DashboardSidebarShell({
             onClick={() => void handleLogout()}
             className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-[13.5px] font-semibold text-[#fca5a5] transition-all hover:bg-[#ef4444]/15 hover:text-white disabled:opacity-60"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#ef4444]/20 text-[#fecaca]">
-              <LogOut className="h-[15px] w-[15px]" />
+            <span className={`flex shrink-0 items-center justify-center ${sidebarClassName ? "h-[34px] w-[34px] rounded-[12px]" : "h-8 w-8 rounded-xl bg-[#ef4444]/20 text-[#fecaca]"}`}>
+              <LogOut className={sidebarClassName ? "h-4 w-4" : "h-[15px] w-[15px]"} strokeWidth={sidebarClassName ? 1.75 : 2} />
             </span>
             {loggingOut ? "Logging out…" : "Logout"}
           </button>

@@ -58,7 +58,7 @@ export default function AuthModal() {
     closeAuth();
     if (userRole === "recruiter") router.push("/dashboard/recruiter");
     else if (userRole === "admin") router.push("/dashboard/admin");
-    else router.push("/dashboard/seeker");
+    else router.push("/");
     router.refresh();
   }
 

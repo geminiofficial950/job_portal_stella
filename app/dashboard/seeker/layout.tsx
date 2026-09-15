@@ -13,16 +13,17 @@ export default async function SeekerDashboardLayout({
 }) {
   await requireAuth(["user"]);
 
-  const theme = (await cookies()).get("seeker-theme")?.value === "light" ? "light" : "dark";
+  const theme = (await cookies()).get("seeker-theme")?.value === "dark" ? "dark" : "light";
 
   return (
     <SeekerThemeProvider initialTheme={theme}>
     <div
-      className={`${styles.workspace} min-h-screen font-[family-name:var(--font-ui)]`}
+      data-seeker-finish="matte"
+      className={`${styles.workspace} ${styles.creamCanvas} min-h-screen font-[family-name:var(--font-ui)]`}
     >
       <div className="flex min-h-screen">
         <SeekerSidebar />
-        <div className="min-w-0 flex-1 overflow-x-hidden">{children}</div>
+        <div className={`${styles.mainContent} min-w-0 flex-1 overflow-x-hidden`}>{children}</div>
       </div>
       <MatchedJobsNotification />
       <ApplicationNotifications />

@@ -1,19 +1,21 @@
 "use client";
 
 import styles from "./SeekerProfileForm.module.css";
-import { isValidSalaryExpectation, parseSalaryRange } from "@/lib/salaryRange";
 import Image from "next/image";
 import SeekerProfilePreview from "./SeekerProfilePreview";
+import ResumeProfileCompletion from "./ResumeProfileCompletion";
 import SeekerHistoryFields from "./SeekerHistoryFields";
+import ProfilePhotoCropPopup from "./ProfilePhotoCropPopup";
 import { validateHistory, type ExperienceEntry, type EducationEntry } from "@/lib/seekerHistory";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { useAuth } from "./AuthProvider";
 import {
   Loader2,
   Save,
   X,
-  ExternalLink,
+  Upload,
   CheckCircle2,
   PenLine,
   ArrowLeft,
@@ -21,7 +23,6 @@ import {
   Camera,
   ArrowRight,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export type ProfileState = {
   photoUrl: string;
@@ -42,7 +43,7 @@ export type ProfileState = {
   openToWork: boolean;
 };
 
-type Mode = "choose" | "import" | "preview" | "edit";
+type Mode = "choose" | "preview" | "edit";
 
 const emptyProfile = (): ProfileState => ({
   photoUrl: "",
@@ -80,7 +81,6 @@ function validateStep(profile: ProfileState, step: number): string | null {
     if (profile.headline.trim().length < 5) return "Headline is required (min 5 characters)";
     if (profile.location.trim().length < 2) return "Location is required";
     if (!profile.experienceLevel) return "Please select experience level";
-    if (!isValidSalaryExpectation(profile.salaryExpectation)) return "Enter a valid minimum and maximum salary (maximum must be at least minimum)";
   }
   if (step === 1) return validateHistory(profile.experiences, []);
   if (step === 2) {
@@ -105,7 +105,7 @@ const EMPLOYMENT = ["full-time", "part-time", "casual", "contract"];
 const WORK_MODES = ["onsite", "hybrid", "remote"];
 
 
-function isValidHttpUrl(value: string) {
+export function isValidHttpUrl(value: string) {
   try {
     const u = new URL(value);
     return u.protocol === "http:" || u.protocol === "https:";
@@ -114,7 +114,7 @@ function isValidHttpUrl(value: string) {
   }
 }
 
-function isValidLinkedInUrl(value: string) {
+export function isValidLinkedInUrl(value: string) {
   if (!isValidHttpUrl(value)) return false;
   try {
     const host = new URL(value).hostname.replace(/^www\./, "").toLowerCase();
@@ -125,7 +125,7 @@ function isValidLinkedInUrl(value: string) {
 }
 
 
-function validateProfile(p: ProfileState): string | null {
+export function validateProfile(p: ProfileState): string | null {
   if (!p.headline.trim() || p.headline.trim().length < 5) {
     return "Headline is required (min 5 characters)";
   }
@@ -142,10 +142,6 @@ function validateProfile(p: ProfileState): string | null {
     return "Education is required";
   }
   if (!p.skills.length) return "Add at least one skill";
-  if (!p.salaryExpectation.trim()) return "Salary expectation is required";
-  if (!isValidSalaryExpectation(p.salaryExpectation)) {
-    return "Enter a valid salary range";
-  }
   if (!p.resumeUrl.trim()) return "Resume URL is required";
   if (!isValidHttpUrl(p.resumeUrl.trim())) {
     return "Resume URL must be a valid http/https link";
@@ -185,7 +181,6 @@ function hasMeaningfulProfile(p: ProfileState) {
 function mergeImportedProfile(
   current: ProfileState,
   imported: Partial<ProfileState>,
-  linkedinUrl: string,
 ): ProfileState {
   const skills = Array.isArray(imported.skills)
     ? imported.skills.map((s) => String(s).trim()).filter(Boolean).slice(0, 30)
@@ -209,7 +204,6 @@ function mergeImportedProfile(
     : [];
 
   const importedLinkedin = String(imported.linkedin || "").trim();
-  const typedLinkedin = linkedinUrl.trim();
 
   return {
     ...current,
@@ -218,22 +212,17 @@ function mergeImportedProfile(
     about: String(imported.about || "").trim() || current.about,
     skills: skills.length ? skills : current.skills,
     experienceLevel,
+    experiences: imported.experiences?.length ? imported.experiences : current.experiences,
     education: String(imported.education || "").trim() || current.education,
     educations: current.educations.length ? current.educations : imported.education ? [{ institution: imported.education, degree: "", description: "", skills: [] }] : [],
     preferredEmploymentTypes: employment.length
       ? employment
       : current.preferredEmploymentTypes,
     preferredWorkModes: modes.length ? modes : current.preferredWorkModes,
-    salaryExpectation: isValidSalaryExpectation(
-      String(imported.salaryExpectation || "").trim(),
-    )
-      ? String(imported.salaryExpectation).trim()
-      : current.salaryExpectation,
     linkedin:
       (importedLinkedin && isValidLinkedInUrl(importedLinkedin)
         ? importedLinkedin
         : "") ||
-      (typedLinkedin && isValidLinkedInUrl(typedLinkedin) ? typedLinkedin : "") ||
       current.linkedin,
     portfolio: String(imported.portfolio || "").trim() || current.portfolio,
     resumeUrl: String(imported.resumeUrl || "").trim() || current.resumeUrl,
@@ -251,12 +240,13 @@ function ProfileSectionHeading({ step, title, copy }: { step: string; title: str
 }
 
 export default function SeekerProfileForm() {
-  const router = useRouter();
+  const { refreshUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState(0);
   const [stepError, setStepError] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [mode, setMode] = useState<Mode>("choose");
   const [skillInput, setSkillInput] = useState("");
@@ -264,7 +254,9 @@ export default function SeekerProfileForm() {
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [profile, setProfile] = useState<ProfileState>(emptyProfile());
-  const [linkedinWarnings, setLinkedinWarnings] = useState<string[]>([]);
+  const resumeInput = useRef<HTMLInputElement>(null);
+  const [importError, setImportError] = useState("");
+  const [importedDraft, setImportedDraft] = useState<ProfileState | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -281,60 +273,14 @@ export default function SeekerProfileForm() {
         setUserEmail(String(data.account?.email || "").trim());
         setUserPhone(String(data.account?.phone || "").trim());
 
-        const params = new URLSearchParams(window.location.search);
-        const linkedinStatus = params.get("linkedin");
-
-        if (linkedinStatus === "error") {
-          toast.error(
-            params.get("message") || "LinkedIn import failed. Try again.",
-          );
-          setMode(hasMeaningfulProfile(next) ? "edit" : "choose");
-          router.replace("/dashboard/seeker/profile");
-        } else if (linkedinStatus === "imported") {
-          setImporting(true);
-          try {
-            const importRes = await fetch(
-              "/api/seeker/profile/linkedin/result",
-              { cache: "no-store" },
-            );
-            const importData = await importRes.json();
-            if (!importRes.ok || !importData.success) {
-              toast.error(importData.message || "LinkedIn import failed");
-              setMode(hasMeaningfulProfile(next) ? "edit" : "choose");
-            } else {
-              const merged = mergeImportedProfile(
-                next,
-                importData.profile as Partial<ProfileState>,
-                String(importData.profile?.linkedin || ""),
-              );
-              setProfile(merged);
-              if (importData.account?.name) {
-                setUserName(String(importData.account.name));
-              }
-              const warnings = Array.isArray(importData.linkedin?.warnings)
-                ? (importData.linkedin.warnings as string[])
-                : [];
-              setLinkedinWarnings(warnings);
-              toast.success(
-                importData.message ||
-                  "LinkedIn profile imported — review and save",
-              );
-              setMode("edit");
-            }
-          } finally {
-            setImporting(false);
-            router.replace("/dashboard/seeker/profile");
-          }
-        } else {
-          setMode(hasMeaningfulProfile(next) ? "preview" : "choose");
-        }
+        setMode(hasMeaningfulProfile(next) ? "preview" : "choose");
       } catch {
         toast.error("Failed to load profile");
       } finally {
         setLoading(false);
       }
     })();
-  }, [router]);
+  }, []);
 
   function addSkill() {
     const value = skillInput.trim();
@@ -385,7 +331,6 @@ export default function SeekerProfileForm() {
         return;
       }
       setProfile(data.profile);
-      setLinkedinWarnings([]);
       toast.success("Profile saved");
       setStep(0);
       if (hasMeaningfulProfile(data.profile)) setMode("preview");
@@ -396,9 +341,26 @@ export default function SeekerProfileForm() {
     }
   }
 
-  function startLinkedInOAuth() {
+  async function importResume(resumeFile: File) {
+    if (importing) return;
+    if (!resumeFile.size || resumeFile.size > 8 * 1024 * 1024) {
+      setImportError("Choose a non-empty resume under 8 MB."); return;
+    }
+    if (!/\.(pdf|docx|jpg|jpeg|png|webp)$/i.test(resumeFile.name)) {
+      setImportError("Use PDF, DOCX, JPG, PNG, or WEBP."); return;
+    }
     setImporting(true);
-    window.location.href = "/api/seeker/profile/linkedin/authorize";
+    setImportError("");
+    try {
+      const body = new FormData();
+      body.append("file", resumeFile);
+      const response = await fetch("/api/seeker/profile/parse-resume", { method: "POST", body });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || "Resume import failed. Try again.");
+      setImportedDraft(mergeImportedProfile(profile, data.profile));
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : "Resume import failed. Try again.");
+    } finally { setImporting(false); }
   }
 
   function changeStep(next: number) {
@@ -411,11 +373,34 @@ export default function SeekerProfileForm() {
     });
   }
 
-  async function uploadPhoto(file?: File) {
+  function closePhotoCrop() {
+    setCropImageSrc((current) => {
+      if (current) URL.revokeObjectURL(current);
+      return null;
+    });
+  }
+
+  function pickPhoto(file?: File) {
     if (!file) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || !file.size || file.size > 2 * 1024 * 1024) {
-      toast.error("Choose a JPG, PNG, or WebP photo under 2 MB");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Choose a JPG, PNG, or WebP photo");
       return;
+    }
+    if (!file.size || file.size > 10 * 1024 * 1024) {
+      toast.error("Choose a photo under 10 MB");
+      return;
+    }
+    setCropImageSrc((current) => {
+      if (current) URL.revokeObjectURL(current);
+      return URL.createObjectURL(file);
+    });
+  }
+
+  async function uploadPhoto(file?: File) {
+    if (!file) return false;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || !file.size || file.size > 2 * 1024 * 1024) {
+      toast.error("Cropped photo must be a JPG, PNG, or WebP under 2 MB");
+      return false;
     }
     setUploadingPhoto(true);
     try {
@@ -426,9 +411,14 @@ export default function SeekerProfileForm() {
       if (!response.ok || !data.success) throw new Error(data.message || "Photo upload failed");
       setProfile((previous) => ({ ...previous, photoUrl: data.url }));
       toast.success("Profile photo saved");
+      await refreshUser();
+      return true;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Photo upload failed");
-    } finally { setUploadingPhoto(false); }
+      return false;
+    } finally {
+      setUploadingPhoto(false);
+    }
   }
 
   if (loading) {
@@ -447,7 +437,7 @@ export default function SeekerProfileForm() {
       : `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
     : "ME";
 
-  /* ── Choose: Manual vs LinkedIn ── */
+  /* ── Choose: Manual vs Resume ── */
   if (mode === "choose") {
     return (
       <div className={`${styles.root} ${styles.profileFlow} mx-auto max-w-3xl space-y-6`}>
@@ -462,9 +452,23 @@ export default function SeekerProfileForm() {
           </p>
         </div>
 
+        {importedDraft && <ResumeProfileCompletion initial={importedDraft} onClose={() => setImportedDraft(null)} onSaved={(saved) => { setProfile(saved); setImportedDraft(null); setMode("preview"); toast.success("Profile saved"); }} />}
+        <input
+          ref={resumeInput}
+          type="file"
+          accept=".pdf,.docx,.jpg,.jpeg,.png,.webp"
+          hidden
+          disabled={importing}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) void importResume(file);
+          }}
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <button
             type="button"
+            disabled={importing}
             onClick={() => { setStep(0); setStepError(""); setMode("edit"); }}
             className={`${styles.surface} group rounded-[22px] border border-[#2d4463] bg-[#131d30] p-6 text-left shadow-[0_8px_24px_rgba(26,26,46,0.04)] transition hover:border-[#2d4463]/40 hover:shadow-[0_12px_28px_rgba(88,80,236,0.12)]`}
           >
@@ -486,92 +490,26 @@ export default function SeekerProfileForm() {
 
           <button
             type="button"
-            onClick={() => setMode("import")}
+            onClick={() => { setImportError(""); resumeInput.current?.click(); }}
+            disabled={importing}
+            aria-busy={importing}
+            aria-describedby="resume-help"
             className={`${styles.surface} group rounded-[22px] border border-[#2d4463] bg-[#131d30] p-6 text-left shadow-[0_8px_24px_rgba(26,26,46,0.04)] transition hover:border-[#2d4463]/40 hover:shadow-[0_12px_28px_rgba(10,102,194,0.12)]`}
           >
             <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2563eb] text-white">
-              <ExternalLink className="h-5 w-5" />
+              {importing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
             </span>
             <h2 className="mt-4 text-lg font-bold text-[#e5edf9]">
-              Import from LinkedIn
+              Import from Resume
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-[#a1b0c7]">
-              Sign in with LinkedIn (official OAuth) and autofill your profile.
+              Upload your resume to autofill your experience, education, and skills.
             </p>
-            <span className={styles.cardAction}>Connect LinkedIn <ArrowUpRight size={16} /></span>
+            <span className={styles.cardAction} aria-live="polite">{importing ? "Importing resume…" : "Upload resume"} <Upload size={16} /></span>
           </button>
         </div>
-      </div>
-    );
-  }
-
-  /* ── Import from LinkedIn OAuth ── */
-  if (mode === "import") {
-    return (
-      <div className={`${styles.root} ${styles.profileFlow} mx-auto max-w-xl space-y-5`}>
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className={styles.eyebrow}>YOUR PROFESSIONAL IDENTITY</p>
-            <h1 className="text-2xl font-bold tracking-tight text-[#e5edf9]">
-              Import from LinkedIn
-            </h1>
-            <p className="mt-1 text-sm text-[#a1b0c7]">
-              Official LinkedIn OAuth. With Member Data Portability access we
-              can import About, experience, education, and skills (often
-              EU/EEA/CH profiles).
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() =>
-              setMode(hasMeaningfulProfile(profile) ? "edit" : "choose")
-            }
-            className="inline-flex items-center gap-1.5 rounded-2xl border border-[#2d4463] bg-[#131d30] px-4 py-2.5 text-sm font-semibold text-[#e5edf9]"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back
-          </button>
-        </div>
-
-        <div className={`${styles.surface} space-y-4 rounded-[22px] border border-[#2d4463] bg-[#131d30] p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]`}>
-          <ol className="space-y-2 text-sm text-[#e5edf9]">
-            <li>
-              <span className="font-semibold text-[#e5edf9]">1.</span> Continue
-              with LinkedIn and approve access
-            </li>
-            <li>
-              <span className="font-semibold text-[#e5edf9]">2.</span> We fetch
-              allowed profile fields via LinkedIn APIs
-            </li>
-            <li>
-              <span className="font-semibold text-[#e5edf9]">3.</span> Review
-              autofilled form fields, then save
-            </li>
-          </ol>
-
-          <button
-            type="button"
-            onClick={startLinkedInOAuth}
-            disabled={importing}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(10,102,194,0.28)] disabled:opacity-60"
-            style={{ background: "#0a66c2" }}
-          >
-            {importing ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <ExternalLink className="h-4 w-4" />
-            )}
-            {importing ? "Redirecting to LinkedIn…" : "Continue with LinkedIn"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setStep(0); setStepError(""); setMode("edit"); }}
-            className="w-full text-center text-sm font-semibold text-[#8ab4ff] hover:underline"
-          >
-            Create manually instead
-          </button>
-        </div>
+        <p id="resume-help" className="text-sm text-[#a1b0c7]">PDF, DOCX, JPG, PNG, or WEBP · Up to 8 MB. Your resume is processed by Google Gemini to extract your profile details.</p>
+        {importError && <p role="alert" className="text-sm text-red-500">{importError}</p>}
       </div>
     );
   }
@@ -584,6 +522,7 @@ export default function SeekerProfileForm() {
   /* ── Edit form ── */
   const requiredFieldError = validateStep(normalizeHistorySkills(profile), step);
   return (
+    <>
     <form onSubmit={onSubmit} noValidate className={`${styles.root} ${styles.editForm}`}>
       <div className={`${styles.profileHeader} flex flex-wrap items-center justify-between gap-3`}>
         <div>
@@ -616,17 +555,6 @@ export default function SeekerProfileForm() {
         </div>
       </div>
 
-      {linkedinWarnings.length > 0 ? (
-        <div className="rounded-2xl border border-[#5b4938] bg-[#3e332c] px-4 py-3 text-sm text-[#e1bd95]">
-          <p className="font-semibold">LinkedIn import notes</p>
-          <ul className="mt-1 list-disc space-y-1 pl-5">
-            {linkedinWarnings.map((warning) => (
-              <li key={warning}>{warning}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
       <nav aria-label="Profile creation progress">
         <ol className={styles.stepper}>{PROFILE_STEPS.map((label, index) => <li key={label}>
           <button type="button" disabled={index > step || saving || uploadingPhoto} aria-current={index === step ? "step" : undefined} data-complete={index < step} onClick={() => changeStep(index)}>
@@ -648,7 +576,16 @@ export default function SeekerProfileForm() {
             <label className={styles.photoUpload}>
               {uploadingPhoto ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
               {uploadingPhoto ? "Uploading..." : "Change photo"}
-              <input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploadingPhoto || saving} aria-label="Upload profile photo" onChange={(event) => { void uploadPhoto(event.target.files?.[0]); event.target.value = ""; }} />
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                disabled={uploadingPhoto || saving}
+                aria-label="Upload profile photo"
+                onChange={(event) => {
+                  pickPhoto(event.target.files?.[0]);
+                  event.target.value = "";
+                }}
+              />
             </label>
             <p className="mt-3 font-bold text-[#e5edf9]">
               {userName || "Your name"}
@@ -725,19 +662,6 @@ export default function SeekerProfileForm() {
                 <option value="senior">Senior</option>
               </select>
             </label>
-            <fieldset className="sm:col-span-2">
-              <legend className={styles.fieldLabel}>Salary expectation * <small>(AUD / year)</small></legend>
-              <div className={styles.historyGrid}>
-                <label>Minimum *
-                  <input className={inputClass} type="number" inputMode="numeric" min={1} max={100000000} step={1} required placeholder="50000" value={parseSalaryRange(profile.salaryExpectation).min}
-                    onChange={(event) => setProfile((previous) => ({ ...previous, salaryExpectation: `AUD ${event.target.value}-${parseSalaryRange(previous.salaryExpectation).max} / year` }))} />
-                </label>
-                <label>Maximum *
-                  <input className={inputClass} type="number" inputMode="numeric" min={Number(parseSalaryRange(profile.salaryExpectation).min) || 1} max={100000000} step={1} required placeholder="80000" value={parseSalaryRange(profile.salaryExpectation).max}
-                    onChange={(event) => setProfile((previous) => ({ ...previous, salaryExpectation: `AUD ${parseSalaryRange(previous.salaryExpectation).min}-${event.target.value} / year` }))} />
-                </label>
-              </div>
-            </fieldset>
           </div>
         </section>
       </div>
@@ -941,5 +865,17 @@ export default function SeekerProfileForm() {
         </button>
       </div>
     </form>
+    {cropImageSrc && (
+      <ProfilePhotoCropPopup
+        imageSrc={cropImageSrc}
+        onCancel={closePhotoCrop}
+        onComplete={async (file) => {
+          const ok = await uploadPhoto(file);
+          if (ok) closePhotoCrop();
+          else throw new Error("Photo upload failed");
+        }}
+      />
+    )}
+    </>
   );
 }

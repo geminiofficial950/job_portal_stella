@@ -1,17 +1,10 @@
 import type { Metadata } from "next";
-import { DM_Mono, Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { DM_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import Providers from "./components/Providers";
 import ConditionalNavbar from "./components/ConditionalNavbar";
 import ConditionalFooter from "./components/ConditionalFooter";
+import "./fonts/sf-pro.css";
 import "./globals.css";
-
-/* Wellfound-style stack: Graphik → Inter, Aeonik Fono → DM Mono */
-const inter = Inter({
-  variable: "--font-ui",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
 
 /* Closest free match to SEEK Sans used on Seek job descriptions */
 const plusJakarta = Plus_Jakarta_Sans({
@@ -42,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-AU"
-      className={`${inter.variable} ${plusJakarta.variable} ${dmMono.variable} h-full antialiased`}
+      className={`${plusJakarta.variable} ${dmMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { isValidSalaryExpectation } from "@/lib/salaryRange";
 import { validateHistory, type EducationEntry } from "@/lib/seekerHistory";
 import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
@@ -110,7 +109,6 @@ export async function PATCH(request: Request) {
       const education = (p.educations !== undefined
         ? educations.map((entry: EducationEntry) => [entry.degree, entry.institution].filter(Boolean).join(" - ")).join("; ")
         : String(p.education ?? "")).trim().slice(0, 200);
-      const salaryExpectation = String(p.salaryExpectation ?? "").trim().slice(0, 80);
       const linkedin = String(p.linkedin ?? "").trim().slice(0, 200);
       const portfolio = String(p.portfolio ?? "").trim().slice(0, 200);
       const resumeUrl = String(p.resumeUrl ?? "").trim().slice(0, 500);
@@ -132,12 +130,6 @@ export async function PATCH(request: Request) {
       }
       if (!skills.length) {
         return badRequest("Add at least one skill");
-      }
-      if (!salaryExpectation) {
-        return badRequest("Salary expectation is required");
-      }
-      if (!isValidSalaryExpectation(salaryExpectation)) {
-        return badRequest("Enter a valid minimum and maximum salary (maximum must be at least minimum)");
       }
       if (!resumeUrl) {
         return badRequest("Resume URL is required");
@@ -172,7 +164,6 @@ export async function PATCH(request: Request) {
         educations,
         preferredEmploymentTypes,
         preferredWorkModes,
-        salaryExpectation,
         linkedin,
         portfolio,
         resumeUrl,

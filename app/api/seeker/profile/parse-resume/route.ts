@@ -15,7 +15,6 @@ const MAX_BYTES = 8 * 1024 * 1024; // 8MB
 const PDF = "application/pdf";
 const DOCX =
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-const DOC = "application/msword";
 const IMAGES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function badRequest(message: string, status = 400) {
@@ -27,7 +26,6 @@ function guessMime(file: File) {
   const name = file.name.toLowerCase();
   if (name.endsWith(".pdf")) return PDF;
   if (name.endsWith(".docx")) return DOCX;
-  if (name.endsWith(".doc")) return DOC;
   if (name.endsWith(".png")) return "image/png";
   if (name.endsWith(".jpg") || name.endsWith(".jpeg")) return "image/jpeg";
   if (name.endsWith(".webp")) return "image/webp";
@@ -45,17 +43,8 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get("file");
-    const source = String(formData.get("source") || "")
-      .trim()
-      .toLowerCase();
-    const fromLinkedIn = source === "linkedin";
-
-    if (!file || !(file instanceof File)) {
-      return badRequest(
-        fromLinkedIn
-          ? "Upload your LinkedIn profile PDF (More → Save to PDF)"
-          : "Upload a resume file (PDF, DOCX, or image)",
-      );
+    if (!(file instanceof File) || !file.size) {
+      return badRequest("Upload a non-empty resume file (PDF, DOCX, or image)");
     }
 
     if (file.size > MAX_BYTES) {
@@ -66,7 +55,6 @@ export async function POST(request: Request) {
     const allowed =
       mimeType === PDF ||
       mimeType === DOCX ||
-      mimeType === DOC ||
       IMAGES.has(mimeType);
 
     if (!allowed) {
@@ -76,7 +64,7 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     let profile;
-    if (mimeType === DOCX || mimeType === DOC) {
+    if (mimeType === DOCX) {
       const parsed = await mammoth.extractRawText({ buffer });
       const text = parsed.value?.trim();
       if (!text || text.length < 40) {
@@ -90,6 +78,10 @@ export async function POST(request: Request) {
         buffer,
         mimeType: mimeType === PDF ? PDF : mimeType,
       });
+    }
+
+    if (!profile.headline && !profile.skills.length && !profile.experiences.length) {
+      return badRequest("No career details found. Try a clearer resume.", 422);
     }
 
     let resumeUrl = "";
@@ -112,9 +104,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: fromLinkedIn
-        ? "LinkedIn profile imported — review and save"
-        : "Resume parsed successfully — review and save",
+      message: "Resume parsed successfully — review and save",
       profile: {
         ...profile,
         resumeUrl,

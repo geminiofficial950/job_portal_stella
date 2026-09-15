@@ -29,7 +29,6 @@ function isProfileReady(profile: {
   education?: string | null;
   resumeUrl?: string | null;
   linkedin?: string | null;
-  salaryExpectation?: string | null;
 } | null) {
   if (!profile) return false;
   return Boolean(
@@ -40,8 +39,7 @@ function isProfileReady(profile: {
       profile.experienceLevel &&
       profile.education?.trim() &&
       profile.resumeUrl?.trim() &&
-      profile.linkedin?.trim() &&
-      profile.salaryExpectation?.trim(),
+      profile.linkedin?.trim(),
   );
 }
 
@@ -167,7 +165,7 @@ export async function POST(request: Request) {
 
     if (!isProfileReady(user.seekerProfile || null)) {
       return badRequest(
-        "Complete your profile before applying (headline, skills, resume, LinkedIn, salary, etc.)",
+        "Complete your profile before applying (headline, skills, resume, LinkedIn, etc.)",
       );
     }
 

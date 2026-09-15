@@ -8,7 +8,6 @@ import {
   CalendarCheck,
   UserRound,
   Settings,
-  Briefcase,
   Bell,
 } from "lucide-react";
 import styles from "@/app/dashboard/seeker/seeker.module.css";
@@ -19,9 +18,7 @@ export default function SeekerSidebar() {
     <DashboardSidebarShell
       sidebarClassName={styles.sidebar}
       menuButtonClassName={styles.menuButton}
-      brandEyebrow="Career Workspace"
-      brandTitle="Job Seeker Panel"
-      brandIcon={Briefcase}
+      brandLogo
       groups={[
         {
           label: "Main Menu",

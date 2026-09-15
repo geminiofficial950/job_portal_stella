@@ -40,7 +40,7 @@ const PATH_CONTENT: Record<
     steps: [
       {
         title: "Bring what you already have",
-        desc: "Import LinkedIn, upload certificates, add overseas qualifications. Once, not ten times.",
+        desc: "Import your resume, upload certificates, add overseas qualifications. Once, not ten times.",
       },
       {
         title: "Prove the parts that matter",

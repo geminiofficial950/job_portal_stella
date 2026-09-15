@@ -3,35 +3,33 @@
 const PLATFORMS = [
   {
     name: "SEEK",
-    logo: "/logos/seek.png",
-    width: 164,
+    logo: "/logos/seek.svg",
+    width: 118,
   },
   {
     name: "Indeed",
     logo: "/logos/indeed.svg",
-    width: 120,
+    width: 100,
   },
   {
     name: "LinkedIn",
     logo: "/logos/linkedin.svg",
-    width: 120,
+    width: 100,
   },
   {
     name: "Jora",
     logo: "/logos/jora.svg",
-    width: 205,
-    offset: 39,
+    width: 130,
   },
   {
     name: "gov.au",
-    logo: "/logos/gov-au.png",
-    width: 130,
+    logo: "/logos/gov-au.svg",
+    width: 110,
   },
   {
     name: "Australian JobSearch",
     logo: "/logos/australian-jobsearch.svg",
-    width: 180,
-    offset: 28,
+    width: 140,
   },
 ] as const;
 
@@ -43,23 +41,20 @@ export default function TrustedJobPlatforms() {
           Jobs from top employers and leading platforms, all in one place
         </p>
 
-        <div className="trusted-platforms-row flex flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-10 md:flex-nowrap md:justify-between md:gap-x-5 lg:gap-x-9 xl:gap-x-12">
+        <div className="trusted-platforms-row flex flex-wrap items-center justify-center gap-x-5 gap-y-4 sm:gap-x-6 md:flex-nowrap md:gap-x-7 lg:gap-x-8">
           {PLATFORMS.map((platform) => (
             <div
               key={platform.name}
-              className="trusted-platforms-logo flex h-12 w-[140px] shrink-0 items-center justify-center overflow-hidden"
+              className="trusted-platforms-logo flex h-10 w-auto shrink-0 items-center justify-center bg-transparent"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={platform.logo}
                 alt={platform.name}
                 width={platform.width}
-                height={40}
-                className="h-auto max-w-none shrink-0 object-contain object-center"
-                style={{
-                  width: platform.width,
-                  transform: "offset" in platform ? `translateX(${platform.offset}px)` : undefined,
-                }}
+                height={36}
+                className="h-9 w-auto max-w-none shrink-0 bg-transparent object-contain object-center"
+                style={{ width: platform.width }}
                 loading="lazy"
                 decoding="async"
               />

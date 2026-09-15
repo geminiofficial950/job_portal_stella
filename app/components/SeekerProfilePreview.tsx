@@ -1,18 +1,52 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Pencil, MapPin, Mail, Phone, BriefcaseBusiness, GraduationCap, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import type { ProfileState } from "./SeekerProfileForm";
 import styles from "./SeekerProfilePreview.module.css";
 
 function Description({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const ref = useRef<HTMLParagraphElement>(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const measure = () => {
+      if (expanded) return;
+      setOverflows(el.scrollHeight > el.clientHeight + 1);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [text, expanded]);
+
   if (!text) return null;
-  const expandable = text.length > 180 || text.split("\n").length > 3;
-  return <div><p className={`${styles.description} ${expandable && !expanded ? styles.clamped : ""}`}>{text}</p>
-    {expandable && <button className={styles.textButton} type="button" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? "Show less" : "Read more"}</button>}
-  </div>;
+
+  const showToggle = overflows || expanded;
+
+  return (
+    <div>
+      <p ref={ref} className={`${styles.description} ${!expanded ? styles.clamped : ""}`}>
+        {text}
+      </p>
+      {showToggle && (
+        <button
+          className={styles.textButton}
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((value) => !value)}
+        >
+          {expanded ? "Show less" : "Read more"}
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function SeekerProfilePreview({ profile, name, email, phone, initials, onEdit }: { profile: ProfileState; name: string; email: string; phone: string; initials: string; onEdit: (step: number) => void }) {
@@ -69,7 +103,6 @@ export default function SeekerProfilePreview({ profile, name, email, phone, init
           <div className={styles.sectionHeading}><h2>Job preferences</h2>{editButton(4, "preferences")}</div>
           <dl className={styles.facts}>
             <div><dt>Level</dt><dd>{profile.experienceLevel || "Not specified"}</dd></div>
-            <div><dt>Salary</dt><dd>{profile.salaryExpectation || "Not specified"}</dd></div>
             <div><dt>Employment</dt><dd>{profile.preferredEmploymentTypes.join(", ") || "Not specified"}</dd></div>
             <div><dt>Work mode</dt><dd>{profile.preferredWorkModes.join(", ") || "Not specified"}</dd></div>
           </dl>

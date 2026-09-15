@@ -16,7 +16,7 @@ export default async function RecruiterDashboardLayout({
   const auth = await requireAuth(["recruiter"]);
   const access = await getRecruiterCompanyAccess(auth.sub);
   const preferences = await cookies();
-  const theme = (preferences.get("recruiter-theme") ?? preferences.get("seeker-theme"))?.value === "light" ? "light" : "dark";
+  const theme = (preferences.get("recruiter-theme") ?? preferences.get("seeker-theme"))?.value === "dark" ? "dark" : "light";
 
   return (
     <SeekerThemeProvider initialTheme={theme} cookieName="recruiter-theme">

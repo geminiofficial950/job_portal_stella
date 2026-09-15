@@ -1,0 +1,166 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(8, 10, 16, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.dialog {
+  width: min(440px, 100%);
+  overflow: hidden;
+  border-radius: 18px;
+  background: #111318;
+  color: #f4f4f5;
+  box-shadow: 0 28px 70px -24px rgba(0, 0, 0, 0.55);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.header h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-heading);
+}
+
+.iconBtn,
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+}
+
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: #d4d4d8;
+}
+
+.iconBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.saveBtn {
+  min-width: 72px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #f4f4f5;
+}
+
+.saveBtn:disabled,
+.iconBtn:disabled,
+.zoom:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #0a0b0f;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.dragging {
+  cursor: grabbing;
+}
+
+.image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.62);
+  -webkit-mask: radial-gradient(circle at center, transparent 55%, #000 55.4%);
+  mask: radial-gradient(circle at center, transparent 55%, #000 55.4%);
+}
+
+.circle {
+  position: absolute;
+  inset: 11%;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.92);
+  pointer-events: none;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px 6px;
+  color: #a1a1aa;
+}
+
+.zoom {
+  flex: 1;
+  accent-color: #fff;
+  cursor: pointer;
+}
+
+.hint {
+  margin: 0;
+  padding: 0 18px 16px;
+  font-size: 12px;
+  color: #71717a;
+  text-align: center;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .dialog {
+    width: min(100%, calc(100vw - 16px));
+    border-radius: 14px;
+  }
+
+  .circle {
+    inset: 10%;
+  }
+}

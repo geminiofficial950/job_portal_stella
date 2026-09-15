@@ -111,7 +111,14 @@ export default async function SeekerOverviewPage() {
       <header className={styles.topbar}>
         <div className={styles.breadcrumb}>Workspace <span>/</span> <strong>Overview</strong></div>
         <div className={styles.headerActions}><SeekerThemeToggle /><Link href="/dashboard/seeker/profile" className={styles.account} aria-label="View your profile">
-          <span className={styles.avatar}>{auth.name.trim().charAt(0).toUpperCase()}</span>
+          <span className={styles.avatar}>
+            {user?.seekerProfile?.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.seekerProfile.photoUrl} alt="" />
+            ) : (
+              auth.name.trim().charAt(0).toUpperCase()
+            )}
+          </span>
           <span>{auth.name}<small>Personal workspace</small></span>
           <ArrowUpRight size={16} />
         </Link></div>

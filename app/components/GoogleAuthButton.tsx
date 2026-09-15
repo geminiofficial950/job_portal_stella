@@ -24,7 +24,7 @@ interface GoogleAuthButtonProps {
 function redirectForRole(role: string, router: ReturnType<typeof useRouter>) {
   if (role === "recruiter") router.push("/dashboard/recruiter");
   else if (role === "admin") router.push("/dashboard/admin");
-  else router.push("/dashboard/seeker");
+  else router.push("/");
   router.refresh();
 }
 

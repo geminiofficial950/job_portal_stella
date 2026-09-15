@@ -60,7 +60,7 @@ function RegisterForm() {
       } else if (data.user?.role === "recruiter") {
         router.push("/dashboard/recruiter");
       } else {
-        router.push("/dashboard/seeker");
+        router.push("/");
       }
       router.refresh();
     } catch {

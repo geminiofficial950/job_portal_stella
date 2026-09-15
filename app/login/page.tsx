@@ -61,7 +61,7 @@ function LoginForm() {
       } else if (data.user?.role === "admin") {
         router.push("/dashboard/admin");
       } else {
-        router.push("/dashboard/seeker");
+        router.push("/");
       }
       router.refresh();
     } catch {

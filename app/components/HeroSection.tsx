@@ -239,20 +239,19 @@ export default function HeroSection() {
           </p>
 
           <div className="hero-v2-skills-anchor">
-          <div className="hero-v2-float hero-v2-float--skills absolute left-[28%] top-[32%] z-30 lg:left-[28%] lg:top-[38%]">
-            <span className="hero-v2-float-icon hero-v2-float-icon--violet">
-              <Brain className="h-4 w-4" strokeWidth={2.2} />
-            </span>
-            <div>
-              <p className="text-[13px] font-bold leading-snug text-[#0f172a]">
-                AI matches jobs to your skills
-              </p>
-              <p className="mt-0.5 text-[11px] font-medium text-slate-500">
-                Smarter opportunities, faster.
-              </p>
+            <div className="hero-v2-float hero-v2-float--skills absolute left-[28%] top-[32%] z-30 lg:left-[28%] lg:top-[38%]">
+              <span className="hero-v2-float-icon hero-v2-float-icon--violet">
+                <Brain className="h-4 w-4" strokeWidth={2.2} />
+              </span>
+              <div>
+                <p className="text-[13px] font-bold leading-snug text-[#0f172a]">
+                  AI matches jobs to your skills
+                </p>
+                <p className="mt-0.5 text-[11px] font-medium text-slate-500">
+                  Smarter opportunities, faster.
+                </p>
+              </div>
             </div>
-          </div>
-
           </div>
 
           <div className="hero-v2-float hero-v2-float--people absolute right-[4%] top-[42%] z-30 lg:right-[2%] lg:top-[42%]">

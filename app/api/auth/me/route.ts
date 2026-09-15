@@ -31,6 +31,7 @@ export async function GET() {
         email: user.email,
         role: user.role,
         phone: user.phone,
+        photoUrl: user.seekerProfile?.photoUrl || "",
       },
     });
   } catch (error) {

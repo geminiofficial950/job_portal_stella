@@ -22,9 +22,8 @@
   --grad-btn: #1e3a5f;
   --wait: #8a6206;
   --wait-soft: #fbf2df;
-  --ui:
-    var(--font-ui), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    sans-serif;
+  --ui: var(--font-sf-text);
+  --heading: var(--font-heading);
   --mono:
     var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     monospace;
@@ -64,6 +63,7 @@
 .gemini-home h2,
 .gemini-home h3 {
   margin: 0;
+  font-family: var(--heading);
   font-weight: 500;
 }
 
@@ -1222,17 +1222,9 @@
 }
 
 .gemini-home .hero-v2-title {
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    Helvetica,
-    Arial,
-    sans-serif !important;
+  font-family: var(--heading) !important;
   font-size: clamp(2.5rem, 4.6vw, 3.75rem) !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
   line-height: 1.02 !important;
   letter-spacing: -0.04em !important;
   color: #0a0f1c !important;

@@ -85,7 +85,12 @@ export default function SignInMenu({
           aria-haspopup="true"
         >
           <span className="profile-avatar" aria-hidden>
-            {initials(user.name)}
+            {user.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.photoUrl} alt="" />
+            ) : (
+              initials(user.name)
+            )}
           </span>
           <span className="profile-name">{firstName}</span>
           <ChevronDown className="signin-chevron h-3.5 w-3.5" />

@@ -7,11 +7,11 @@ import styles from "./TalentNetworkSection.module.css";
 
 const members = [
   { label: "Designers", x: 22, y: 24, size: 10, tone: "#eea6e9", clip: "designer", portrait: "09-trust-avatar-01.png" },
-  { label: "Engineers", x: 59, y: 15, size: 10, tone: "#9be6fa", clip: "engineering", portrait: "09-trust-avatar-04.png" },
+  { label: "Doctors", x: 59, y: 15, size: 10, tone: "#9be6fa", clip: "doctor", portrait: "talent-doctor.jpg" },
   { label: "Product", x: 89, y: 21, size: 9, tone: "#f4c7ca", clip: "team", portrait: "09-trust-avatar-05.png" },
   { label: "Engineers", x: 12, y: 62, size: 12, tone: "#81deef", clip: "developer", portrait: "09-trust-avatar-02.png" },
   { label: "Data Scientists", x: 77, y: 41, size: 11, tone: "#d99adf", clip: "data", portrait: "09-trust-avatar-05.png" },
-  { label: "Creators", x: 61, y: 62, size: 11, tone: "#e4b1e8", clip: "creator", portrait: "09-trust-avatar-03.png" },
+  { label: "Nurses", x: 61, y: 62, size: 11, tone: "#e4b1e8", clip: "nurse", portrait: "talent-nurse.jpg" },
   { label: "Marketers", x: 41, y: 84, size: 9, tone: "#f0bb99", clip: "marketing", portrait: "09-trust-avatar-01.png" },
 ];
 const stats = [
@@ -59,7 +59,7 @@ export default function TalentNetworkSection() {
           <Link href="/profile/setup" className={styles.cta}>Join the Talent Network <ArrowRight size={19} /></Link>
         </div>
 
-        <div className={styles.network} role="group" aria-label="A connected community of designers, engineers, creators and marketers">
+        <div className={styles.network} role="group" aria-label="A connected community of designers, doctors, engineers, data scientists, nurses and marketers">
           <svg className={styles.lines} viewBox="0 0 1000 460" fill="none" aria-hidden="true">
             <defs>
               <radialGradient id="talent-line-glow"><stop stopColor="#48aaff" stopOpacity=".9" /><stop offset="1" stopColor="#225bda" stopOpacity=".12" /></radialGradient>

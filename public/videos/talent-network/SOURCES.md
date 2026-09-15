@@ -13,3 +13,7 @@ Each of the eight circles uses a different clip. Files are served locally withou
 - marketing.mp4: https://www.pexels.com/video/team-meeting-at-the-office-6561559/
 
 License: https://www.pexels.com/license/
+
+Healthcare clips and matching preview posters:
+- doctor.mp4 / talent-doctor.jpg: RDNE Stock project — https://www.pexels.com/video/doctor-and-nurse-looking-at-camera-6130129/
+- nurse.mp4 / talent-nurse.jpg: Pavel Danilyuk — https://www.pexels.com/video/couple-talking-to-a-nurse-in-a-hospital-6997941/

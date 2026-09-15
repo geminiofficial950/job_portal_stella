@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef } from "react";
 import { BENEFIT_CARDS } from "@/lib/stellaContent";
 import { useAuth } from "@/app/components/AuthProvider";
 
@@ -31,6 +32,26 @@ const CARD_BUTTONS = [
 
 export default function MemberBenefitsSection() {
   const { user } = useAuth();
+  const marqueeRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  function scrollCards(direction: -1 | 1) {
+    const track = trackRef.current;
+    const marquee = marqueeRef.current;
+    if (!track || !marquee) return;
+    const card = track.querySelector("article");
+    if (!card) return;
+    const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+    const step = card.getBoundingClientRect().width + gap;
+    const animation = track.getAnimations()[0];
+    if (animation && typeof animation.currentTime === "number") {
+      const duration = 32000;
+      const offset = direction * step / (track.scrollWidth / 2) * duration;
+      animation.currentTime = ((animation.currentTime + offset) % duration + duration) % duration;
+    } else {
+      marquee.scrollBy({ left: direction * step, behavior: "instant" });
+    }
+  }
 
   const profileHref =
     user?.role === "user"
@@ -69,7 +90,13 @@ export default function MemberBenefitsSection() {
           </div>
 
           {/* RIGHT SIDE AUTO SCROLL */}
-          <div className="relative min-w-0 overflow-hidden">
+          <div className="benefits-carousel relative min-w-0 overflow-hidden" role="region" aria-label="Member benefits carousel">
+            <button type="button" className="benefits-scroll-button benefits-scroll-button--left" aria-label="Scroll benefits left" onClick={() => scrollCards(-1)}>
+              <ChevronLeft size={24} />
+            </button>
+            <button type="button" className="benefits-scroll-button benefits-scroll-button--right" aria-label="Scroll benefits right" onClick={() => scrollCards(1)}>
+              <ChevronRight size={24} />
+            </button>
             {/* Soft fade left */}
             <div
               aria-hidden
@@ -82,8 +109,8 @@ export default function MemberBenefitsSection() {
               className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-16 bg-gradient-to-l from-white to-transparent sm:w-24"
             /> */}
 
-            <div className="benefits-marquee overflow-hidden py-3">
-              <div className="benefits-marquee-track flex w-max gap-4 sm:gap-5">
+            <div ref={marqueeRef} className="benefits-marquee overflow-hidden py-3">
+              <div ref={trackRef} className="benefits-marquee-track flex w-max gap-4 sm:gap-5">
                 {scrollingCards.map((card, index) => {
                   const originalIndex = index % BENEFIT_CARDS.length;
 
@@ -164,8 +191,48 @@ export default function MemberBenefitsSection() {
           will-change: transform;
         }
 
-        .benefits-marquee:hover .benefits-marquee-track {
+        .benefits-carousel:has(:focus-visible) .benefits-marquee-track {
           animation-play-state: paused;
+        }
+        @media (hover: hover) {
+          .benefits-carousel:hover .benefits-marquee-track {
+            animation-play-state: paused;
+          }
+        }
+
+        .benefits-scroll-button {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 20;
+          display: grid;
+          place-items: center;
+          width: 44px;
+          height: 44px;
+          border: 1px solid #e2e8f0;
+          border-radius: 50%;
+          background: white;
+          color: #246bfd;
+          box-shadow: 0 4px 18px #06143b26;
+          cursor: pointer;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 180ms ease, background 180ms ease;
+        }
+        .benefits-scroll-button--left { left: 12px; }
+        .benefits-scroll-button--right { right: 12px; }
+        .benefits-carousel:hover .benefits-scroll-button,
+        .benefits-carousel:has(:focus-visible) .benefits-scroll-button {
+          opacity: 1;
+          pointer-events: auto;
+        }
+        .benefits-scroll-button:hover { background: #edf3ff; }
+        .benefits-scroll-button:focus-visible {
+          outline: 3px solid #246bfd;
+          outline-offset: 3px;
+        }
+        @media (hover: none) {
+          .benefits-scroll-button { opacity: 1; pointer-events: auto; }
         }
 
         @keyframes benefits-scroll {
@@ -179,6 +246,7 @@ export default function MemberBenefitsSection() {
         }
 
         @media (prefers-reduced-motion: reduce) {
+          .benefits-marquee { overflow-x: auto; scrollbar-width: none; }
           .benefits-marquee-track {
             animation: none;
           }

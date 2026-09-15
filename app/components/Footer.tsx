@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import BrandLogo from "@/app/components/BrandLogo";
+import { useAuth } from "./AuthProvider";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Mail, Share2 } from "lucide-react";
 import { STELLA_CONTACT } from "@/lib/stellaContent";
@@ -15,6 +16,7 @@ const columns = [
 ];
 
 export default function Footer() {
+  const { user, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
@@ -53,7 +55,9 @@ export default function Footer() {
             <p>Join a community of professionals and forward-thinking employers<br className={styles.desktopBreak} /> on Gemini Jobs.</p>
             <div className={styles.actions}>
               <Link href="/profile/setup" className={styles.primary}>Get Started Free <ArrowRight size={18} /></Link>
-              <Link href="/register?role=recruiter" className={styles.secondary}>I&apos;m Hiring <ArrowRight size={18} /></Link>
+              {!loading && user?.role !== "user" && (
+                <Link href="/register?role=recruiter" className={styles.secondary}>I&apos;m Hiring <ArrowRight size={18} /></Link>
+              )}
             </div>
           </div>
           <div className={styles.handwriting} aria-hidden="true">

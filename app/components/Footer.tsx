@@ -10,7 +10,6 @@ import styles from "./Footer.module.css";
 
 const columns = [
   { title: "For Job Seekers", links: [ ["Jobs", "/jobs"], ["Resume & Profile", "/profile/setup"], ["Career Support", "/#benefits"], ["Talent Network", "/#talent-network"] ] },
-  { title: "For Employers", links: [ ["Hire Talent", "/employers"], ["Post a Job", "/register?role=recruiter&next=/dashboard/recruiter/jobs/new"], ["Talent Solutions", "/recruiters"], ["Employer Account", "/register?role=recruiter"] ] },
   { title: "Company", links: [ ["Our Community", "/#talent-network"], ["Learning", "/courses"], ["Events", "/events"], ["Careers", "/jobs"] ] },
   { title: "Support", links: [ ["Help Center", `mailto:${STELLA_CONTACT.email}`], ["Contact Us", `mailto:${STELLA_CONTACT.email}`], ["Privacy Policy", "/privacy"], ["Terms of Service", "/terms"] ] },
 ];

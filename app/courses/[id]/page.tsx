@@ -8,7 +8,6 @@ import { ensureLearningSeeded } from "@/lib/learningStore";
 import { formatPrice } from "@/lib/stellaContent";
 import { Course } from "@/models/Learning";
 import InterestForm from "@/app/components/InterestForm";
-import CourseEnrolActions from "@/app/components/CourseEnrolActions";
 
 type Props = { params: Promise<{ id: string }> };
 type CourseDetails = {
@@ -25,6 +24,21 @@ export default async function CourseDetailPage({ params }: Props) {
     course = await Course.findById(id).lean<CourseDetails>();
   }
   if (!course) notFound();
+
+  const visuals: Record<string, { src: string; alt: string }> = {
+    "workplace-communication": {
+      src: "/assets/course-workplace-communication.png",
+      alt: "A professional practising workplace communication",
+    },
+    "digital-job-search": {
+      src: "/assets/course-digital-job-search.png",
+      alt: "A professional searching for jobs on a laptop",
+    },
+  };
+  const visual = visuals[course.slug] ?? {
+    src: "/assets/paths-seeker-consultant.png",
+    alt: "",
+  };
 
   const trainingLabel =
     course.trainingType === "qualification"
@@ -44,7 +58,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
         <div className={styles.split}>
           <div className={styles.visual}>
-            <Image src="/assets/paths-seeker-consultant.png" alt="" fill loading="eager"
+            <Image src={visual.src} alt={visual.alt} fill loading="eager"
               sizes="(max-width: 767px) 100vw, (max-width: 1208px) 50vw, 580px"
               className={styles.image} />
             <div className={styles.caption}>
@@ -69,8 +83,9 @@ export default async function CourseDetailPage({ params }: Props) {
             <div><dt>Training type</dt><dd>{trainingLabel}</dd></div>
             <div><dt>Price</dt><dd>{/pending/i.test(course.price) ? "To be announced" : formatPrice(course.price)}</dd></div>
           </dl>
-          {course.accessInstructions && <p className={styles.speaker}>{brandText(course.accessInstructions)}</p>}
-          <CourseEnrolActions slug={course.slug} />
+          {course.accessInstructions && !/enrolment handoff/i.test(course.accessInstructions) && (
+            <p className={styles.speaker}>{brandText(course.accessInstructions)}</p>
+          )}
         </section>
       </div>
     </main>

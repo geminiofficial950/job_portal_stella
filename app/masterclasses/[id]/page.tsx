@@ -38,6 +38,20 @@ export default async function MasterclassDetailPage({ params }: Props) {
     session.bookingStatus !== "pending_content" &&
     session.bookingStatus !== "cancelled" &&
     session.bookingStatus !== "full";
+  const visuals: Record<string, { src: string; alt: string }> = {
+    "resume-that-gets-read": {
+      src: "/assets/masterclass-resume.png",
+      alt: "A professional reviewing a resume in a bright office",
+    },
+    "interview-confidence": {
+      src: "/assets/masterclass-interview.png",
+      alt: "A professional preparing for a job interview",
+    },
+  };
+  const visual = visuals[session.slug] ?? {
+    src: "/assets/paths-seeker-consultant.png",
+    alt: "",
+  };
 
   return (
     <main className={styles.page}>
@@ -50,7 +64,7 @@ export default async function MasterclassDetailPage({ params }: Props) {
 
         <div className={styles.split}>
           <div className={styles.visual}>
-            <Image src="/assets/paths-seeker-consultant.png" alt="" fill
+            <Image src={visual.src} alt={visual.alt} fill
               sizes="(max-width: 767px) 100vw, (max-width: 1208px) 50vw, 580px"
               className={styles.image} />
             <div className={styles.caption}>
@@ -78,7 +92,6 @@ export default async function MasterclassDetailPage({ params }: Props) {
           {session.speakerBackground && !/pending/i.test(session.speakerBackground) && (
             <p className={styles.speaker}>{session.speakerBackground}</p>
           )}
-          {session.pendingOwnerContent && <p className={styles.status}>Session details are being confirmed. Interest registration is open.</p>}
           <SessionBookingActions slug={session.slug} title={session.title} bookingOpen={bookingOpen} />
         </section>
       </div>

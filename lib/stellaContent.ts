@@ -206,8 +206,7 @@ export const COURSES: Course[] = [
     prerequisites: "Free Stella profile recommended",
     price: "Free",
     trainingType: "professional-development",
-    accessInstructions:
-      "Enrolment handoff opens when the provider link is supplied by Stella.",
+    accessInstructions: "",
     pendingOwnerContent: true,
   },
 ];

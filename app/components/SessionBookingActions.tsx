@@ -66,14 +66,7 @@ export default function SessionBookingActions({
     }
   }
 
-  if (!bookingOpen) {
-    return (
-      <p className="mt-4 text-sm text-amber-800">
-        Live booking opens when Gemini Jobs publishes confirmed speakers and fees.
-        You can register your interest in the meantime.
-      </p>
-    );
-  }
+  if (!bookingOpen) return null;
 
   return (
     <div className="mt-4 space-y-2">

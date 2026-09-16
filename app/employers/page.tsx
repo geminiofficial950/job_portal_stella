@@ -11,16 +11,6 @@ export default function EmployersPage() {
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(37,99,235,0.1),_transparent_50%),radial-gradient(ellipse_at_bottom_right,_rgba(13,148,136,0.1),_transparent_45%),linear-gradient(180deg,#eef4fb_0%,#f8fafc_55%,#f0fdf4_100%)]"
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-25"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #94a3b8 1px, transparent 1px), linear-gradient(to bottom, #94a3b8 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
-
       <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-8 lg:px-10">
         <div className="max-w-2xl">
           <h1 className="text-3xl font-bold tracking-tight text-[#0f2744] sm:text-4xl">

@@ -9,6 +9,7 @@ export interface AuthTokenPayload {
   email: string;
   role: UserRole;
   name: string;
+  exp?: number;
 }
 
 function getSecret() {
@@ -35,12 +36,13 @@ export async function signToken(payload: AuthTokenPayload) {
 export async function verifyToken(token: string): Promise<AuthTokenPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    if (!payload.sub || typeof payload.email !== "string" || typeof payload.role !== "string") {
+    if (!payload.sub || typeof payload.email !== "string" || typeof payload.role !== "string" || typeof payload.exp !== "number") {
       return null;
     }
 
     return {
       sub: payload.sub,
+      exp: payload.exp,
       email: payload.email,
       role: payload.role as UserRole,
       name: typeof payload.name === "string" ? payload.name : "",

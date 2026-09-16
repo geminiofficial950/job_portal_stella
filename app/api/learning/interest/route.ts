@@ -3,14 +3,23 @@ import { connectDB } from "@/lib/db";
 import { LearningInterest } from "@/models/VerificationRequest";
 
 export async function POST(request: Request) {
+  let body;
   try {
-    const body = await request.json();
-    const kind = String(body.kind || "");
-    const itemId = String(body.itemId || "").trim();
-    const itemTitle = String(body.itemTitle || "").trim();
-    const name = String(body.name || "").trim();
-    const email = String(body.email || "").trim().toLowerCase();
-    const notes = String(body.notes || "").trim();
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ success: false, message: "Invalid form data" }, { status: 400 });
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ success: false, message: "Invalid form data" }, { status: 400 });
+  }
+  try {
+    const text = (value: unknown) => typeof value === "string" ? value.trim() : "";
+    const kind = text(body.kind);
+    const itemId = text(body.itemId);
+    const itemTitle = text(body.itemTitle);
+    const name = text(body.name);
+    const email = text(body.email).toLowerCase();
+    const notes = text(body.notes);
 
     if (!["masterclass", "course", "event"].includes(kind)) {
       return NextResponse.json(
@@ -18,9 +27,15 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    if (!itemId || !itemTitle || name.length < 2 || !email.includes("@")) {
+    if (!itemId || !itemTitle || name.length < 2 || name.length > 120 || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
-        { success: false, message: "Name, email and item are required" },
+        { success: false, message: "Enter your full name (2–120 characters) and a valid email address." },
+        { status: 400 },
+      );
+    }
+    if (notes.length > 2000) {
+      return NextResponse.json(
+        { success: false, message: "Please keep your message under 2,000 characters." },
         { status: 400 },
       );
     }

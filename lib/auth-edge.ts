@@ -21,13 +21,15 @@ export async function verifyAuthToken(
     if (
       !payload.sub ||
       typeof payload.email !== "string" ||
-      typeof payload.role !== "string"
+      typeof payload.role !== "string" ||
+      typeof payload.exp !== "number"
     ) {
       return null;
     }
 
     return {
       sub: payload.sub,
+      exp: payload.exp,
       email: payload.email,
       role: payload.role as UserRole,
       name: typeof payload.name === "string" ? payload.name : "",

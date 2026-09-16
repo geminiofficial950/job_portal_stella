@@ -1,0 +1,28 @@
+.page { background: radial-gradient(ellipse at 90% 0%, #ececff 0%, transparent 46%), linear-gradient(180deg, #f6f8fd, #fff); padding: 40px 24px 72px; color: #172b49; }
+.container { max-width: 1160px; margin: 0 auto; }
+.back { display: inline-flex; align-items: center; gap: 8px; color: #61718b; font-size: 14px; text-decoration: none; }
+.back:hover { color: #4f46e5; }
+.layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; gap: clamp(28px, 5vw, 72px); margin-top: 34px; }
+.badge { display: inline-flex; align-items: center; gap: 7px; border: 1px solid #dddffd; background: #eeefff; color: #5a51b9; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 600; }
+.title { margin: 20px 0 14px; font-size: clamp(30px, 3.2vw, 46px); line-height: 1.13; letter-spacing: -.04em; font-weight: 700; overflow-wrap: anywhere; }
+.intro { color: #6c7c92; font-size: 15px; line-height: 1.75; margin: 0; }
+.details { margin-top: 30px; padding: 24px; border: 1px solid #e4e9f2; border-radius: 20px; background: #ffffffb8; }
+.details h2 { font-size: 16px; font-weight: 650; margin: 0 0 8px; }
+.detail { display: flex; align-items: flex-start; gap: 14px; padding: 17px 0; border-bottom: 1px solid #edf0f6; }
+.detail:last-child { border-bottom: 0; padding-bottom: 0; }
+.detailIcon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 36px; height: 36px; border-radius: 10px; background: #f0f3fa; color: #647798; }
+.detail dt { color: #7a869a; font-size: 12px; margin-bottom: 4px; }
+.detail dd { color: #293c58; font-size: 14px; line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+.booking { display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; color: #4f46c7; font-size: 14px; font-weight: 600; }
+.notice { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; color: #748196; font-size: 13px; line-height: 1.7; }
+.notice svg { flex-shrink: 0; margin-top: 3px; }
+.card { min-width: 0; padding: clamp(22px, 3vw, 36px); border: 1px solid #e3e8f2; border-radius: 24px; background: #fff; box-shadow: 0 12px 48px -20px #27376428; }
+.formIcon { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; margin-bottom: 20px; border-radius: 14px; background: #eeefff; color: #6660ce; }
+.card h2 { font-size: 25px; line-height: 1.2; font-weight: 700; letter-spacing: -.025em; margin: 0 0 10px; }
+.card > p { color: #748196; font-size: 14px; line-height: 1.7; margin: 0; }
+@media (max-width: 767px) {
+  .page { padding: 24px 16px 40px; }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 28px; margin-top: 24px; }
+  .details { padding: 20px; margin-top: 24px; }
+  .card { border-radius: 20px; }
+}

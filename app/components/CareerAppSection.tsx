@@ -65,7 +65,7 @@ export default function CareerAppSection() {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* LEFT TESTIMONIAL */}
-          <div className="relative h-[390px] overflow-hidden rounded-[22px] sm:h-[410px] lg:h-[360px] xl:h-[380px]">
+          <div className="relative h-[390px] overflow-hidden rounded-[22px] sm:h-[410px] lg:h-auto lg:min-h-[420px]">
             <Image
               src={testimonial.image}
               alt={testimonial.name}
@@ -159,7 +159,7 @@ export default function CareerAppSection() {
           <div
             className="
           relative
-          h-[510px]
+          min-h-[510px]
           overflow-hidden
           rounded-[22px]
           bg-gradient-to-br
@@ -167,15 +167,14 @@ export default function CareerAppSection() {
           via-[#eee8ff]
           to-[#dce4ff]
 
-          sm:h-[500px]
-          lg:h-[360px]
-          xl:h-[380px]
+          sm:min-h-[500px]
+          lg:min-h-[420px]
         "
           >
             {/* very subtle background */}
             <div className="pointer-events-none absolute -left-16 -top-20 h-[200px] w-[200px] rounded-full bg-[#f2a8ff]/10 blur-3xl" />
 
-            <div className="relative z-10 grid h-full grid-cols-1 lg:grid-cols-[46%_54%]">
+            <div className="relative z-10 grid min-h-full grid-cols-1 lg:grid-cols-[minmax(0,46%)_minmax(0,54%)]">
               {/* LEFT CONTENT */}
               <div
                 className="
@@ -304,19 +303,15 @@ export default function CareerAppSection() {
               </div>
 
               {/* DESKTOP PHONES */}
-              <div className="relative hidden h-full lg:block">
+              <div className="relative hidden min-w-0 items-center justify-center gap-3 px-5 py-8 lg:flex xl:gap-4">
                 {/* MAIN PHONE */}
                 <div
                   className="
-                absolute
-                bottom-[-78px]
-                left-[4%]
-                w-[49%]
+                relative
+                w-[calc(50%_-_8px)]
+                max-w-[180px]
+                shrink-0
                 rotate-[-2deg]
-
-                xl:bottom-[-88px]
-                xl:left-[5%]
-                xl:w-[50%]
               "
                 >
                   <PhoneMockup type="jobs" />
@@ -325,15 +320,12 @@ export default function CareerAppSection() {
                 {/* SECOND PHONE */}
                 <div
                   className="
-                absolute
-                bottom-[-90px]
-                right-[-2%]
-                w-[46%]
+                relative
+                mt-8
+                w-[calc(50%_-_8px)]
+                max-w-[180px]
+                shrink-0
                 rotate-[4deg]
-
-                xl:bottom-[-100px]
-                xl:right-[-1%]
-                xl:w-[47%]
               "
                 >
                   <PhoneMockup type="profile" />

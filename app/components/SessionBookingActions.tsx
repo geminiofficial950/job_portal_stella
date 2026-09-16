@@ -70,7 +70,7 @@ export default function SessionBookingActions({
     return (
       <p className="mt-4 text-sm text-amber-800">
         Live booking opens when Gemini Jobs publishes confirmed speakers and fees.
-        Use interest registration below in the meantime.
+        You can register your interest in the meantime.
       </p>
     );
   }

@@ -19,12 +19,14 @@ export async function GET() {
     if (!user || !user.isActive) {
       return NextResponse.json(
         { success: false, message: "User not found" },
-        { status: 404 }
+        { status: 401 }
       );
     }
 
     return NextResponse.json({
       success: true,
+      expiresAt: auth.exp! * 1000,
+      serverTime: Date.now(),
       user: {
         id: user._id,
         name: user.name,

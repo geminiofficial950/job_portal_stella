@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Briefcase, Search } from "lucide-react";
+import { ArrowRight, Bookmark, Search } from "lucide-react";
 import { STELLA_CONTACT } from "@/lib/stellaContent";
 
 export const metadata = { title: "For Employers — Gemini Jobs" };
@@ -60,17 +60,17 @@ export default function EmployersPage() {
 
           <article className="relative flex h-full flex-col overflow-hidden rounded-[24px] border border-white/80 bg-white/75 p-6 backdrop-blur-md sm:p-7">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-50 text-teal-700">
-              <Briefcase className="h-5 w-5" />
+              <Bookmark className="h-5 w-5" />
             </div>
-            <h2 className="text-lg font-bold text-[#0f2744]">Post a job</h2>
+            <h2 className="text-lg font-bold text-[#0f2744]">Saved jobs</h2>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-500">
-              Publish Australian vacancies with clear location and work type.
+              Revisit your bookmarked jobs, review the details and apply when you’re ready.
             </p>
             <Link
-              href="/register?role=recruiter&next=/dashboard/recruiter/jobs/new"
+              href="/dashboard/seeker/saved"
               className="mt-5 inline-flex items-center gap-2 self-start rounded-xl bg-[#00082C] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00061F]"
             >
-              Post a job
+              View saved jobs
               <ArrowRight className="h-4 w-4" />
             </Link>
           </article>

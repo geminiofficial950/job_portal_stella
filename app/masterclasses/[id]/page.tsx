@@ -1,26 +1,38 @@
 import Link from "next/link";
+import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
+import styles from "@/app/components/LearningDetail.module.css";
 import { notFound } from "next/navigation";
 import { ensureLearningSeeded } from "@/lib/learningStore";
-import { formatPrice, formatWhen } from "@/lib/stellaContent";
+import { formatPrice } from "@/lib/stellaContent";
 import { Masterclass } from "@/models/Learning";
 import InterestForm from "@/app/components/InterestForm";
 import SessionBookingActions from "@/app/components/SessionBookingActions";
 
 type Props = { params: Promise<{ id: string }> };
+type SessionDetails = {
+  slug: string; title: string; outcome: string; startsAt: Date; timeZone: string;
+  speaker: string; speakerBackground: string; durationMinutes: number; format: string;
+  price: string; bookedCount: number; capacity: number; bookingStatus: string;
+  venueOrLink: string; pendingOwnerContent: boolean;
+};
 
 export default async function MasterclassDetailPage({ params }: Props) {
   const { id } = await params;
   await ensureLearningSeeded();
-  let session: any = await Masterclass.findOne({
+  let session = await Masterclass.findOne({
     slug: id,
     published: true,
-  }).lean();
+  }).lean<SessionDetails>();
   if (!session && /^[a-f\d]{24}$/i.test(id)) {
-    session = await Masterclass.findById(id).lean();
+    session = await Masterclass.findById(id).lean<SessionDetails>();
   }
   if (!session) notFound();
 
-  const startsAt = new Date(session.startsAt).toISOString();
+  const when = new Intl.DateTimeFormat("en-AU", {
+    day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit",
+    timeZone: session.timeZone,
+  }).format(new Date(session.startsAt));
   const bookingOpen =
     !session.pendingOwnerContent &&
     session.bookingStatus !== "pending_content" &&
@@ -28,58 +40,47 @@ export default async function MasterclassDetailPage({ params }: Props) {
     session.bookingStatus !== "full";
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12 sm:px-8">
-      <Link href="/masterclasses" className="text-sm text-[#2563eb]">
-        ← All masterclasses
-      </Link>
-      {session.pendingOwnerContent ? (
-        <p className="mt-3 text-xs font-bold uppercase text-amber-700">
-          Pending owner content — not a confirmed live booking
-        </p>
-      ) : null}
-      <h1 className="mt-2 text-3xl font-bold text-[#0f2744]">{session.title}</h1>
-      <p className="mt-2 text-slate-500">{session.outcome}</p>
-      <div className="mt-6 rounded-[22px] border border-slate-100 bg-white p-5 text-sm text-slate-600 shadow-sm">
-        <p>
-          <strong>Speaker:</strong> {session.speaker}
-        </p>
-        <p className="mt-1">{session.speakerBackground}</p>
-        <p className="mt-3">
-          <strong>When:</strong> {formatWhen(startsAt, session.timeZone)} (
-          {session.timeZone})
-        </p>
-        <p>
-          <strong>Duration:</strong> {session.durationMinutes} minutes ·{" "}
-          {session.format}
-        </p>
-        <p>
-          <strong>Price:</strong> {formatPrice(session.price)}
-        </p>
-        <p>
-          <strong>Capacity:</strong> {session.bookedCount}/{session.capacity} ·
-          status {session.bookingStatus}
-        </p>
-        <p className="mt-2 text-xs text-slate-500">
-          Venue/link: {session.venueOrLink || "Provided after booking opens"}
-        </p>
-      </div>
+    <main className={styles.page}>
+      <div className={styles.container}>
+        <Link href="/masterclasses" className={styles.back}><ArrowLeft size={16} /> All masterclasses</Link>
+        <header className={styles.intro}>
+          <h1>{session.title}</h1>
+          <p>{session.outcome}</p>
+        </header>
 
-      <SessionBookingActions
-        slug={session.slug}
-        title={session.title}
-        bookingOpen={bookingOpen}
-      />
+        <div className={styles.split}>
+          <div className={styles.visual}>
+            <Image src="/assets/paths-seeker-consultant.png" alt="" fill
+              sizes="(max-width: 767px) 100vw, (max-width: 1208px) 50vw, 580px"
+              className={styles.image} />
+            <div className={styles.caption}>
+              <span>GEMINI JOBS · MASTERCLASSES</span>
+              <p>Your next step starts with learning.</p>
+            </div>
+          </div>
+          <section className={styles.form} aria-labelledby="register-interest-title">
+            <h2 id="register-interest-title">Register your interest</h2>
+            <p>Leave your details and any questions about this masterclass.</p>
+            <InterestForm kind="masterclass" itemId={session.slug} itemTitle={session.title} />
+          </section>
+        </div>
 
-      <div className="mt-8">
-        <h2 className="text-lg font-bold text-[#0f2744]">Register interest</h2>
-        <p className="text-sm text-slate-500">
-          Use this if booking is not open. Interest is not a confirmed seat.
-        </p>
-        <InterestForm
-          kind="masterclass"
-          itemId={session.slug}
-          itemTitle={session.title}
-        />
+        <section className={styles.information} aria-labelledby="session-details-title">
+          <h2 id="session-details-title">About this masterclass</h2>
+          <dl className={styles.details}>
+            <div><dt>Date & time</dt><dd>{when}<br />{session.timeZone}</dd></div>
+            <div><dt>Duration & format</dt><dd>{session.durationMinutes} minutes · {session.format === "in-person" ? "In person" : "Online"}</dd></div>
+            <div><dt>Price</dt><dd>{/pending/i.test(session.price) ? "To be announced" : formatPrice(session.price)}</dd></div>
+            <div><dt>Speaker</dt><dd>{/pending/i.test(session.speaker) ? "To be announced" : session.speaker}</dd></div>
+            <div><dt>Capacity</dt><dd>{session.bookedCount} / {session.capacity} booked</dd></div>
+            <div><dt>Booking status</dt><dd>{session.bookingStatus === "pending_content" ? "Details being confirmed" : session.bookingStatus.replaceAll("_", " ")}</dd></div>
+          </dl>
+          {session.speakerBackground && !/pending/i.test(session.speakerBackground) && (
+            <p className={styles.speaker}>{session.speakerBackground}</p>
+          )}
+          {session.pendingOwnerContent && <p className={styles.status}>Session details are being confirmed. Interest registration is open.</p>}
+          <SessionBookingActions slug={session.slug} title={session.title} bookingOpen={bookingOpen} />
+        </section>
       </div>
     </main>
   );

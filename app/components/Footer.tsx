@@ -100,7 +100,6 @@ export default function Footer() {
             <button type="button" onClick={() => share("x")} aria-label="Share Gemini Jobs on X"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3L12 14.6 5.5 22H2.3l8.2-9.4L.8 2h6.5l5.5 6.7L18.9 2Zm-1.1 18h1.8L6.3 3.9H4.4L17.8 20Z" /></svg></button>
             <button type="button" onClick={() => share("email")} aria-label="Share Gemini Jobs by email"><Mail size={21} /></button>
           </div>
-          <p>A more human future of work.</p>
         </div>
       </div>
     </footer>

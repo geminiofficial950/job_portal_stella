@@ -5,13 +5,12 @@ import BrandLogo from "@/app/components/BrandLogo";
 import { useAuth } from "./AuthProvider";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Mail, Share2 } from "lucide-react";
-import { STELLA_CONTACT } from "@/lib/stellaContent";
 import styles from "./Footer.module.css";
 
 const columns = [
   { title: "For Job Seekers", links: [ ["Jobs", "/jobs"], ["Resume & Profile", "/profile/setup"], ["Career Support", "/#benefits"], ["Talent Network", "/#talent-network"] ] },
   { title: "Company", links: [ ["Our Community", "/#talent-network"], ["Learning", "/courses"], ["Events", "/events"], ["Careers", "/jobs"] ] },
-  { title: "Support", links: [ ["Help Center", `mailto:${STELLA_CONTACT.email}`], ["Contact Us", `mailto:${STELLA_CONTACT.email}`], ["Privacy Policy", "/privacy"], ["Terms of Service", "/terms"] ] },
+  { title: "Support", links: [ ["Help Center", "/contact"], ["Contact Us", "/contact"], ["Privacy Policy", "/privacy"], ["Terms of Service", "/terms"] ] },
 ];
 
 export default function Footer() {

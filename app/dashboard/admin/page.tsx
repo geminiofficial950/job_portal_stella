@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
 import { Company } from "@/models/Company";
 import { Job } from "@/models/Job";
+import { ContactMessage } from "@/models/ContactMessage";
 import DashboardStatCards from "@/app/components/DashboardStatCards";
 import {
   DashboardPageHeader,
@@ -20,6 +21,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Eye,
+  Mail,
 } from "lucide-react";
 
 function formatDate(value?: Date | string | null) {
@@ -49,6 +51,7 @@ export default async function AdminOverviewPage() {
     recentUsers,
     recentJobs,
     pendingList,
+    contactMessages,
   ] = await Promise.all([
     User.countDocuments({}),
     User.countDocuments({ role: "user" }),
@@ -62,6 +65,7 @@ export default async function AdminOverviewPage() {
     User.find({}).sort({ createdAt: -1 }).limit(5).lean(),
     Job.find({}).sort({ createdAt: -1 }).limit(5).lean(),
     Company.find({ status: "pending" }).sort({ updatedAt: -1 }).limit(5).lean(),
+    ContactMessage.countDocuments({}),
   ]);
 
   const cards = [
@@ -96,6 +100,14 @@ export default async function AdminOverviewPage() {
       icon: Briefcase,
       actionIcon: Briefcase,
       action: `${totalJobs} total jobs`,
+    },
+    {
+      label: "Contact messages",
+      value: contactMessages,
+      href: "/dashboard/admin/messages",
+      icon: Mail,
+      actionIcon: Mail,
+      action: "From the Contact Us form",
     },
   ];
 

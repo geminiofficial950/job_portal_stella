@@ -9,6 +9,7 @@ import {
   Shield,
   BadgeCheck,
   GraduationCap,
+  Mail,
 } from "lucide-react";
 import DashboardSidebarShell from "./DashboardSidebarShell";
 
@@ -57,6 +58,11 @@ export default function AdminSidebar() {
               label: "Learning",
               href: "/dashboard/admin/learning",
               icon: GraduationCap,
+            },
+            {
+              label: "Messages",
+              href: "/dashboard/admin/messages",
+              icon: Mail,
             },
           ],
         },

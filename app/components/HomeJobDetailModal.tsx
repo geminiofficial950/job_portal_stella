@@ -1,5 +1,7 @@
 "use client";
 
+import ApplyWithCoverLetter from "@/app/components/ApplyWithCoverLetter";
+
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -706,15 +708,24 @@ export default function HomeJobDetailModal({
     }
 
     return (
-      <button
-        type="button"
+      <ApplyWithCoverLetter
         className="job-detail-apply-btn"
         disabled={applying}
-        onClick={async () => {
+        key={activeJob.id}
+        jobId={activeJob.id}
+        jobTitle={activeJob.title}
+        jobSkills={activeJob.skills}
+        jobDescription={activeJob.description}
+        jobRequirements={activeJob.requirements}
+        company={activeJob.company}
+        onBeforeOpen={() => {
           if (!user || user.role !== "user") {
             openAuth({ mode: "login", role: "user" });
-            return;
+            return false;
           }
+          return true;
+        }}
+        onSubmit={async (coverNote) => {
           setApplying(true);
           try {
             const body = isStellaJob
@@ -743,7 +754,7 @@ export default function HomeJobDetailModal({
             const res = await fetch("/api/seeker/applications", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(body),
+              body: JSON.stringify({ ...body, coverNote }),
             });
             const data = await res.json();
             if (!res.ok || !data.success) {
@@ -771,15 +782,14 @@ export default function HomeJobDetailModal({
             toast.success("Applied successfully");
             onApplied?.(activeJob.id);
             onClose();
+            return true;
           } catch {
             toast.error("Could not apply");
           } finally {
             setApplying(false);
           }
         }}
-      >
-        {applying ? "Applying…" : "Apply"}
-      </button>
+      />
     );
   }
 

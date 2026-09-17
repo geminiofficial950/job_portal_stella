@@ -2487,3 +2487,12 @@ html.jobs-search-compact .jobs-search-fixed {
     font-size: 1.5rem;
   }
 }
+
+.jobs-apply-btn.is-applied,
+.job-detail-apply-btn.is-applied {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+  cursor: default;
+  opacity: 1;
+}

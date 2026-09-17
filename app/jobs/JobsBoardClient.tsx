@@ -1,5 +1,9 @@
 "use client";
 
+import { useAppliedJobs } from "@/app/components/useAppliedJobs";
+
+import ApplyWithCoverLetter from "@/app/components/ApplyWithCoverLetter";
+
 import React, {
   useState,
   useEffect,
@@ -808,6 +812,7 @@ function JobSearchInner({
   const countryFromUrl = searchParams.get("country")?.trim().toLowerCase() || "";
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { isApplied, markApplied } = useAppliedJobs(user?.role === "user" ? user.id : undefined);
   const { openAuth } = useAuthModal();
 
   // Only SSR props during first render — never sessionStorage (hydration-safe).
@@ -1706,6 +1711,10 @@ function JobSearchInner({
     if (!displayJobDetail) return null;
 
     const isStellaJob = /^[a-f\d]{24}$/i.test(displayJobDetail.id);
+    if (isApplied(displayJobDetail)) {
+      return <button type="button" className="job-detail-apply-btn is-applied" disabled>Applied</button>;
+    }
+
 
     if (!authLoading && !user) {
       return (
@@ -1720,15 +1729,24 @@ function JobSearchInner({
     }
 
     return (
-      <button
-        type="button"
+      <ApplyWithCoverLetter
         className="job-detail-apply-btn"
         disabled={applying}
-        onClick={async () => {
+        key={displayJobDetail.id}
+        jobId={displayJobDetail.id}
+        jobTitle={displayJobDetail.title}
+        jobSkills={displayJobDetail.skills}
+        jobDescription={displayJobDetail.description}
+        jobRequirements={displayJobDetail.requirements}
+        company={displayJobDetail.company?.name}
+        onBeforeOpen={() => {
           if (!user || user.role !== "user") {
             openAuth({ mode: "login", role: "user" });
-            return;
+            return false;
           }
+          return true;
+        }}
+        onSubmit={async (coverNote) => {
           setApplying(true);
           try {
             const body = isStellaJob
@@ -1757,10 +1775,14 @@ function JobSearchInner({
             const res = await fetch("/api/seeker/applications", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(body),
+              body: JSON.stringify({ ...body, coverNote }),
             });
             const data = await res.json();
             if (!res.ok || !data.success) {
+              if (typeof data.message === "string" && data.message.toLowerCase().includes("already applied")) {
+                markApplied(displayJobDetail);
+                return true;
+              }
               toast.error(data.message || "Could not apply");
               if (
                 typeof data.message === "string" &&
@@ -1773,17 +1795,17 @@ function JobSearchInner({
               }
               return;
             }
+            markApplied(displayJobDetail);
             toast.success("Applied successfully");
             closeJobDetail();
+            return true;
           } catch {
             toast.error("Could not apply");
           } finally {
             setApplying(false);
           }
         }}
-      >
-        {applying ? "Applying…" : "Apply"}
-      </button>
+      />
     );
   };
 
@@ -2704,9 +2726,10 @@ function JobSearchInner({
                                 e.stopPropagation();
                                 openJobDetail(job.id);
                               }}
-                              className="jobs-apply-btn"
+                              className={`jobs-apply-btn ${isApplied(job) ? "is-applied" : ""}`}
+                              disabled={isApplied(job)}
                             >
-                              Apply
+                              {isApplied(job) ? "Applied" : "Apply"}
                             </button>
                           </div>
                         </article>

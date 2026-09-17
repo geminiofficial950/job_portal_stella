@@ -1,5 +1,7 @@
 "use client";
 
+import ApplyWithCoverLetter from "./ApplyWithCoverLetter";
+
 import styles from "@/app/dashboard/seeker/seeker.module.css";
 
 import { Suspense, useCallback, useEffect, useState } from "react";
@@ -70,13 +72,13 @@ function SeekerJobsListInner() {
     return () => clearTimeout(t);
   }, [load]);
 
-  async function applyToJob(jobId: string) {
+  async function applyToJob(jobId: string, coverNote: string) {
     setApplyingId(jobId);
     try {
       const res = await fetch("/api/seeker/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId }),
+        body: JSON.stringify({ jobId, coverNote }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -97,6 +99,7 @@ function SeekerJobsListInner() {
             : j
         )
       );
+      return true;
     } catch {
       toast.error("Could not apply");
     } finally {
@@ -221,14 +224,15 @@ function SeekerJobsListInner() {
                     Applied
                   </Link>
                 ) : (
-                  <button
-                    type="button"
+                  <ApplyWithCoverLetter
+                    jobId={job.id}
+                    jobTitle={job.title}
+                    jobSkills={job.skills}
+                    company={job.company?.name}
                     disabled={applyingId === job.id}
-                    onClick={() => void applyToJob(job.id)}
+                    onSubmit={(coverNote) => applyToJob(job.id, coverNote)}
                     className={`${styles.formButton} shrink-0 rounded-lg bg-[#2563eb] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#2563eb] disabled:opacity-60`}
-                  >
-                    {applyingId === job.id ? "Applying…" : "Apply"}
-                  </button>
+                  />
                 )}
               </div>
             </li>

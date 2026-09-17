@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { validateCoverLetter } from "@/lib/cover-letter";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import { requireApiAuth } from "@/lib/requireApiAuth";
@@ -48,12 +49,26 @@ function boardExternalKey(source: string, id: string) {
 }
 
 /** Seeker: list my applications (Stella jobs + board listings) */
-export async function GET() {
+export async function GET(request: Request) {
   const result = await requireApiAuth(["user"]);
   if (result.error) return result.error;
 
   try {
     await connectDB();
+    if (new URL(request.url).searchParams.get("summary") === "1") {
+      const [local, imported] = await Promise.all([
+        Application.find({ seekerId: result.auth.sub }).select("jobId").lean(),
+        BoardApplication.find({ seekerId: result.auth.sub }).select("externalKey").lean(),
+      ]);
+      return NextResponse.json({
+        success: true,
+        appliedKeys: [
+          ...local.map((application) => `stella:${String(application.jobId).toLowerCase()}`),
+          ...imported.map((application) => application.externalKey),
+        ],
+      }, { headers: { "Cache-Control": "private, no-store" } });
+    }
+
     const [apps, boardApps] = await Promise.all([
       Application.find({ seekerId: result.auth.sub })
         .sort({ updatedAt: -1 })
@@ -149,8 +164,10 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
+    const coverLetterError = validateCoverLetter(body?.coverNote);
+    if (coverLetterError) return badRequest(coverLetterError);
     const jobId = String(body.jobId ?? "").trim();
-    const coverNote = String(body.coverNote ?? "").trim().slice(0, 1000);
+    const coverNote = (body.coverNote as string).trim();
     const boardJob =
       body.boardJob && typeof body.boardJob === "object"
         ? (body.boardJob as Record<string, unknown>)

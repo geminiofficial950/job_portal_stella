@@ -9,6 +9,7 @@ type AppItem = {
   status: string;
   statusLabel: string;
   statusNote: string;
+  coverNote?: string;
   createdAt: string | null;
   job: { title: string; location: string; status: string } | null;
   company: { name: string; logoUrl: string } | null;
@@ -216,6 +217,12 @@ export default function RecruiterApplicationsPanel() {
                   </div>
                 ) : null}
                 <div className="mt-3 flex flex-wrap gap-3 text-sm">
+                  {app.coverNote && (
+                    <details className="w-full rounded-lg border border-slate-200 p-3">
+                      <summary className="cursor-pointer text-sm font-semibold">Cover letter</summary>
+                      <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">{app.coverNote}</p>
+                    </details>
+                  )}
                   {app.seeker?.resumeUrl ? (
                     <a
                       href={app.seeker.resumeUrl}

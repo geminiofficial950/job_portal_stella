@@ -262,7 +262,7 @@ export default function RecruiterApplicationsPanel() {
                   value={app.status}
                   disabled={savingId === app.id}
                   onChange={(e) => void updateStatus(app.id, e.target.value)}
-                  className="w-full min-w-[180px] rounded-lg border border-[#cdd3e0] bg-white px-3 py-2.5 text-sm font-medium text-[#1e293b] outline-none focus:border-[#1e3a5f] disabled:opacity-60"
+                  className="w-full rounded-lg border border-[#cdd3e0] bg-white px-3 py-2.5 text-sm font-medium text-[#1e293b] outline-none focus:border-[#1e3a5f] disabled:opacity-60 lg:min-w-[180px]"
                 >
                   {STATUSES.map((s) => (
                     <option key={s.value} value={s.value}>

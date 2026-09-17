@@ -50,6 +50,7 @@ export function RecruiterApprovalBanner({
 
   return (
     <div
+      data-preserve-color
       className={`border-b px-5 py-3 sm:px-8 lg:px-10 ${
         isRejected
           ? "border-[#fecaca] bg-[#fef2f2]"

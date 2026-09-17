@@ -4,6 +4,7 @@
 .content :is(h1, h2, h3, h4) { color: var(--seeker-text); }
 .content :is([class*="border-[#"], [class*="border-slate-"], [class*="border-white/"], [class*="divide-"] > *) { border-color: var(--seeker-line); }
 .content :is([class~="text-[#0f172a]"], [class~="text-[#1e293b]"], [class~="text-[#334155]"], [class~="text-[#00082C]"], [class~="text-white"]) { color: var(--seeker-text); }
+.content :is(button, a)[class~="text-white"] { color: #fff; }
 .content :is([class~="text-[#6b7280]"], [class~="text-[#64748b]"], [class~="text-[#6b7a9e]"], [class~="text-[#475569]"], [class~="text-[#94a3b8]"], [class~="text-[#4a5878]"], [class~="text-[#cbd5e1]"], [class~="text-slate-400"], [class~="text-slate-500"], [class~="text-slate-600"], [class~="text-white/40"], [class~="text-white/50"], [class~="text-white/60"], [class~="text-white/70"]) { color: var(--seeker-muted); }
 .content :is([class~="text-[#5850ec]"], [class~="text-[#1e3a5f]"]) { color: var(--seeker-link); }
 .content :is([class~="bg-white"], [class~="bg-[#f8fafc]"]) { background: var(--seeker-surface); }
@@ -24,9 +25,13 @@
 .content input:is([type="checkbox"], [type="radio"]) { accent-color: var(--seeker-accent); }
 .content [role="switch"][aria-checked="false"] { background: var(--seeker-line); }
 .content [role="switch"] > span { background: #fff; }
-.content :is(button, a)[class*="hover:bg-"]:hover { background: var(--seeker-raised); color: var(--seeker-text); }
+.content :is(button, a)[class*="hover:bg-"]:not([class~="text-white"]):hover { background: var(--seeker-raised); color: var(--seeker-text); }
+.content :is(button, a)[class~="text-white"]:hover { color: #fff; }
 .content :is([class~="bg-[#dcfce7]"], [class~="bg-[#d1fae5]"]) { background: #d9eee3; color: #267664; }
 .content :is([class~="bg-[#fee2e2]"], [class~="bg-[#fff5f5]"]) { background: #f7e5e3; color: #9b3838; }
 .content [class~="bg-[#fef3c7]"] { background: #fbf0d5; color: #855c16; }
 .content :is([class~="bg-[#dbeafe]"], [class~="bg-[#ede9fe]"][class~="text-[#5b21b6]"]) { background: var(--seeker-raised); color: var(--seeker-link); }
-@media (max-width: 767px) { .toolbar { margin-inline: 20px; flex-wrap: wrap; padding-block: 10px; }.content { padding-bottom: 76px; } }
+@media (max-width: 767px) {
+  .toolbar { margin-inline: 12px; flex-wrap: wrap; gap: 8px; padding-block: 10px; }
+  .content { padding-bottom: 88px; overflow-x: clip; }
+}

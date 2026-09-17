@@ -90,12 +90,12 @@ export default function RecruiterJobCard({
 
   return (
     <article
-      className={`flex gap-4 rounded-2xl border border-[#e8ecf3] bg-white shadow-[0_2px_12px_rgba(15,23,42,0.05)] transition-shadow hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)] ${
-        compact ? "p-4" : "p-5"
+      className={`flex min-w-0 gap-3 overflow-hidden rounded-2xl border border-[#e8ecf3] bg-white shadow-[0_2px_12px_rgba(15,23,42,0.05)] transition-shadow hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)] sm:gap-4 ${
+        compact ? "p-3.5 sm:p-4" : "p-4 sm:p-5"
       }`}
     >
       {/* Logo */}
-      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#ede9fe]">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#ede9fe] sm:h-14 sm:w-14">
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -112,7 +112,7 @@ export default function RecruiterJobCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="truncate text-[15px] font-bold text-[#0f172a]">
+            <h3 className="break-words text-[15px] font-bold text-[#0f172a]">
               {companyName}
             </h3>
             <p className="mt-0.5 line-clamp-2 text-sm text-[#475569]">
@@ -175,9 +175,9 @@ export default function RecruiterJobCard({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#64748b]">
-          <span className="inline-flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5 text-[#94a3b8]" />
-            {job.location}
+          <span className="inline-flex min-w-0 items-center gap-1">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#94a3b8]" />
+            <span className="break-words">{job.location}</span>
           </span>
           <span className="inline-flex items-center gap-1">
             <Eye className="h-3.5 w-3.5 text-[#94a3b8]" />

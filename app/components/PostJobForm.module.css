@@ -17,6 +17,22 @@
 .nextButton:hover:not(:disabled) { background: #1d4ed8; color: #fff; }
 .nextButton:disabled { opacity: 0.6; cursor: not-allowed; }
 @media (max-width: 640px) {
-  .stepper { gap: 6px; }
-  .stepper button { font-size: 11px; }
+  .stepper { gap: 4px; }
+  .stepper button {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    padding-bottom: 8px;
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+  .stepLabel {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

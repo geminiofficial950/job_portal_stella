@@ -8,13 +8,20 @@ type Props = {
   imageSrc: string;
   onCancel: () => void;
   onComplete: (file: File) => void | Promise<void>;
+  /** Circle for profile photos, square for logos. */
+  shape?: "circle" | "square";
 };
 
 const OUTPUT_SIZE = 640;
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
 
-export default function ProfilePhotoCropPopup({ imageSrc, onCancel, onComplete }: Props) {
+export default function ProfilePhotoCropPopup({
+  imageSrc,
+  onCancel,
+  onComplete,
+  shape = "circle",
+}: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const [natural, setNatural] = useState({ w: 0, h: 0 });
@@ -110,25 +117,32 @@ export default function ProfilePhotoCropPopup({ imageSrc, onCancel, onComplete }
       const ctx = canvas.getContext("2d");
       if (!ctx || !imgRef.current) throw new Error("Could not crop photo");
 
-      // Soft teal fill — JPEG has no alpha; empty pixels would otherwise bake as black
-      ctx.fillStyle = "#e8f4f5";
-      ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+      if (shape === "circle") {
+        // Soft teal fill — JPEG has no alpha; empty pixels would otherwise bake as black
+        ctx.fillStyle = "#e8f4f5";
+        ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+        ctx.beginPath();
+        ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+      }
 
-      ctx.beginPath();
-      ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.clip();
       ctx.drawImage(imgRef.current, sx, sy, sSize, sSize, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
+      const mime = shape === "square" ? "image/png" : "image/jpeg";
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
           (result) => (result ? resolve(result) : reject(new Error("Could not export photo"))),
-          "image/jpeg",
+          mime,
           0.92,
         );
       });
 
-      const file = new File([blob], "profile-photo.jpg", { type: "image/jpeg" });
+      const file = new File(
+        [blob],
+        shape === "square" ? "company-logo.png" : "profile-photo.jpg",
+        { type: mime },
+      );
       await onComplete(file);
     } catch (error) {
       setSaving(false);
@@ -190,8 +204,14 @@ export default function ProfilePhotoCropPopup({ imageSrc, onCancel, onComplete }
               setOffset({ x: 0, y: 0 });
             }}
           />
-          <div className={styles.dim} aria-hidden />
-          <div className={styles.circle} aria-hidden />
+          {shape === "square" ? (
+            <div className={styles.square} aria-hidden />
+          ) : (
+            <>
+              <div className={styles.dim} aria-hidden />
+              <div className={styles.circle} aria-hidden />
+            </>
+          )}
         </div>
 
         <div className={styles.controls}>

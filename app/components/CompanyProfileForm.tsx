@@ -2,8 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { ArrowLeft, ArrowRight, Building2, Check, Loader2, Save, Upload, Asterisk } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Asterisk,
+  Building2,
+  Check,
+  Clock3,
+  ExternalLink,
+  Globe,
+  Loader2,
+  MapPin,
+  Pencil,
+  Phone,
+  Save,
+  Upload,
+  Users,
+} from "lucide-react";
 import styles from "./CompanyProfileForm.module.css";
+import ProfilePhotoCropPopup from "./ProfilePhotoCropPopup";
+import { INDUSTRIES, LOCATIONS, withCurrentOption } from "@/lib/profileOptions";
 
 type CompanyStatus = "pending" | "approved" | "rejected";
 
@@ -33,6 +51,59 @@ const emptyForm = {
 };
 
 const sizeOptions = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"];
+
+/** Dial codes for the countries this portal supports. */
+const PHONE_CODES = [
+  { code: "au", label: "Australia", flag: "🇦🇺", dial: "+61" },
+  { code: "us", label: "USA", flag: "🇺🇸", dial: "+1" },
+  { code: "gb", label: "UK", flag: "🇬🇧", dial: "+44" },
+  { code: "nz", label: "New Zealand", flag: "🇳🇿", dial: "+64" },
+  { code: "ca", label: "Canada", flag: "🇨🇦", dial: "+1" },
+  { code: "sg", label: "Singapore", flag: "🇸🇬", dial: "+65" },
+] as const;
+
+function phoneMeta(code: string) {
+  return PHONE_CODES.find((item) => item.code === code) ?? PHONE_CODES[0];
+}
+
+function composePhone(code: string, local: string) {
+  const number = local.trim();
+  if (!number) return "";
+  const meta = phoneMeta(code);
+  return `${meta.flag} ${meta.dial} ${number}`;
+}
+
+function parseStoredPhone(raw: string) {
+  const value = raw.trim();
+  if (!value) return { code: "au", number: "" };
+
+  const byFlag = PHONE_CODES.find((item) => value.startsWith(item.flag));
+  if (byFlag) {
+    return {
+      code: byFlag.code,
+      number: value.slice(byFlag.flag.length).replace(byFlag.dial, "").trim(),
+    };
+  }
+
+  if (/canada/i.test(value) && value.includes("+1")) {
+    return {
+      code: "ca",
+      number: value.replace(/^\+1/, "").replace(/canada/i, "").replace(/[()]/g, "").trim(),
+    };
+  }
+
+  const byDial = [...PHONE_CODES].sort((a, b) => b.dial.length - a.dial.length);
+  for (const item of byDial) {
+    if (!value.startsWith(item.dial)) continue;
+    return {
+      code: item.dial === "+1" ? "us" : item.code,
+      number: value.slice(item.dial.length).trim(),
+    };
+  }
+
+  return { code: "au", number: value };
+}
+
 const STEPS = ["Company details", "Logo", "About"];
 const fieldClass =
   "w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20 transition-all";
@@ -59,6 +130,153 @@ function FieldLabel({
         </span>
       )}
     </span>
+  );
+}
+
+function websiteHref(website: string) {
+  const value = website.trim();
+  if (!value) return "";
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+}
+
+function CompanyProfileShowcase({
+  company,
+  notice,
+  onEdit,
+}: {
+  company: Company;
+  notice: "" | "created" | "updated";
+  onEdit: () => void;
+}) {
+  const site = websiteHref(company.website);
+  const facts = [
+    { icon: Building2, label: "Industry", value: company.industry },
+    { icon: MapPin, label: "Location", value: company.location },
+    { icon: Users, label: "Company size", value: company.size ? `${company.size} employees` : "" },
+    { icon: Phone, label: "Phone", value: company.phone },
+  ];
+
+  return (
+    <div className="space-y-5">
+      {notice === "created" ? (
+        <div className="rounded-2xl border border-[#86efac] bg-[#f0fdf4] px-5 py-4">
+          <p className="flex items-center gap-2 text-base font-semibold text-[#166534]">
+            <Check className="h-5 w-5" />
+            Company profile created
+          </p>
+          <p className="mt-1 text-sm leading-relaxed text-[#166534]">
+            Submitted for review. Hiring tools unlock once an admin approves your company.
+          </p>
+        </div>
+      ) : null}
+      {notice === "updated" ? (
+        <div className="rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] px-5 py-4 text-sm font-medium text-[#1d4ed8]">
+          Profile updated and sent back for review.
+        </div>
+      ) : null}
+
+      <section className="overflow-hidden rounded-2xl border border-[#e6eaf2] bg-white shadow-[0_16px_40px_-24px_rgba(15,23,42,0.35)]">
+        <div className="h-28 bg-[linear-gradient(120deg,#0f2744_0%,#2563eb_55%,#60a5fa_100%)]" />
+        <div className="px-5 pb-6 sm:px-7">
+          <div className="-mt-12 flex flex-wrap items-end justify-between gap-4">
+            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
+              {company.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={company.logoUrl}
+                  alt={`${company.name} logo`}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <Building2 className="h-8 w-8 text-[#6b7a9e]" />
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={onEdit}
+              className="inline-flex items-center gap-2 rounded-full bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8]"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit profile
+            </button>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <h2 className="text-2xl font-bold tracking-tight text-[#0f172a] sm:text-[1.7rem]">
+              {company.name}
+            </h2>
+            <StatusBadge status={company.status} />
+          </div>
+
+          <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[#64748b]">
+            {company.industry ? <span>{company.industry}</span> : null}
+            {company.location ? (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {company.location}
+              </span>
+            ) : null}
+          </p>
+
+          {company.status === "pending" ? (
+            <p className="mt-4 flex items-start gap-2 rounded-xl bg-[#fffbeb] px-3.5 py-3 text-sm text-[#92400e]">
+              <Clock3 className="mt-0.5 h-4 w-4 shrink-0" />
+              Pending approval. You can still edit details while our team reviews this profile.
+            </p>
+          ) : null}
+          {company.status === "rejected" ? (
+            <p className="mt-4 rounded-xl bg-[#fef2f2] px-3.5 py-3 text-sm text-[#991b1b]">
+              {company.rejectionReason ||
+                "Not approved. Update your details and resubmit for review."}
+            </p>
+          ) : null}
+          {company.status === "approved" ? (
+            <p className="mt-4 rounded-xl bg-[#f0fdf4] px-3.5 py-3 text-sm text-[#166534]">
+              Company is active. Hiring tools are unlocked.
+            </p>
+          ) : null}
+
+          <dl className="mt-6 grid gap-3 sm:grid-cols-2">
+            {facts.map(({ icon: Icon, label, value }) => (
+              <div
+                key={label}
+                className="rounded-xl border border-[#e6eaf2] bg-[#f8fafc] px-4 py-3"
+              >
+                <dt className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7a9e]">
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </dt>
+                <dd className="mt-1 text-[15px] font-medium text-[#0f172a]">
+                  {value || "—"}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          {site ? (
+            <a
+              href={site}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2563eb] hover:underline"
+            >
+              <Globe className="h-4 w-4" />
+              {company.website.replace(/^https?:\/\//i, "")}
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-[#e6eaf2] bg-white p-5 shadow-sm sm:p-7">
+        <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-[#6b7a9e]">
+          About the company
+        </h3>
+        <p className="mt-3 whitespace-pre-line text-[15px] leading-7 text-[#334155]">
+          {company.about}
+        </p>
+      </section>
+    </div>
   );
 }
 
@@ -93,7 +311,12 @@ export default function CompanyProfileForm() {
   const [uploading, setUploading] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [phoneCode, setPhoneCode] = useState("au");
+  const [phoneLocal, setPhoneLocal] = useState("");
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [step, setStep] = useState(0);
+  const [view, setView] = useState<"form" | "profile">("form");
+  const [notice, setNotice] = useState<"" | "created" | "updated">("");
 
   useEffect(() => {
     let cancelled = false;
@@ -109,13 +332,17 @@ export default function CompanyProfileForm() {
         if (cancelled) return;
         if (data.company) {
           setCompany(data.company);
+          setView("profile");
+          const parsedPhone = parseStoredPhone(data.company.phone || "");
+          setPhoneCode(parsedPhone.code);
+          setPhoneLocal(parsedPhone.number);
           setForm({
             name: data.company.name || "",
             website: data.company.website || "",
             industry: data.company.industry || "",
             location: data.company.location || "",
             size: data.company.size || "",
-            phone: data.company.phone || "",
+            phone: composePhone(parsedPhone.code, parsedPhone.number) || data.company.phone || "",
             about: data.company.about || "",
             logoUrl: data.company.logoUrl || "",
           });
@@ -137,40 +364,52 @@ export default function CompanyProfileForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function onLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  function closeLogoCrop() {
+    setCropImageSrc((current) => {
+      if (current) URL.revokeObjectURL(current);
+      return null;
+    });
+  }
 
+  function onLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type)) {
+      toast.error("Choose a JPG, PNG, WEBP, or GIF logo");
+      return;
+    }
+    if (!file.size || file.size > 10 * 1024 * 1024) {
+      toast.error("Choose a logo under 10 MB");
+      return;
+    }
+    setCropImageSrc((current) => {
+      if (current) URL.revokeObjectURL(current);
+      return URL.createObjectURL(file);
+    });
+  }
+
+  async function uploadLogo(file: File) {
     setUploading(true);
     try {
       const body = new FormData();
       body.append("file", file);
-
-      const res = await fetch("/api/upload/logo", {
-        method: "POST",
-        body,
-      });
+      const res = await fetch("/api/upload/logo", { method: "POST", body });
       const data = await res.json();
-
       if (!res.ok || !data.success) {
-        toast.error(data.message || "Logo upload failed");
-        return;
+        throw new Error(data.message || "Logo upload failed");
       }
-
       updateField("logoUrl", data.url);
       toast.success("Logo uploaded");
-    } catch {
-      toast.error("Logo upload failed");
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
   function stepError(index: number) {
     if (index === 0) {
       if (!form.name.trim() || form.name.trim().length < 2) return "Company name is required";
-      if (!form.phone.trim()) return "Phone is required";
+      if (phoneLocal.replace(/\D/g, "").length < 6) return "Enter a valid phone number";
       if (!form.industry.trim()) return "Industry is required";
       if (!form.size.trim()) return "Company size is required";
       if (!form.location.trim()) return "Location is required";
@@ -225,7 +464,9 @@ export default function CompanyProfileForm() {
       }
 
       setCompany(data.company);
-      toast.success(data.message || "Saved");
+      setNotice(company ? "updated" : "created");
+      setView("profile");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       toast.error("Something went wrong");
     } finally {
@@ -239,6 +480,20 @@ export default function CompanyProfileForm() {
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading company profile…
       </div>
+    );
+  }
+
+  if (view === "profile" && company) {
+    return (
+      <CompanyProfileShowcase
+        company={company}
+        notice={notice}
+        onEdit={() => {
+          setNotice("");
+          setStep(0);
+          setView("form");
+        }}
+      />
     );
   }
 
@@ -275,7 +530,15 @@ export default function CompanyProfileForm() {
             Please fill your company profile and get approved to unlock the
             recruiter panel.
           </p>
-        ) : null}
+        ) : (
+          <button
+            type="button"
+            onClick={() => setView("profile")}
+            className="text-sm font-semibold text-[#2563eb] hover:underline"
+          >
+            View profile
+          </button>
+        )}
       </div>
 
       <form
@@ -349,26 +612,56 @@ export default function CompanyProfileForm() {
               </label>
               <label className="block">
                 <FieldLabel required>Phone</FieldLabel>
-                <input
-                  required
-                  value={form.phone}
-                  onChange={(e) => updateField("phone", e.target.value)}
-                  className={fieldClass}
-                  placeholder="03 xxxx xxxx"
-                />
+                <div className="flex gap-2">
+                  <select
+                    aria-label="Country code"
+                    value={phoneCode}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setPhoneCode(next);
+                      updateField("phone", composePhone(next, phoneLocal));
+                    }}
+                    className="w-[5.75rem] shrink-0 rounded-lg border border-[#cdd3e0] bg-white px-2 py-3 text-[15px] outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20"
+                  >
+                    {PHONE_CODES.map((item) => (
+                      <option key={item.code} value={item.code}>
+                        {item.flag} {item.dial}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    required
+                    inputMode="tel"
+                    autoComplete="tel-national"
+                    value={phoneLocal}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setPhoneLocal(next);
+                      updateField("phone", composePhone(phoneCode, next));
+                    }}
+                    className={`${fieldClass} min-w-0 flex-1`}
+                    placeholder="412 345 678"
+                  />
+                </div>
               </label>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <FieldLabel required>Industry</FieldLabel>
-                <input
+                <select
                   required
                   value={form.industry}
                   onChange={(e) => updateField("industry", e.target.value)}
-                  className={fieldClass}
-                  placeholder="Aged care / Disability"
-                />
+                  className={`${fieldClass} bg-white`}
+                >
+                  <option value="">Select industry</option>
+                  {withCurrentOption(INDUSTRIES, form.industry).map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="block">
                 <FieldLabel required>Company size</FieldLabel>
@@ -390,13 +683,27 @@ export default function CompanyProfileForm() {
 
             <label className="block">
               <FieldLabel required>Location</FieldLabel>
-              <input
+              <select
                 required
                 value={form.location}
                 onChange={(e) => updateField("location", e.target.value)}
-                className={fieldClass}
-                placeholder="Melbourne, VIC"
-              />
+                className={`${fieldClass} bg-white`}
+              >
+                <option value="">Select location</option>
+                {form.location &&
+                !LOCATIONS.some((group) => group.options.includes(form.location)) ? (
+                  <option value={form.location}>{form.location}</option>
+                ) : null}
+                {LOCATIONS.map((group) => (
+                  <optgroup key={group.group} label={group.group}>
+                    {group.options.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
             </label>
           </>
         ) : null}
@@ -440,7 +747,7 @@ export default function CompanyProfileForm() {
                   {uploading ? "Uploading…" : "Choose file"}
                 </button>
                 <p className="mt-2 text-xs text-[#6b7a9e]">
-                  JPG, PNG, WEBP or GIF · max 2MB
+                  JPG, PNG, WEBP or GIF · drag and zoom to fit
                 </p>
               </div>
               {form.logoUrl ? (
@@ -506,6 +813,22 @@ export default function CompanyProfileForm() {
           )}
         </div>
       </form>
+      {cropImageSrc ? (
+        <ProfilePhotoCropPopup
+          imageSrc={cropImageSrc}
+          shape="square"
+          onCancel={closeLogoCrop}
+          onComplete={async (file) => {
+            try {
+              await uploadLogo(file);
+              closeLogoCrop();
+            } catch (error) {
+              toast.error(error instanceof Error ? error.message : "Logo upload failed");
+              throw error;
+            }
+          }}
+        />
+      ) : null}
     </div>
   );
 }

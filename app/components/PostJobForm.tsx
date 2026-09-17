@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { ArrowLeft, ArrowRight, Asterisk, Check, Loader2, Save, X } from "lucide-react";
 import RichTextEditor from "./RichTextEditor";
+import { INDUSTRIES, LOCATIONS } from "@/lib/profileOptions";
 import styles from "./PostJobForm.module.css";
 
 function stripHtml(html: string) {
@@ -36,6 +37,14 @@ function FieldLabel({
   );
 }
 
+const CURRENCIES = [
+  { code: "AUD", label: "AUD · Australia" },
+  { code: "USD", label: "USD · USA" },
+  { code: "GBP", label: "GBP · UK" },
+  { code: "NZD", label: "NZD · New Zealand" },
+  { code: "CAD", label: "CAD · Canada" },
+  { code: "SGD", label: "SGD · Singapore" },
+] as const;
 const inputClass =
   "w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20";
 const STEPS = ["Role", "Pay", "Skills", "Details", "Publish"];
@@ -67,6 +76,7 @@ export default function PostJobForm() {
   const [form, setForm] = useState(emptyForm);
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
+  const [categoryCustom, setCategoryCustom] = useState(false);
 
   function updateField(key: keyof typeof emptyForm, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -211,7 +221,7 @@ export default function PostJobForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-5 rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm"
+      className="space-y-5 overflow-hidden rounded-2xl border border-[#e6eaf2] bg-white p-4 shadow-sm sm:p-6"
     >
       <ol className={styles.stepper}>
         {STEPS.map((label, index) => {
@@ -243,7 +253,7 @@ export default function PostJobForm() {
                 >
                   {complete ? <Check className="h-3.5 w-3.5" /> : index + 1}
                 </span>
-                <span className="min-w-0">{label}</span>
+                <span className={`${styles.stepLabel} min-w-0`}>{label}</span>
               </button>
             </li>
           );
@@ -267,25 +277,64 @@ export default function PostJobForm() {
       </label>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block">
+        <div className="block">
           <FieldLabel required>Category</FieldLabel>
-          <input
-            required
-            value={form.category}
-            onChange={(e) => updateField("category", e.target.value)}
-            className={inputClass}
-            placeholder="Aged care / Nursing / Disability"
-          />
-        </label>
+          <select
+            required={!categoryCustom}
+            value={categoryCustom ? "__custom__" : form.category}
+            onChange={(e) => {
+              if (e.target.value === "__custom__") {
+                setCategoryCustom(true);
+                updateField("category", "");
+                return;
+              }
+              setCategoryCustom(false);
+              updateField("category", e.target.value);
+            }}
+            className={`${inputClass} bg-white`}
+          >
+            <option value="">Select category</option>
+            {INDUSTRIES.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+            <option value="__custom__">Custom</option>
+          </select>
+          {categoryCustom ? (
+            <input
+              required
+              value={form.category}
+              onChange={(e) => updateField("category", e.target.value)}
+              className={`${inputClass} mt-2 bg-white`}
+              placeholder="Type your category"
+              maxLength={80}
+            />
+          ) : null}
+        </div>
         <label className="block">
           <FieldLabel required>Location</FieldLabel>
-          <input
+          <select
             required
             value={form.location}
             onChange={(e) => updateField("location", e.target.value)}
-            className={inputClass}
-            placeholder="Melbourne, VIC"
-          />
+            className={`${inputClass} bg-white`}
+          >
+            <option value="">Select location</option>
+            {form.location &&
+            !LOCATIONS.some((group) => group.options.includes(form.location)) ? (
+              <option value={form.location}>{form.location}</option>
+            ) : null}
+            {LOCATIONS.map((group) => (
+              <optgroup key={group.group} label={group.group}>
+                {group.options.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
         </label>
       </div>
 
@@ -366,16 +415,22 @@ export default function PostJobForm() {
       <div className="grid gap-4 sm:grid-cols-3">
         <label className="block">
           <FieldLabel required>Currency</FieldLabel>
-          <input
+          <select
             required
-            maxLength={3}
             value={form.salaryCurrency}
-            onChange={(e) =>
-              updateField("salaryCurrency", e.target.value.toUpperCase())
-            }
-            className={inputClass}
-            placeholder="AUD"
-          />
+            onChange={(e) => updateField("salaryCurrency", e.target.value)}
+            className={`${inputClass} bg-white`}
+          >
+            {form.salaryCurrency &&
+            !CURRENCIES.some((item) => item.code === form.salaryCurrency) ? (
+              <option value={form.salaryCurrency}>{form.salaryCurrency}</option>
+            ) : null}
+            {CURRENCIES.map((item) => (
+              <option key={item.code} value={item.code}>
+                {item.label}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="block">
           <FieldLabel required>Salary period</FieldLabel>

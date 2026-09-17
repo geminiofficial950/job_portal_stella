@@ -147,7 +147,7 @@ function SeekerJobsListInner() {
             setLoading(true);
             void load();
           }}
-          className={`${styles.formButton} rounded-lg bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white`}
+            className={`${styles.formButton} w-full rounded-lg bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white sm:w-auto`}
         >
           Search
         </button>
@@ -174,10 +174,10 @@ function SeekerJobsListInner() {
           {jobs.map((job) => (
             <li
               key={job.id}
-              className={`${styles.surface} rounded-2xl border border-[#2d4463] bg-[#131d30] p-5`}
+              className={`${styles.surface} rounded-2xl border border-[#2d4463] bg-[#131d30] p-4 sm:p-5`}
             >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex gap-3">
+              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex min-w-0 gap-3">
                   {job.company?.logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -190,13 +190,13 @@ function SeekerJobsListInner() {
                       {(job.company?.name || "J").slice(0, 1)}
                     </div>
                   )}
-                  <div>
-                    <p className="font-semibold text-[#e5edf9]">{job.title}</p>
-                    <p className="mt-1 text-sm text-[#a1b0c7]">
+                  <div className="min-w-0">
+                    <p className="break-words font-semibold text-[#e5edf9]">{job.title}</p>
+                    <p className="mt-1 break-words text-sm text-[#a1b0c7]">
                       {job.company?.name || "Company"} · {job.location} ·{" "}
                       {job.employmentType} · {job.workMode}
                     </p>
-                    <p className="mt-1 text-sm text-[#a1b0c7]">
+                    <p className="mt-1 break-words text-sm text-[#a1b0c7]">
                       {job.salaryCurrency} {job.salaryMin}–{job.salaryMax}/
                       {job.salaryPeriod} · {job.experienceLevel} ·{" "}
                       {job.category}
@@ -218,7 +218,7 @@ function SeekerJobsListInner() {
                 {job.applied ? (
                   <Link
                     href="/dashboard/seeker/applications"
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#2d4463] bg-[#19283e] px-3.5 py-2 text-sm font-semibold text-[#8ab4ff]"
+                    className="inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#2d4463] bg-[#19283e] px-3.5 py-2 text-sm font-semibold text-[#8ab4ff] sm:w-auto"
                   >
                     <Check className="h-4 w-4" />
                     Applied
@@ -231,7 +231,7 @@ function SeekerJobsListInner() {
                     company={job.company?.name}
                     disabled={applyingId === job.id}
                     onSubmit={(coverNote) => applyToJob(job.id, coverNote)}
-                    className={`${styles.formButton} shrink-0 rounded-lg bg-[#2563eb] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#2563eb] disabled:opacity-60`}
+                    className={`${styles.formButton} w-full shrink-0 justify-center rounded-lg bg-[#2563eb] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#2563eb] disabled:opacity-60 sm:w-auto`}
                   />
                 )}
               </div>

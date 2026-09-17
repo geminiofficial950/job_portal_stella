@@ -19,6 +19,24 @@ export default function SeekerSidebar() {
       sidebarClassName={styles.sidebar}
       menuButtonClassName={styles.menuButton}
       brandLogo
+      mobileTabs={[
+        {
+          label: "Home",
+          href: "/dashboard/seeker",
+          icon: LayoutDashboard,
+          exact: true,
+        },
+        {
+          label: "Jobs",
+          href: "/dashboard/seeker/suggested",
+          icon: Search,
+        },
+        {
+          label: "Applied",
+          href: "/dashboard/seeker/applications",
+          icon: FileText,
+        },
+      ]}
       groups={[
         {
           label: "Main Menu",

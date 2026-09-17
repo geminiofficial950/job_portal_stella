@@ -40,6 +40,25 @@ export default function RecruiterSidebar({
       sidebarClassName={styles.sidebar}
       menuButtonClassName={styles.menuButton}
       brandLogo
+      mobileTabs={[
+        {
+          label: "Home",
+          href: "/dashboard/recruiter",
+          icon: LayoutDashboard,
+          exact: true,
+        },
+        {
+          label: "Jobs",
+          href: "/dashboard/recruiter/jobs",
+          icon: Briefcase,
+          exact: true,
+        },
+        {
+          label: "Inbox",
+          href: "/dashboard/recruiter/applications",
+          icon: FileText,
+        },
+      ]}
       groups={[
         {
           label: "Main Menu",

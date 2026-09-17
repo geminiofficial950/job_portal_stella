@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Menu,
+  Ellipsis,
   X,
   ChevronRight,
   Home,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DASH } from "@/app/lib/dashboardTheme";
+import styles from "@/app/dashboard/seeker/seeker.module.css";
 import { useAuth } from "./AuthProvider";
 import BrandLogo from "./BrandLogo";
 
@@ -28,6 +29,14 @@ export type DashNavGroup = {
   items: DashNavItem[];
 };
 
+function GlassIcon({ icon: Icon }: { icon: LucideIcon }) {
+  return (
+    <span className={styles.mobileGlassIcon}>
+      <Icon />
+    </span>
+  );
+}
+
 function isActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -40,6 +49,8 @@ type Props = {
   /** Use the site BrandLogo instead of icon + title text */
   brandLogo?: boolean;
   groups: DashNavGroup[];
+  /** Short items shown in the mobile bottom bar, before More. */
+  mobileTabs?: DashNavItem[];
   footer?: React.ReactNode;
   sidebarClassName?: string;
   menuButtonClassName?: string;
@@ -51,15 +62,24 @@ export default function DashboardSidebarShell({
   brandIcon: BrandIcon,
   brandLogo = false,
   groups,
+  mobileTabs,
   footer,
   sidebarClassName = "",
-  menuButtonClassName = "",
 }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const { logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const tabs =
+    mobileTabs ??
+    groups.flatMap((group) => group.items).slice(0, 3);
+  const moreActive =
+    open || !tabs.some((item) => isActive(pathname, item.href, item.exact));
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -109,43 +129,103 @@ export default function DashboardSidebarShell({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className={`${menuButtonClassName} fixed bottom-5 left-5 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full text-white shadow-xl lg:hidden`}
-        style={{ background: DASH.accent }}
-        aria-label="Open menu"
+      <nav
+        className={`${styles.mobileDock} lg:hidden`}
+        style={{ gridTemplateColumns: `repeat(${tabs.length + 1}, minmax(0, 1fr))` }}
+        aria-label="Mobile navigation"
       >
-        <Menu className="h-5 w-5" />
-      </button>
+        {tabs.map((item) => {
+          const active = isActive(pathname, item.href, item.exact);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={styles.mobileDockItem}
+            >
+              <GlassIcon icon={Icon} />
+              <span className="max-w-full truncate">{item.label}</span>
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          className={styles.mobileDockItem}
+          data-open={open ? "true" : undefined}
+        >
+          <GlassIcon icon={open ? X : Ellipsis} />
+          <span>{open ? "Close" : "More"}</span>
+        </button>
+      </nav>
 
       {open ? (
         <button
           type="button"
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-x-0 top-0 z-40 bg-black/40 lg:hidden"
+          style={{ bottom: "calc(86px + env(safe-area-inset-bottom))" }}
           aria-label="Close menu overlay"
           onClick={() => setOpen(false)}
         />
       ) : null}
 
+      {open ? (
+        <div
+          className={`${styles.mobileSheet} lg:hidden`}
+          style={{ bottom: "calc(78px + env(safe-area-inset-bottom))" }}
+          role="dialog"
+          aria-label="More menu"
+        >
+          {groups.map((group) => (
+            <div key={group.label} className="mb-4">
+              <p className={styles.mobileSheetLabel}>{group.label}</p>
+              <ul>
+                {group.items.map((item) => {
+                  const active = isActive(pathname, item.href, item.exact);
+                  const Icon = item.icon;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        onClick={() => setOpen(false)}
+                        className={styles.mobileSheetLink}
+                      >
+                        <GlassIcon icon={Icon} />
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+          <div className={styles.mobileSheetFooter}>
+            <Link href="/" onClick={() => setOpen(false)} className={styles.mobileSheetLink}>
+              <GlassIcon icon={Home} />
+              Home
+            </Link>
+            <button
+              type="button"
+              disabled={loggingOut}
+              onClick={() => void handleLogout()}
+              className={styles.mobileSheetLink}
+            >
+              <GlassIcon icon={LogOut} />
+              {loggingOut ? "Logging out…" : "Logout"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <aside
-        className={`${sidebarClassName} fixed left-0 top-0 z-50 flex h-screen w-[250px] flex-col transition-transform duration-300 lg:sticky lg:z-0 lg:translate-x-0 ${
-          open ? "translate-x-0" : "-translate-x-full"
-        } ${sidebarClassName ? "" : "border-r border-white/5"}`}
+        className={`${sidebarClassName} hidden h-screen w-[250px] flex-col lg:sticky lg:top-0 lg:z-0 lg:flex ${
+          sidebarClassName ? "" : "border-r border-white/5"
+        }`}
         style={sidebarClassName ? undefined : { background: DASH.panel }}
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 lg:hidden">
-          <div className="min-w-0 flex-1 pr-2">{brandMark}</div>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="rounded-lg p-1.5 text-white/60 hover:bg-white/10"
-            aria-label="Close menu"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
         <div
           data-sidebar-brand
           data-brand-logo={brandLogo ? "true" : undefined}

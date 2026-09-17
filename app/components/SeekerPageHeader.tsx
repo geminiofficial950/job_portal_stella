@@ -1,9 +1,9 @@
 import SeekerThemeToggle from "@/app/components/SeekerTheme";
 import Link from "next/link";
-import { ArrowUpRight, Bookmark, Briefcase, CalendarCheck, FileText, Settings, Search, Bell } from "lucide-react";
+import { ArrowUpRight, Bookmark, Briefcase, CalendarCheck, FileText, Mail, Settings, Search, Bell } from "lucide-react";
 import styles from "@/app/dashboard/seeker/seeker.module.css";
 
-const icons = { suggested: Search, applications: FileText, saved: Bookmark, jobs: Briefcase, interviews: CalendarCheck, settings: Settings, preferences: Bell };
+const icons = { suggested: Search, applications: FileText, saved: Bookmark, jobs: Briefcase, interviews: CalendarCheck, settings: Settings, preferences: Bell, letters: Mail };
 
 export default function SeekerPageHeader({ title, subtitle, section, icon }: {
   title: string;

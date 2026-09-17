@@ -11,6 +11,84 @@ import { Company } from "@/models/Company";
 export const runtime = "nodejs";
 
 const fail = (message: string, status = 400) => NextResponse.json({ success: false, message }, { status });
+
+type SavedLetter = {
+  id: string;
+  text: string;
+  jobTitle: string;
+  company: string;
+  usedAt: string | null;
+};
+
+export async function GET() {
+  const auth = await requireApiAuth(["user"]);
+  if (auth.error) return auth.error;
+
+  try {
+    await connectDB();
+    const seekerId = auth.auth.sub;
+    const [{ Application }, { BoardApplication }] = await Promise.all([
+      import("@/models/Application"),
+      import("@/models/BoardApplication"),
+    ]);
+
+    const [apps, boardApps] = await Promise.all([
+      Application.find({ seekerId, coverNote: { $nin: ["", null] } })
+        .sort({ updatedAt: -1 })
+        .limit(30)
+        .select("coverNote jobId companyId updatedAt")
+        .lean(),
+      BoardApplication.find({ seekerId, coverNote: { $nin: ["", null] } })
+        .sort({ updatedAt: -1 })
+        .limit(30)
+        .select("coverNote title companyName updatedAt")
+        .lean(),
+    ]);
+
+    const jobIds = apps.map((app) => app.jobId);
+    const companyIds = apps.map((app) => app.companyId);
+    const [jobs, companies] = await Promise.all([
+      Job.find({ _id: { $in: jobIds } }).select("title").lean(),
+      Company.find({ _id: { $in: companyIds } }).select("name").lean(),
+    ]);
+    const jobMap = new Map(jobs.map((job) => [String(job._id), job.title]));
+    const companyMap = new Map(companies.map((company) => [String(company._id), company.name]));
+
+    const rows: SavedLetter[] = [
+      ...apps.map((app) => ({
+        id: String(app._id),
+        text: String(app.coverNote || "").trim(),
+        jobTitle: jobMap.get(String(app.jobId)) || "Job",
+        company: companyMap.get(String(app.companyId)) || "",
+        usedAt: app.updatedAt ? new Date(app.updatedAt).toISOString() : null,
+      })),
+      ...boardApps.map((app) => ({
+        id: String(app._id),
+        text: String(app.coverNote || "").trim(),
+        jobTitle: String(app.title || "Job"),
+        company: String(app.companyName || ""),
+        usedAt: app.updatedAt ? new Date(app.updatedAt).toISOString() : null,
+      })),
+    ]
+      .filter((row) => row.text)
+      .sort((a, b) => (b.usedAt || "").localeCompare(a.usedAt || ""));
+
+    const seen = new Set<string>();
+    const letters = rows.filter((row) => {
+      if (seen.has(row.text)) return false;
+      seen.add(row.text);
+      return true;
+    }).slice(0, 20);
+
+    return NextResponse.json(
+      { success: true, letters },
+      { headers: { "Cache-Control": "private, no-store" } },
+    );
+  } catch (error) {
+    console.error("Cover letters GET error:", error);
+    return fail("Could not load your cover letters.", 500);
+  }
+}
 const text = (value: unknown, limit: number) => typeof value === "string" ? value.trim().slice(0, limit) : "";
 
 export async function POST(request: Request) {

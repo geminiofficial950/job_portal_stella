@@ -1226,6 +1226,31 @@
   color: var(--seeker-link);
   font-size: 13px;
 }
+.coverDialog {
+  position: fixed;
+  inset: 0;
+  width: min(560px, calc(100vw - 24px));
+  height: fit-content;
+  max-height: min(86dvh, 720px);
+  margin: auto;
+  overflow: auto;
+  border: 1px solid #dbe2ef;
+  border-radius: 20px;
+  padding: 0;
+  background: #fff;
+  color: #17233b;
+  box-shadow: 0 24px 80px #07182f40;
+}
+.coverDialog::backdrop {
+  background: #06152a99;
+}
+@media (max-width: 640px) {
+  .coverDialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 16px;
+  }
+}
 .subpage .emptyState {
   position: relative;
   border: 1px solid var(--seeker-line);

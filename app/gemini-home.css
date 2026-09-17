@@ -2522,6 +2522,13 @@
   color: #ffffff !important;
 }
 
+/* Job detail is portaled inside .gemini-home (resume popup). Don't inherit the 104px section padding. */
+.gemini-home .home-job-detail-modal section,
+.gemini-home .job-detail-modal section,
+.gemini-home .job-detail-panel section {
+  padding: 0 !important;
+}
+
 /* Homepage job popup — portaled to body; always visible on all breakpoints */
 .home-job-detail-modal.job-detail-modal,
 .home-job-detail-modal {

@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
   type CSSProperties,
+  type FormEvent,
 } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
@@ -15,6 +16,15 @@ import { jobOffersVisaSponsorship } from "@/lib/visa-sponsorship";
 import HomeJobDetailModal, {
   type HomeModalJob,
 } from "@/app/components/HomeJobDetailModal";
+import SuggestedMissingDetails, {
+  type GapDraft,
+} from "@/app/components/SuggestedMissingDetails";
+import {
+  isValidHttpUrl,
+  validateProfile,
+  type ProfileState,
+} from "@/app/components/SeekerProfileForm";
+import { educationLine, profileGapKeys, type GapKey } from "@/lib/profileGaps";
 import "@/app/jobs/jobs.css";
 
 type SuggestedJob = {
@@ -131,11 +141,33 @@ function toModalJob(job: SuggestedJob): HomeModalJob {
   };
 }
 
+function gapDraftFrom(profile: ProfileState, phone: string): GapDraft {
+  return {
+    headline: profile.headline || "",
+    location: profile.location || "",
+    experienceLevel: profile.experienceLevel || "",
+    about: profile.about || "",
+    skills: (profile.skills || []).join(", "),
+    education: educationLine(profile),
+    preferredEmploymentTypes: profile.preferredEmploymentTypes || [],
+    preferredWorkModes: profile.preferredWorkModes || [],
+    linkedin: profile.linkedin || "",
+    resumeUrl: profile.resumeUrl || "",
+    phone: phone || "",
+  };
+}
+
 export default function SeekerSuggestedJobsList() {
   const [loading, setLoading] = useState(true);
   const [hasSkills, setHasSkills] = useState(true);
   const [jobs, setJobs] = useState<SuggestedJob[]>([]);
   const [selectedJob, setSelectedJob] = useState<HomeModalJob | null>(null);
+  const [profile, setProfile] = useState<ProfileState | null>(null);
+  const [accountName, setAccountName] = useState("");
+  const [gaps, setGaps] = useState<GapKey[]>([]);
+  const [draft, setDraft] = useState<GapDraft | null>(null);
+  const [savingGaps, setSavingGaps] = useState(false);
+  const [gapError, setGapError] = useState("");
 
   const load = useCallback(async () => {
     try {
@@ -155,8 +187,143 @@ export default function SeekerSuggestedJobsList() {
   }, []);
 
   useEffect(() => {
-    void load();
+    let cancelled = false;
+    async function start() {
+      try {
+        const res = await fetch("/api/seeker/profile", { cache: "no-store" });
+        const data = await res.json();
+        if (cancelled) return;
+        if (!res.ok || !data.success || !data.profile) {
+          setLoading(false);
+          toast.error(data.message || "Failed to load profile");
+          return;
+        }
+        const next = data.profile as ProfileState;
+        const phone = String(data.account?.phone || "");
+        const missing = profileGapKeys(
+          { ...next, phone },
+          { includePhone: true },
+        );
+        if (missing.length) {
+          setProfile(next);
+          setAccountName(String(data.account?.name || ""));
+          setGaps(missing);
+          setDraft(gapDraftFrom(next, phone));
+          setLoading(false);
+          return;
+        }
+        await load();
+      } catch {
+        if (!cancelled) {
+          setLoading(false);
+          toast.error("Failed to load profile");
+        }
+      }
+    }
+    void start();
+    return () => {
+      cancelled = true;
+    };
   }, [load]);
+
+  async function saveGaps(event: FormEvent) {
+    event.preventDefault();
+    if (!profile || !draft || savingGaps) return;
+    const skills = draft.skills
+      .split(",")
+      .map((skill) => skill.trim())
+      .filter(Boolean);
+    const next: ProfileState = {
+      ...profile,
+      headline: gaps.includes("headline") ? draft.headline.trim() : profile.headline,
+      location: gaps.includes("location") ? draft.location.trim() : profile.location,
+      experienceLevel: gaps.includes("experienceLevel")
+        ? draft.experienceLevel
+        : profile.experienceLevel,
+      about: gaps.includes("about") ? draft.about.trim() : profile.about,
+      skills: gaps.includes("skills") ? skills : profile.skills,
+      linkedin: gaps.includes("linkedin") ? draft.linkedin.trim() : profile.linkedin,
+      resumeUrl: gaps.includes("resumeUrl") ? draft.resumeUrl.trim() : profile.resumeUrl,
+      portfolio:
+        profile.portfolio && isValidHttpUrl(profile.portfolio.trim())
+          ? profile.portfolio.trim()
+          : "",
+      preferredEmploymentTypes: gaps.includes("preferredEmploymentTypes")
+        ? draft.preferredEmploymentTypes
+        : profile.preferredEmploymentTypes,
+      preferredWorkModes: gaps.includes("preferredWorkModes")
+        ? draft.preferredWorkModes
+        : profile.preferredWorkModes,
+      education: gaps.includes("education") ? draft.education.trim() : profile.education,
+      experiences: (profile.experiences || []).filter((entry) => entry.company?.trim()),
+      educations: gaps.includes("education")
+        ? [
+            {
+              institution: draft.education.trim(),
+              degree: "",
+              level: "",
+              yearCompleted: "",
+              description: "",
+              skills: [],
+            },
+          ]
+        : profile.educations,
+    };
+    const invalid = validateProfile(next);
+    if (invalid) {
+      setGapError(invalid);
+      return;
+    }
+    setSavingGaps(true);
+    setGapError("");
+    try {
+      const response = await fetch("/api/seeker/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section: "profile", profile: next }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Could not save those details");
+      }
+      if (gaps.includes("phone")) {
+        const accountRes = await fetch("/api/seeker/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            section: "account",
+            name: accountName.trim().length >= 2 ? accountName.trim() : "Job seeker",
+            phone: draft.phone.trim(),
+          }),
+        });
+        const accountData = await accountRes.json();
+        if (!accountRes.ok || !accountData.success) {
+          throw new Error(accountData.message || "Could not save phone");
+        }
+      }
+      setGaps([]);
+      setProfile(data.profile);
+      setLoading(true);
+      await load();
+    } catch (cause) {
+      setGapError(cause instanceof Error ? cause.message : "Could not save those details");
+    } finally {
+      setSavingGaps(false);
+    }
+  }
+
+  if (gaps.length && draft) {
+    return (
+      <SuggestedMissingDetails
+        gaps={gaps}
+        draft={draft}
+        saving={savingGaps}
+        error={gapError}
+        onChange={setDraft}
+        onSubmit={saveGaps}
+      />
+    );
+  }
 
   if (loading) {
     return (

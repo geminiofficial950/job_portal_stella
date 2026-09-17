@@ -5,6 +5,14 @@ import { createPortal } from "react-dom";
 import { COVER_LETTER_MAX_LENGTH, validateCoverLetter } from "@/lib/cover-letter";
 import styles from "./ApplyWithCoverLetter.module.css";
 
+type SavedLetter = {
+  id: string;
+  text: string;
+  jobTitle: string;
+  company: string;
+  usedAt: string | null;
+};
+
 type Props = {
   jobId: string;
   jobTitle: string;
@@ -23,6 +31,7 @@ export default function ApplyWithCoverLetter({
   className, disabled, onBeforeOpen, onSubmit,
 }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const letterRow = useRef<HTMLUListElement>(null);
   const submitting = useRef(false);
   const generation = useRef<AbortController | null>(null);
   const [open, setOpen] = useState(false);
@@ -31,9 +40,28 @@ export default function ApplyWithCoverLetter({
   const [draft, setDraft] = useState("");
   const [letter, setLetter] = useState("");
   const [error, setError] = useState("");
+  const [savedLetters, setSavedLetters] = useState<SavedLetter[]>([]);
   const id = useId();
 
   useEffect(() => () => generation.current?.abort(), []);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    fetch("/api/seeker/cover-letter", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (cancelled || !data.success || !Array.isArray(data.letters)) return;
+        const letters = data.letters as SavedLetter[];
+        setSavedLetters(letters);
+      })
+      .catch(() => {
+        if (!cancelled) setSavedLetters([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   function close() {
     if (submitting.current) return;
@@ -121,6 +149,55 @@ export default function ApplyWithCoverLetter({
           <h2 id={`${id}-title`}>Add a cover letter</h2>
           <p id={`${id}-job`} className={styles.job}>{jobTitle}{company ? ` at ${company}` : ""}</p>
           <p className={styles.hint}>A cover letter is required. Write your own, or use AI to create a draft from your profile and this job. Review and edit it before submitting.</p>
+          {savedLetters.length > 0 && (
+            <section className={styles.saved} aria-label="Your previous cover letters">
+              <div className={styles.savedHead}>
+                <h3>Your cover letters</h3>
+                {savedLetters.length > 1 && (
+                  <div className={styles.savedNav}>
+                    <button
+                      type="button"
+                      aria-label="Previous cover letters"
+                      disabled={busy || generating}
+                      onClick={() => letterRow.current?.scrollBy({ left: -220, behavior: "smooth" })}
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Next cover letters"
+                      disabled={busy || generating}
+                      onClick={() => letterRow.current?.scrollBy({ left: 220, behavior: "smooth" })}
+                    >
+                      ›
+                    </button>
+                  </div>
+                )}
+              </div>
+              <ul ref={letterRow}>
+                {savedLetters.map((item) => {
+                  const selected = letter === item.text;
+                  return (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        disabled={busy || generating}
+                        aria-pressed={selected}
+                        onClick={() => {
+                          setLetter(item.text);
+                          setDraft("");
+                          setError("");
+                        }}
+                      >
+                        {item.jobTitle}
+                        {item.company ? ` · ${item.company}` : ""}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
           <div className={styles.aiActions}>
             <button type="button" className={styles.generate} disabled={busy || generating} onClick={() => void generate()}>
               {generating ? "Generating draft…" : draft ? "Generate another draft" : "Generate with AI"}

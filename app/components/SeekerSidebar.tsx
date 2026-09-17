@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Search,
   FileText,
+  Mail,
   Bookmark,
   CalendarCheck,
   UserRound,
@@ -61,6 +62,11 @@ export default function SeekerSidebar() {
               label: "Applications",
               href: "/dashboard/seeker/applications",
               icon: FileText,
+            },
+            {
+              label: "Cover letters",
+              href: "/dashboard/seeker/cover-letters",
+              icon: Mail,
             },
             {
               label: "Saved Jobs",

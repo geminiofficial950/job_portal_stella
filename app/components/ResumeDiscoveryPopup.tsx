@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -17,6 +17,10 @@ import { useAuth } from "@/app/components/AuthProvider";
 import HomeJobDetailModal, {
   type HomeModalJob,
 } from "@/app/components/HomeJobDetailModal";
+import SuggestedMissingDetails, {
+  type GapDraft,
+} from "@/app/components/SuggestedMissingDetails";
+import { profileGapKeys, type GapKey } from "@/lib/profileGaps";
 import styles from "./ResumeDiscoveryPopup.module.css";
 import "@/app/jobs/jobs.css";
 
@@ -166,6 +170,9 @@ export default function ResumeDiscoveryPopup({
   const [selectedJob, setSelectedJob] = useState<HomeModalJob | null>(null);
   // Keep popup alive after register even though auth user becomes set.
   const [onboardingActive, setOnboardingActive] = useState(false);
+  const [askMissing, setAskMissing] = useState(false);
+  const [missingGaps, setMissingGaps] = useState<GapKey[]>([]);
+  const [gapDraft, setGapDraft] = useState<GapDraft | null>(null);
 
   const dismissKey = dismissKeyFor(surface);
   const stepLabels = [
@@ -327,8 +334,18 @@ export default function ResumeDiscoveryPopup({
 
     const onWheel = (event: WheelEvent) => {
       if (!dialog.current?.open) return;
+      const target = event.target as HTMLElement | null;
+      const detailScroll = target?.closest?.(
+        ".job-detail-panel__scroll",
+      ) as HTMLElement | null;
+      const overModal = Boolean(target?.closest?.(".job-detail-modal"));
       event.preventDefault();
       event.stopPropagation();
+      if (detailScroll) {
+        detailScroll.scrollTop += event.deltaY;
+        return;
+      }
+      if (overModal) return;
       const board = jobsBoardRef.current;
       if (board) {
         board.scrollTop += event.deltaY;
@@ -338,8 +355,10 @@ export default function ResumeDiscoveryPopup({
     };
 
     const onTouchMove = (event: TouchEvent) => {
+      const target = event.target as HTMLElement | null;
+      const detailScroll = target?.closest?.(".job-detail-panel__scroll");
+      if (detailScroll) return;
       const board = jobsBoardRef.current;
-      const target = event.target as Node | null;
       if (board && target && board.contains(target)) return;
       event.preventDefault();
     };
@@ -384,16 +403,164 @@ export default function ResumeDiscoveryPopup({
     }
   }
 
-  async function findJobs() {
+  function openJobs() {
     if (!profile) return;
+    const missing = profileGapKeys(
+      { ...profile, phone: profile.phone },
+      { includePhone: !profile.phone, includeResumeUrl: false },
+    );
+    if (missing.length) {
+      setMissingGaps(missing);
+      setGapDraft({
+        headline: profile.headline || "",
+        location: profile.location || "",
+        experienceLevel: profile.experienceLevel || "",
+        about: profile.about || "",
+        skills: (profile.skills || []).join(", "),
+        education: profile.education || "",
+        preferredEmploymentTypes: profile.preferredEmploymentTypes || [],
+        preferredWorkModes: profile.preferredWorkModes || [],
+        linkedin: profile.linkedin || "",
+        resumeUrl: "",
+        phone: profile.phone || "",
+      });
+      setAskMissing(true);
+      setStep(3);
+      setError("");
+      return;
+    }
+    void findJobs();
+  }
+
+  async function saveFilledProfile(next: ExtractedSeekerProfile) {
+    const response = await fetch("/api/seeker/profile", { cache: "no-store" });
+    if (response.status === 401) return;
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Could not save those details");
+    }
+    const current = data.profile;
+    const education = next.education?.trim() || "";
+    const merged = { ...current };
+    if (missingGaps.includes("headline") && next.headline) merged.headline = next.headline;
+    if (missingGaps.includes("location") && next.location) merged.location = next.location;
+    if (missingGaps.includes("experienceLevel") && next.experienceLevel) {
+      merged.experienceLevel = next.experienceLevel;
+    }
+    if (missingGaps.includes("about") && next.about) merged.about = next.about;
+    if (missingGaps.includes("skills") && next.skills?.length) merged.skills = next.skills;
+    if (missingGaps.includes("linkedin") && next.linkedin) merged.linkedin = next.linkedin;
+    if (missingGaps.includes("preferredEmploymentTypes") && next.preferredEmploymentTypes?.length) {
+      merged.preferredEmploymentTypes = next.preferredEmploymentTypes;
+    }
+    if (missingGaps.includes("preferredWorkModes") && next.preferredWorkModes?.length) {
+      merged.preferredWorkModes = next.preferredWorkModes;
+    }
+    if (merged.portfolio && !/^https?:\/\//i.test(String(merged.portfolio))) {
+      merged.portfolio = "";
+    }
+    if (missingGaps.includes("education") && education) {
+      merged.education = education;
+      merged.educations = [
+        {
+          institution: education,
+          degree: "",
+          level: "",
+          yearCompleted: "",
+          description: "",
+          skills: [],
+        },
+      ];
+    }
+    const saved = await fetch("/api/seeker/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ section: "profile", profile: merged }),
+    });
+    const savedData = await saved.json();
+    if (!saved.ok || !savedData.success) {
+      throw new Error(savedData.message || "Could not save those details");
+    }
+    if (next.phone && next.phone !== data.account?.phone) {
+      const account = await fetch("/api/seeker/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          section: "account",
+          name: data.account?.name || next.name || "Job seeker",
+          phone: next.phone,
+        }),
+      });
+      const accountData = await account.json();
+      if (!account.ok || !accountData.success) {
+        throw new Error(accountData.message || "Could not save phone");
+      }
+    }
+  }
+
+  async function submitMissing(event: FormEvent) {
+    event.preventDefault();
+    if (!profile || !gapDraft || busy) return;
+    if (
+      missingGaps.includes("preferredEmploymentTypes") &&
+      !gapDraft.preferredEmploymentTypes.length
+    ) {
+      setError("Select at least one employment type");
+      return;
+    }
+    if (missingGaps.includes("preferredWorkModes") && !gapDraft.preferredWorkModes.length) {
+      setError("Select at least one work mode");
+      return;
+    }
+    const skills = gapDraft.skills
+      .split(",")
+      .map((skill) => skill.trim())
+      .filter(Boolean);
+    const next: ExtractedSeekerProfile = {
+      ...profile,
+      headline: missingGaps.includes("headline") ? gapDraft.headline.trim() : profile.headline,
+      location: missingGaps.includes("location") ? gapDraft.location.trim() : profile.location,
+      experienceLevel: missingGaps.includes("experienceLevel")
+        ? gapDraft.experienceLevel
+        : profile.experienceLevel,
+      about: missingGaps.includes("about") ? gapDraft.about.trim() : profile.about,
+      skills: missingGaps.includes("skills") ? skills : profile.skills,
+      education: missingGaps.includes("education")
+        ? gapDraft.education.trim()
+        : profile.education,
+      preferredEmploymentTypes: missingGaps.includes("preferredEmploymentTypes")
+        ? gapDraft.preferredEmploymentTypes
+        : profile.preferredEmploymentTypes,
+      preferredWorkModes: missingGaps.includes("preferredWorkModes")
+        ? gapDraft.preferredWorkModes
+        : profile.preferredWorkModes,
+      linkedin: missingGaps.includes("linkedin") ? gapDraft.linkedin.trim() : profile.linkedin,
+      phone: missingGaps.includes("phone") ? gapDraft.phone.trim() : profile.phone,
+    };
+    setProfile(next);
+    setBusy(true);
+    setError("");
+    try {
+      await saveFilledProfile(next);
+      await findJobs(next);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not save those details");
+      setBusy(false);
+    }
+  }
+
+  async function findJobs(source?: ExtractedSeekerProfile) {
+    const active = source || profile;
+    if (!active) return;
+    setAskMissing(false);
     setStep(3);
     setBusy(true);
     setError("");
     try {
       const query =
-        profile.skills[0] ||
-        profile.headline ||
-        profile.experiences?.[0]?.title ||
+        active.skills[0] ||
+        active.headline ||
+        active.experiences?.[0]?.title ||
         "";
       const response = await fetch(
         `/api/jobs/browse?${new URLSearchParams({
@@ -413,7 +580,7 @@ export default function ResumeDiscoveryPopup({
             .toLowerCase();
           return {
             ...job,
-            matchedSkills: (profile.skills || []).filter((skill) =>
+            matchedSkills: (active.skills || []).filter((skill) =>
               text.includes(skill.toLowerCase()),
             ),
           };
@@ -530,17 +697,17 @@ export default function ResumeDiscoveryPopup({
         ) : null}
 
         <div
-          className={`${styles.content} ${step === 3 ? styles.contentJobs : ""}`}
+          className={`${styles.content} ${step === 3 && !askMissing ? styles.contentJobs : ""}`}
         >
           <h2 id="resume-discovery-title">
-            {
-              [
-                "Scan your resume. Find your next job.",
-                "Want to track your applications?",
-                "Account created — save your password",
-                "Jobs matched to your resume",
-              ][step]
-            }
+            {askMissing
+              ? "A few details weren't on your resume"
+              : [
+                  "Scan your resume. Find your next job.",
+                  "Want to track your applications?",
+                  "Account created — save your password",
+                  "Jobs matched to your resume",
+                ][step]}
           </h2>
 
           {step === 0 && (
@@ -671,7 +838,7 @@ export default function ResumeDiscoveryPopup({
                   <button
                     type="button"
                     disabled={busy}
-                    onClick={() => void findJobs()}
+                    onClick={openJobs}
                   >
                     Not now, just show jobs
                   </button>
@@ -730,7 +897,7 @@ export default function ResumeDiscoveryPopup({
                 type="button"
                 className={styles.primary}
                 disabled={busy}
-                onClick={() => void findJobs()}
+                onClick={openJobs}
               >
                 Continue to matching jobs
                 <ArrowRight size={16} />
@@ -745,7 +912,19 @@ export default function ResumeDiscoveryPopup({
             </div>
           )}
 
-          {step === 3 && (
+          {step === 3 && askMissing && gapDraft && (
+            <SuggestedMissingDetails
+              tone="popup"
+              gaps={missingGaps}
+              draft={gapDraft}
+              saving={busy}
+              error={error}
+              onChange={setGapDraft}
+              onSubmit={submitMissing}
+            />
+          )}
+
+          {step === 3 && !askMissing && (
             <>
               <p className={styles.muted}>
                 Roles matched from your resume skills
@@ -919,7 +1098,7 @@ export default function ResumeDiscoveryPopup({
             </>
           )}
 
-          {error && (
+          {error && !askMissing && (
             <div role="alert" className={styles.error}>
               <p>{error}</p>
               {emailExists ? (

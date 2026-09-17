@@ -5,22 +5,14 @@ import { User } from "@/models/User";
 import { Company } from "@/models/Company";
 import { Job } from "@/models/Job";
 import { ContactMessage } from "@/models/ContactMessage";
-import DashboardStatCards from "@/app/components/DashboardStatCards";
-import {
-  DashboardPageHeader,
-  DashboardDarkPanel,
-  DashboardSoftPanel,
-} from "@/app/components/DashboardUI";
-import { DASH } from "@/app/lib/dashboardTheme";
+import styles from "../seeker/seeker.module.css";
 import {
   Users,
   Building2,
   Briefcase,
   UserCog,
-  Clock3,
-  CheckCircle2,
   ArrowRight,
-  Eye,
+  ArrowUpRight,
   Mail,
 } from "lucide-react";
 
@@ -68,182 +60,122 @@ export default async function AdminOverviewPage() {
     ContactMessage.countDocuments({}),
   ]);
 
-  const cards = [
-    {
-      label: "Total users",
-      value: totalUsers,
-      href: "/dashboard/admin/users",
-      icon: Users,
-      actionIcon: Eye,
-      action: `${jobSeekers} seekers · ${recruiters} recruiters`,
-    },
-    {
-      label: "Recruiters",
-      value: recruiters,
-      href: "/dashboard/admin/recruiters",
-      icon: UserCog,
-      actionIcon: CheckCircle2,
-      action: `${approvedCompanies} approved companies`,
-    },
-    {
-      label: "Companies pending",
-      value: pendingCompanies,
-      href: "/dashboard/admin/companies",
-      icon: Building2,
-      actionIcon: Clock3,
-      action: `${approvedCompanies} approved · ${rejectedCompanies} rejected`,
-    },
-    {
-      label: "Open jobs",
-      value: openJobs,
-      href: "/dashboard/admin/jobs",
-      icon: Briefcase,
-      actionIcon: Briefcase,
-      action: `${totalJobs} total jobs`,
-    },
-    {
-      label: "Contact messages",
-      value: contactMessages,
-      href: "/dashboard/admin/messages",
-      icon: Mail,
-      actionIcon: Mail,
-      action: "From the Contact Us form",
-    },
+  const stats = [
+    { label: "Total users", value: totalUsers, href: "/dashboard/admin/users", icon: Users, hint: `${jobSeekers} seekers · ${recruiters} recruiters` },
+    { label: "Recruiters", value: recruiters, href: "/dashboard/admin/recruiters", icon: UserCog, hint: `${approvedCompanies} approved companies` },
+    { label: "Pending companies", value: pendingCompanies, href: "/dashboard/admin/companies", icon: Building2, hint: `${rejectedCompanies} rejected` },
+    { label: "Open jobs", value: openJobs, href: "/dashboard/admin/jobs", icon: Briefcase, hint: `${totalJobs} total jobs` },
+    { label: "Messages", value: contactMessages, href: "/dashboard/admin/messages", icon: Mail, hint: "From Contact Us" },
+  ];
+  const snapshot = [
+    { label: "Companies", value: totalCompanies },
+    { label: "Pending", value: pendingCompanies },
+    { label: "Approved", value: approvedCompanies },
+    { label: "All jobs", value: totalJobs },
   ];
 
   return (
-    <main className="px-5 py-7 sm:px-8 lg:px-10">
-      <DashboardPageHeader
-        title={`Welcome, ${auth.name.split(" ")[0]}`}
-        subtitle="Full platform control — users, recruiters, companies, and jobs in one place."
-      />
-
-      <DashboardStatCards stats={cards} />
-
-      <DashboardDarkPanel className="mt-6">
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          {[
-            { label: "Pending", href: "/dashboard/admin/companies", active: true },
-            { label: "Users", href: "/dashboard/admin/users" },
-            { label: "Jobs", href: "/dashboard/admin/jobs" },
-          ].map((tab) => (
-            <Link
-              key={tab.label}
-              href={tab.href}
-              className={`rounded-full px-4 py-1.5 text-xs font-bold ${
-                tab.active
-                  ? "text-white"
-                  : "bg-white/10 text-white/70 hover:bg-white/15"
-              }`}
-              style={tab.active ? { background: DASH.accent } : undefined}
-            >
-              {tab.label}
-              {tab.label === "Pending" ? ` (${pendingCompanies})` : ""}
-            </Link>
-          ))}
+    <main className={styles.overview}>
+      <section className={styles.welcome}>
+        <div>
+          <p className={styles.eyebrow}>PLATFORM CONTROL</p>
+          <h1>Welcome, {auth.name.split(" ")[0]}</h1>
+          <p>Users, recruiters, companies, and jobs in one place.</p>
         </div>
+        <Link href="/dashboard/admin/companies" className={styles.primaryButton}>
+          Review companies <ArrowUpRight size={16} />
+        </Link>
+      </section>
 
-        <div className="grid gap-4 lg:grid-cols-3">
-          <DashboardSoftPanel>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold text-[#0f172a]">Pending companies</h2>
-              <Link
-                href="/dashboard/admin/companies"
-                className="inline-flex items-center gap-1 text-xs font-bold text-[#5850ec]"
-              >
-                Review <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-            {pendingList.length === 0 ? (
-              <p className="text-sm text-[#6b7280]">No pending reviews.</p>
-            ) : (
-              <ul className="space-y-3">
-                {pendingList.map((c) => (
-                  <li key={String(c._id)} className="text-sm">
-                    <p className="font-semibold text-[#0f172a]">{c.name}</p>
-                    <p className="text-[#6b7280]">
-                      {c.industry || "—"} · {c.location || "—"}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </DashboardSoftPanel>
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Platform statistics">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Link key={stat.label} href={stat.href} className={styles.stat}>
+              <div className={styles.statTop}>
+                <span className={styles.statIcon}><Icon size={18} /></span>
+                <ArrowUpRight size={16} />
+              </div>
+              <strong className={styles.statValue}>{stat.value.toLocaleString()}</strong>
+              <div className={styles.statBottom}>
+                <span>{stat.label}</span>
+                <small>{stat.hint}</small>
+              </div>
+            </Link>
+          );
+        })}
+      </section>
 
-          <DashboardSoftPanel>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold text-[#0f172a]">Latest users</h2>
-              <Link
-                href="/dashboard/admin/users"
-                className="inline-flex items-center gap-1 text-xs font-bold text-[#5850ec]"
-              >
-                All <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-            <ul className="space-y-3">
-              {recentUsers.map((u) => (
-                <li key={String(u._id)} className="text-sm">
-                  <p className="font-semibold text-[#0f172a]">{u.name}</p>
-                  <p className="text-[#6b7280]">
-                    {u.role} · {formatDate(u.createdAt as Date)}
-                  </p>
+      <div className={styles.sectionHeading}>
+        <h2>Recent activity</h2>
+        <span>Newest first</span>
+      </div>
+      <section className="grid items-start gap-4 lg:grid-cols-3">
+        <article className={styles.panel}>
+          <div className={styles.panelHeading}>
+            <h2>Pending companies</h2>
+            <Link href="/dashboard/admin/companies" className={styles.textLink}>Review <ArrowRight size={12} /></Link>
+          </div>
+          {pendingList.length === 0 ? (
+            <p className="mt-4 text-sm text-[#6b7280]">Nothing waiting for review.</p>
+          ) : (
+            <ul className="mt-4 divide-y divide-[#e6eaf2]">
+              {pendingList.map((company) => (
+                <li key={String(company._id)} className="py-3 first:pt-0 last:pb-0">
+                  <p className="text-sm font-semibold text-[#0f172a]">{company.name}</p>
+                  <p className="mt-0.5 text-xs text-[#6b7280]">{company.industry || "—"} · {company.location || "—"}</p>
                 </li>
               ))}
             </ul>
-          </DashboardSoftPanel>
+          )}
+        </article>
 
-          <DashboardSoftPanel>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-bold text-[#0f172a]">Latest jobs</h2>
-              <Link
-                href="/dashboard/admin/jobs"
-                className="inline-flex items-center gap-1 text-xs font-bold text-[#5850ec]"
-              >
-                All <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-            {recentJobs.length === 0 ? (
-              <p className="text-sm text-[#6b7280]">No jobs yet.</p>
-            ) : (
-              <ul className="space-y-3">
-                {recentJobs.map((j) => (
-                  <li key={String(j._id)} className="text-sm">
-                    <p className="font-semibold text-[#0f172a]">{j.title}</p>
-                    <p className="text-[#6b7280]">
-                      {j.status} · {j.location}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </DashboardSoftPanel>
-        </div>
-      </DashboardDarkPanel>
+        <article className={styles.panel}>
+          <div className={styles.panelHeading}>
+            <h2>Latest users</h2>
+            <Link href="/dashboard/admin/users" className={styles.textLink}>All <ArrowRight size={12} /></Link>
+          </div>
+          <ul className="mt-4 divide-y divide-[#e6eaf2]">
+            {recentUsers.map((user) => (
+              <li key={String(user._id)} className="py-3 first:pt-0 last:pb-0">
+                <p className="text-sm font-semibold text-[#0f172a]">{user.name}</p>
+                <p className="mt-0.5 text-xs text-[#6b7280]">{user.role} · {formatDate(user.createdAt as Date)}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
 
-      <section className="mt-6 rounded-[24px] border border-[#ebe9f5] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
-        <h2 className="font-bold text-[#0f172a]">Platform snapshot</h2>
-        <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl bg-[#f4f3fb] p-4">
-            <p className="text-[#6b7280]">Companies total</p>
-            <p className="mt-1 text-xl font-bold">{totalCompanies}</p>
+        <article className={styles.panel}>
+          <div className={styles.panelHeading}>
+            <h2>Latest jobs</h2>
+            <Link href="/dashboard/admin/jobs" className={styles.textLink}>All <ArrowRight size={12} /></Link>
           </div>
-          <div className="rounded-2xl bg-[#fef3c7] p-4">
-            <p className="inline-flex items-center gap-1 text-[#9a6700]">
-              <Clock3 className="h-3.5 w-3.5" /> Pending
-            </p>
-            <p className="mt-1 text-xl font-bold">{pendingCompanies}</p>
+          {recentJobs.length === 0 ? (
+            <p className="mt-4 text-sm text-[#6b7280]">No jobs posted yet.</p>
+          ) : (
+            <ul className="mt-4 divide-y divide-[#e6eaf2]">
+              {recentJobs.map((job) => (
+                <li key={String(job._id)} className="py-3 first:pt-0 last:pb-0">
+                  <p className="text-sm font-semibold text-[#0f172a]">{job.title}</p>
+                  <p className="mt-0.5 text-xs text-[#6b7280]">{job.status} · {job.location}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+      </section>
+
+      <div className={styles.sectionHeading}>
+        <h2>Platform snapshot</h2>
+        <span>Live totals</span>
+      </div>
+      <section className="grid gap-3 pb-6 sm:grid-cols-2 lg:grid-cols-4" aria-label="Platform snapshot">
+        {snapshot.map((item) => (
+          <div key={item.label} className={styles.panel}>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{item.label}</p>
+            <p className="mt-2 text-2xl font-semibold tracking-tight text-[#0f172a]">{item.value.toLocaleString()}</p>
           </div>
-          <div className="rounded-2xl bg-[#dcfce7] p-4">
-            <p className="inline-flex items-center gap-1 text-[#166534]">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Approved
-            </p>
-            <p className="mt-1 text-xl font-bold">{approvedCompanies}</p>
-          </div>
-          <div className="rounded-2xl bg-[#ecebff] p-4">
-            <p className="text-[#5850ec]">Jobs total</p>
-            <p className="mt-1 text-xl font-bold">{totalJobs}</p>
-          </div>
-        </div>
+        ))}
       </section>
     </main>
   );

@@ -85,6 +85,9 @@ export default function SeekerProfilePreview({ profile, name, email, phone, init
               <span className={styles.entryIcon}><Icon size={17} /></span>
               <div className={styles.entryBody}><h3>{("title" in entry ? entry.title : entry.degree) || ("company" in entry ? entry.company : entry.institution)}</h3>
                 {("title" in entry ? entry.title : entry.degree) && <p className={styles.organization}>{"company" in entry ? entry.company : entry.institution}</p>}
+                {"level" in entry && (entry.level || entry.yearCompleted) ? (
+                  <p className={styles.organization}>{[entry.level, entry.yearCompleted].filter(Boolean).join(" · ")}</p>
+                ) : null}
                 <Description text={entry.description} />
                 {entry.skills.length > 0 && <div className={styles.skills}>{entry.skills.map((skill) => <span key={skill}>{skill}</span>)}</div>}
               </div>

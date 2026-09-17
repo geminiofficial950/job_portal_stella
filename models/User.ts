@@ -90,7 +90,7 @@ const UserSchema = new Schema(
       photoUrl: { type: String, default: "" },
       photoPublicId: { type: String, default: "" },
       experiences: { type: [{ _id: false, company: String, title: String, description: String, skills: [String] }], default: [] },
-      educations: { type: [{ _id: false, institution: String, degree: String, description: String, skills: [String] }], default: [] },
+      educations: { type: [{ _id: false, institution: String, degree: String, level: { type: String, default: "" }, yearCompleted: { type: String, default: "" }, description: String, skills: [String] }], default: [] },
       preferredEmploymentTypes: { type: [String], default: [] },
       preferredWorkModes: { type: [String], default: [] },
       salaryExpectation: { type: String, trim: true, maxlength: 80, default: "" },
@@ -381,7 +381,7 @@ export function serializeSeekerProfile(user: {
     profile: {
       photoUrl: p?.photoUrl ?? "",
       experiences: p?.experiences ?? [],
-      educations: p?.educations?.length ? p.educations : p?.education ? [{ institution: p.education, degree: "", description: "", skills: [] }] : [],
+      educations: p?.educations?.length ? p.educations : p?.education ? [{ institution: p.education, degree: "", level: "", yearCompleted: "", description: "", skills: [] }] : [],
       headline: p?.headline ?? d.headline,
       location: p?.location ?? d.location,
       about: p?.about ?? d.about,

@@ -214,7 +214,7 @@ function mergeImportedProfile(
     experienceLevel,
     experiences: imported.experiences?.length ? imported.experiences : current.experiences,
     education: String(imported.education || "").trim() || current.education,
-    educations: current.educations.length ? current.educations : imported.education ? [{ institution: imported.education, degree: "", description: "", skills: [] }] : [],
+    educations: current.educations.length ? current.educations : imported.education ? [{ institution: imported.education, degree: "", level: "", yearCompleted: "", description: "", skills: [] }] : [],
     preferredEmploymentTypes: employment.length
       ? employment
       : current.preferredEmploymentTypes,

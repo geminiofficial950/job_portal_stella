@@ -289,7 +289,7 @@
 }
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 .stat {
@@ -1289,6 +1289,16 @@
   background: var(--seeker-surface);
   border-radius: 11px;
 }
+.switchRow {
+  border-color: var(--seeker-line);
+  background: var(--seeker-surface);
+}
+.switchLabel {
+  color: var(--seeker-text);
+}
+.switchHint {
+  color: var(--seeker-muted);
+}
 .settingsGrid label:has([role="switch"]) > span > span:last-child {
   line-height: 1.7;
 }
@@ -2213,16 +2223,30 @@
   color: #6a5b80;
   border-color: #d7cce6;
 }
-:global([data-seeker-theme="light"]) .settingsGrid label:has([role="switch"]) {
-  background: #f8f5fc;
+:global([data-seeker-theme="light"]) .settingsGrid label:has([role="switch"]),
+:global([data-seeker-theme="light"]) .switchRow {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #0f2744;
+}
+:global([data-seeker-theme="light"]) .switchLabel {
+  color: #0f2744;
+}
+:global([data-seeker-theme="light"]) .switchHint {
+  color: #64748b;
+}
+:global([data-seeker-theme="light"])
+  .settingsGrid
+  [role="switch"][aria-checked="true"] {
+  background: #2563eb;
 }
 :global([data-seeker-theme="light"])
   .settingsGrid
   [role="switch"][aria-checked="false"] {
-  background: #e9dff4;
+  background: #d6dbe6;
 }
 :global([data-seeker-theme="light"]) .settingsGrid [role="switch"] > span {
-  background: #c9b8e1;
+  background: #ffffff;
 }
 :global([data-seeker-theme="light"]) .preferencesNote {
   background: radial-gradient(ellipse at 100% 0, #e9dff4, transparent), #e9dff4;

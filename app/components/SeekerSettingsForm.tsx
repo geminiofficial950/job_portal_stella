@@ -21,11 +21,11 @@ function Toggle({
   hint?: string;
 }) {
   return (
-    <label className="flex items-start justify-between gap-4 rounded-xl border border-[#2d4463] px-4 py-3">
+    <label className={`${styles.switchRow} flex items-start justify-between gap-4 rounded-xl border px-4 py-3`}>
       <span>
-        <span className="block text-sm font-medium text-[#e5edf9]">{label}</span>
+        <span className={`${styles.switchLabel} block text-sm font-medium`}>{label}</span>
         {hint ? (
-          <span className="mt-0.5 block text-xs text-[#a1b0c7]">{hint}</span>
+          <span className={`${styles.switchHint} mt-0.5 block text-xs`}>{hint}</span>
         ) : null}
       </span>
       <button
@@ -34,12 +34,12 @@ function Toggle({
         aria-checked={checked}
         aria-label={label}
         onClick={() => onChange(!checked)}
-        className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors ${
-          checked ? "bg-[#2563eb]" : "bg-[#19283e]"
+        className={`${styles.switchControl} relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors ${
+          checked ? "bg-[#2563eb]" : "bg-[#cbd5e1]"
         }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-[#131d30] transition-transform ${
+          className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
             checked ? "translate-x-5" : "translate-x-0"
           }`}
         />

@@ -1836,8 +1836,8 @@ html.jobs-search-compact .jobs-search-fixed {
 }
 
 .job-detail-icon-btn.is-saved {
-  background: var(--jobs-primary);
-  border-color: var(--jobs-primary);
+  background: var(--jobs-primary, #2563eb);
+  border-color: var(--jobs-primary, #2563eb);
   color: #fff;
 }
 

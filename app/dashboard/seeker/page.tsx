@@ -3,9 +3,10 @@ import Link from "next/link";
 import { requireAuth } from "@/lib/requireAuth";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
-import { Job } from "@/models/Job";
 import { Application } from "@/models/Application";
+import { BoardApplication } from "@/models/BoardApplication";
 import { SavedJob } from "@/models/SavedJob";
+import { InterviewInvitation } from "@/models/Recruitment";
 import styles from "./seeker.module.css";
 import {
   Search, FileText, Bookmark, CalendarCheck, UserRound, ArrowRight,
@@ -35,16 +36,24 @@ function profileCompletion(profile: {
   return { checks, doneCount, percent };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function SeekerOverviewPage() {
   const auth = await requireAuth(["user"]);
 
   await connectDB();
-  const [user, openJobs, applicationCount, savedCount] = await Promise.all([
-    User.findById(auth.sub).select("seekerProfile phone").lean(),
-    Job.countDocuments({ status: "open" }),
-    Application.countDocuments({ seekerId: auth.sub }),
-    SavedJob.countDocuments({ seekerId: auth.sub }),
-  ]);
+  const seekerId = auth.sub;
+  const [user, stellaApplications, boardApplications, savedCount, interviewCount] =
+    await Promise.all([
+      User.findById(seekerId).select("seekerProfile phone").lean(),
+      Application.countDocuments({ seekerId }),
+      BoardApplication.countDocuments({ seekerId }),
+      SavedJob.countDocuments({ seekerId }),
+      InterviewInvitation.countDocuments({
+        seekerId,
+        status: { $in: ["invited", "accepted", "reschedule_suggested"] },
+      }),
+    ]);
 
   const { checks, doneCount, percent } = profileCompletion(
     user?.seekerProfile || null,
@@ -52,16 +61,8 @@ export default async function SeekerOverviewPage() {
 
   const stats = [
     {
-      label: "Open Roles",
-      value: openJobs,
-      icon: Briefcase,
-      href: "/jobs",
-      actionIcon: Search,
-      action: "Browse",
-    },
-    {
       label: "Applications",
-      value: applicationCount,
+      value: stellaApplications + boardApplications,
       icon: FileText,
       href: "/dashboard/seeker/applications",
       actionIcon: FileText,
@@ -77,7 +78,7 @@ export default async function SeekerOverviewPage() {
     },
     {
       label: "Interviews",
-      value: 0,
+      value: interviewCount,
       icon: CalendarCheck,
       href: "/dashboard/seeker/interviews",
       actionIcon: CalendarCheck,

@@ -75,6 +75,13 @@ const LEVEL_LABELS: Record<string, string> = {
   senior: "Senior",
 };
 
+function hasSalary(job: {
+  salaryMin?: number | null;
+  salaryMax?: number | null;
+}) {
+  return (job.salaryMin || 0) > 0 || (job.salaryMax || 0) > 0;
+}
+
 function formatSalaryDetail(job: HomeModalJob): string | null {
   const min = Math.round(job.salaryMin || 0);
   const max = Math.round(job.salaryMax || 0);
@@ -543,6 +550,7 @@ export default function HomeJobDetailModal({
               ? data.descriptionHtml
               : "",
           );
+          const scrapedHasSalary = hasSalary(data.job);
           setEnrichedJob({
             ...job,
             ...data.job,
@@ -551,6 +559,16 @@ export default function HomeJobDetailModal({
             company: data.job.company?.name || job.company,
             companyLogoUrl: data.job.company?.logoUrl || job.companyLogoUrl,
             companyAbout: data.job.company?.about || job.companyAbout,
+            location: data.job.location || job.location,
+            workMode: data.job.location ? data.job.workMode : job.workMode,
+            salaryMin: scrapedHasSalary ? data.job.salaryMin : job.salaryMin,
+            salaryMax: scrapedHasSalary ? data.job.salaryMax : job.salaryMax,
+            salaryCurrency: scrapedHasSalary
+              ? data.job.salaryCurrency
+              : job.salaryCurrency,
+            salaryPeriod: scrapedHasSalary
+              ? data.job.salaryPeriod
+              : job.salaryPeriod,
           });
         })
         .catch(() => {
@@ -606,10 +624,14 @@ export default function HomeJobDetailModal({
             responsibilities:
               data.job.responsibilities || job.responsibilities,
             skills: data.job.skills || job.skills,
-            salaryMin: data.job.salaryMin ?? job.salaryMin,
-            salaryMax: data.job.salaryMax ?? job.salaryMax,
-            salaryCurrency: data.job.salaryCurrency || job.salaryCurrency,
-            salaryPeriod: data.job.salaryPeriod || job.salaryPeriod,
+            salaryMin: hasSalary(data.job) ? data.job.salaryMin : job.salaryMin,
+            salaryMax: hasSalary(data.job) ? data.job.salaryMax : job.salaryMax,
+            salaryCurrency: hasSalary(data.job)
+              ? data.job.salaryCurrency || job.salaryCurrency
+              : job.salaryCurrency,
+            salaryPeriod: hasSalary(data.job)
+              ? data.job.salaryPeriod || job.salaryPeriod
+              : job.salaryPeriod,
             experienceLevel: data.job.experienceLevel || job.experienceLevel,
             location: data.job.location || job.location,
             category: data.job.category || job.category,
@@ -781,9 +803,18 @@ export default function HomeJobDetailModal({
                 type="button"
                 onClick={() => void toggleSave()}
                 className={`job-detail-icon-btn ${saved ? "is-saved" : ""}`}
-                aria-label={canSaveJob ? "Save job" : "Sign in to save jobs"}
+                aria-label={
+                  !canSaveJob
+                    ? "Sign in to save jobs"
+                    : saved
+                      ? "Unsave job"
+                      : "Save job"
+                }
+                aria-pressed={saved}
               >
-                <Bookmark className="h-4 w-4 fill-current" />
+                <Bookmark
+                  className={`h-4 w-4 ${saved ? "fill-current" : ""}`}
+                />
               </button>
               <button
                 type="button"

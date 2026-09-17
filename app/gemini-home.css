@@ -2586,6 +2586,12 @@
   color: #ffffff !important;
 }
 
+.home-job-detail-modal .job-detail-icon-btn.is-saved {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
 .home-job-detail-modal a.job-detail-external-cta__btn {
   color: #2563eb !important;
 }

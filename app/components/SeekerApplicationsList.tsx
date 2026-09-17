@@ -417,7 +417,6 @@ export default function SeekerApplicationsList() {
       </div>
 
       <HomeJobDetailModal
-        className={styles.jobModal}
         job={selectedJob}
         onClose={() => setSelectedJob(null)}
         alreadyApplied

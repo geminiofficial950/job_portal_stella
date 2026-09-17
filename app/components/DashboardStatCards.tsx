@@ -11,12 +11,10 @@ export type DashboardStat = {
   action: string;
 };
 
-const ACCENTS = [
-  { chip: "#ecebff", icon: "#5850ec", bar: "#5850ec" },
-  { chip: "#dcfce7", icon: "#16a34a", bar: "#22c55e" },
-  { chip: "#fee2e2", icon: "#dc2626", bar: "#ef4444" },
-  { chip: "#e0e7ff", icon: "#4338ca", bar: "#6366f1" },
-];
+const accentStyle = {
+  background: "var(--seeker-raised, #ededf0)",
+  color: "var(--seeker-link, #45454c)",
+};
 
 export default function DashboardStatCards({
   stats,
@@ -34,7 +32,6 @@ export default function DashboardStatCards({
     <div className={grid}>
       {stats.map((stat, i) => {
         const Icon = stat.icon;
-        const accent = ACCENTS[i % ACCENTS.length];
 
         return (
           <Link
@@ -45,7 +42,7 @@ export default function DashboardStatCards({
             <div className="flex items-center gap-3">
               <span
                 className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                style={{ background: accent.chip, color: accent.icon }}
+                style={accentStyle}
               >
                 <Icon className="h-4 w-4" strokeWidth={2.2} />
               </span>
@@ -73,7 +70,7 @@ export default function DashboardStatCards({
                 className="h-full rounded-full"
                 style={{
                   width: `${Math.min(100, 35 + (i + 1) * 15)}%`,
-                  background: accent.bar,
+                  background: "var(--seeker-accent, #343438)",
                 }}
               />
             </div>

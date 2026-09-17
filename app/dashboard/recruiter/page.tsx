@@ -4,13 +4,11 @@ import { connectDB } from "@/lib/db";
 import { Job } from "@/models/Job";
 import { Company } from "@/models/Company";
 import { Application } from "@/models/Application";
-import DashboardStatCards from "@/app/components/DashboardStatCards";
+import styles from "../seeker/seeker.module.css";
 import RecruiterJobCard from "@/app/components/RecruiterJobCard";
 import {
-  DashboardPageHeader,
   DashboardDarkPanel,
   DashboardSoftPanel,
-  DashboardPrimaryButton,
 } from "@/app/components/DashboardUI";
 import { DASH } from "@/app/lib/dashboardTheme";
 import {
@@ -19,6 +17,7 @@ import {
   PauseCircle,
   Building2,
   ArrowRight,
+  ArrowUpRight,
   CheckCircle2,
   Clock3,
   AlertCircle,
@@ -85,24 +84,55 @@ export default async function RecruiterOverviewPage() {
   const companyReady = company?.status === "approved";
 
   return (
-    <main className="px-5 py-7 sm:px-8 lg:px-10">
-      <DashboardPageHeader
-        title="Overview"
-        subtitle="Manage and track all your hiring activity in one place."
-        action={
-          <DashboardPrimaryButton
-            href="/dashboard/recruiter/jobs/new"
-            icon={PlusCircle}
-          >
-            Post a job
-          </DashboardPrimaryButton>
-        }
-      />
+    <main className={styles.overview}>
+      <section className={styles.welcome}>
+        <div>
+          <p className={styles.eyebrow}>YOUR NEXT GREAT HIRE STARTS HERE</p>
+          <h1>Hey, {auth.name.split(" ")[0]}</h1>
+          <p>Manage your roles, connect with candidates, and build your team.</p>
+        </div>
+        <Link href="/dashboard/recruiter/jobs/new" className={styles.primaryButton}>
+          <PlusCircle size={17} /> Post a job <ArrowUpRight size={17} />
+        </Link>
+      </section>
 
-      <DashboardStatCards stats={stats} columns={3} />
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <span className={styles.heroTag}>GREAT TEAMS START WITH THE RIGHT PEOPLE</span>
+          <h2>Your next great hire.<br /><span>Make it happen.</span></h2>
+          <p>Share your opportunities, discover talented candidates,<br className="hidden sm:block" /> and take the next step in growing your team.</p>
+          <Link href="/dashboard/recruiter/candidates" className={styles.heroButton}>
+            Explore candidates <ArrowRight size={17} />
+          </Link>
+        </div>
+        <div className={styles.heroArt} aria-hidden="true">
+          <div className={styles.orbit} /><div className={styles.orbitInner} />
+          <div className={styles.floatingLabel}><span /> Your next great team</div>
+          <div className={styles.artCard}>
+            <span className={styles.artIcon}><Briefcase size={32} /></span>
+            <span className={styles.artLine} /><span className={styles.artLineShort} />
+            <div className={styles.artTags}><i /><i /></div>
+          </div>
+          <div className={styles.artCheck}><CheckCircle2 size={25} /></div>
+        </div>
+      </section>
+
+      <div className={styles.sectionHeading}><h2>Your hiring at a glance</h2><span>Build your next great team</span></div>
+      <section className={styles.stats} aria-label="Hiring statistics">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Link key={stat.label} href={stat.href} className={styles.stat} data-tone={index}>
+              <div className={styles.statTop}><span className={styles.statIcon}><Icon size={20} /></span><ArrowUpRight size={18} /></div>
+              <strong className={styles.statValue}>{stat.value.toLocaleString()}</strong>
+              <div className={styles.statBottom}><span>{stat.label}</span><small>{stat.action} <ArrowRight size={12} /></small></div>
+            </Link>
+          );
+        })}
+      </section>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <section className="rounded-[24px] border border-[#ebe9f5] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
+        <section className={styles.panel}>
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span
@@ -170,7 +200,7 @@ export default async function RecruiterOverviewPage() {
           )}
         </section>
 
-        <section className="rounded-[24px] border border-[#ebe9f5] bg-white p-5 shadow-[0_8px_24px_rgba(26,26,46,0.04)]">
+        <section className={styles.panel}>
           <div className="mb-4 flex items-center gap-2">
             <span
               className="flex h-9 w-9 items-center justify-center rounded-2xl text-white"

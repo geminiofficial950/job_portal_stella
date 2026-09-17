@@ -1,0 +1,51 @@
+.page { max-width: 1120px; margin: 0 auto; padding: 42px 36px 56px; }
+.intro { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.eyebrow, .previewEyebrow { font-size: 10px; font-weight: 700; letter-spacing: .15em; }
+.eyebrow, .stepCount { color: var(--seeker-muted); }
+.stepCount { font-size: 12px; }
+.card { display: grid; grid-template-columns: 1.35fr 1fr; overflow: hidden; border: 1px solid var(--seeker-line); border-radius: 24px; background: var(--seeker-bg); box-shadow: 0 16px 48px -28px rgb(20 45 48 / 20%); }
+.main { padding: 34px 38px; }
+.status { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 6px; background: #4fa4b012; color: #34808b; font-size: 10px; font-weight: 650; }
+.status[data-state="rejected"] { background: #fce9e6; color: #a43d30; }
+.statusDot { width: 6px; height: 6px; border-radius: 50%; background: #4fa4b0; }
+.companyIcon { display: grid; place-items: center; width: 58px; height: 58px; margin-top: 26px; border-radius: 17px; border: 1px solid #4fa4b030; background: #4fa4b012; color: #34808b; }
+.title { max-width: 360px; margin-top: 19px; font-size: clamp(26px, 2.7vw, 34px); line-height: 1.15; font-weight: 650; letter-spacing: -1.1px; }
+.description { margin-top: 13px; max-width: 390px; font-size: 13px; line-height: 1.8; color: var(--seeker-muted); }
+.steps { list-style: none; padding: 0; margin: 28px 0; }
+.step { display: flex; gap: 13px; position: relative; align-items: flex-start; padding-bottom: 23px; }
+.step:last-child { padding-bottom: 0; }
+.step:not(:last-child)::after { content: ""; position: absolute; top: 36px; bottom: 5px; left: 16px; width: 1px; background: var(--seeker-line); }
+.stepNumber { display: grid; place-items: center; flex-shrink: 0; width: 33px; height: 33px; border-radius: 50%; border: 1px solid var(--seeker-line); background: var(--seeker-surface); color: var(--seeker-muted); font-size: 10px; font-weight: 650; }
+.step[data-state="current"] .stepNumber, .step[data-state="complete"] .stepNumber { background: #4fa4b0; border-color: #4fa4b0; color: #fff; }
+.step h2 { font-size: 12px; font-weight: 650; margin-top: 1px; }
+.step p { margin-top: 4px; font-size: 11px; line-height: 1.6; color: var(--seeker-muted); }
+.currentLabel { flex-shrink: 0; margin-left: auto; margin-top: 2px; padding: 4px 6px; border-radius: 4px; background: #4fa4b012; color: #34808b; font-size: 9px; font-weight: 600; }
+.cta { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; padding: 14px 17px; border: 1px solid #343438; border-radius: 10px; background: #343438; color: #fff; font-size: 12px; font-weight: 600; transition: background .2s; }
+.cta:hover { background: #235e67; border-color: #235e67; }
+.main .footnote { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 13px; font-size: 10px; color: var(--seeker-muted); }
+.rejection { margin-top: 16px; padding: 12px; border-left: 3px solid #c76858; border-radius: 6px; background: #c7685812; font-size: 12px; line-height: 1.6; }
+.preview { display: flex; flex-direction: column; padding: 37px 30px 25px; border-left: 1px solid #4fa4b026; background: radial-gradient(ellipse at 100% 0%, #4fa4b025, transparent 65%), #edf5f4; }
+.preview .previewEyebrow { color: #517b7c; font-size: 8px; }
+.preview h2 { margin-top: 17px; color: #213d40 !important; font-size: 29px; font-weight: 600; line-height: 1.2; letter-spacing: -.8px; }
+.preview > p { margin-top: 13px; color: #577275 !important; font-size: 12px; line-height: 1.8; max-width: 240px; }
+.illustration { position: relative; display: grid; place-items: center; min-height: 220px; margin: 8px 0; }
+.orbit { position: absolute; width: 192px; height: 192px; border: 1px solid #4fa4b024; border-radius: 50%; outline: 1px solid #4fa4b012; outline-offset: 15px; }
+.profileCard { position: relative; display: flex; flex-direction: column; align-items: center; width: 148px; padding: 21px 14px 17px; border: 1px solid #fff; border-radius: 16px; background: #ffffffd9; box-shadow: 0 16px 28px -15px #28565a45; transform: rotate(-7deg); }
+.profileIcon { display: grid; place-items: center; height: 52px; width: 52px; border-radius: 15px; background: #e3f1f0; color: #3d8d97; }
+.profileLine, .profileLineShort { display: block; height: 6px; width: 75px; margin-top: 15px; border-radius: 5px; background: #d8e5e4; }
+.profileLineShort { width: 50px; margin-top: 7px; background: #e7eeed; }
+.profileBadge { display: flex; gap: 4px; align-items: center; margin-top: 17px; color: #42818a; font-size: 9px; }
+.floatingCheck { position: absolute; left: calc(50% + 52px); bottom: 30px; display: grid; place-items: center; height: 41px; width: 41px; border: 4px solid #edf5f4; border-radius: 50%; background: #4fa4b0; color: #fff; }
+.benefits { display: grid; gap: 18px; padding: 0; list-style: none; }
+.benefits li { display: flex; gap: 11px; align-items: center; }
+.benefits li > span { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px; border: 1px solid #4fa4b022; color: #47818a; }
+.benefits strong { color: #29494b; font-size: 11px; font-weight: 650; }
+.benefits p { margin-top: 3px; color: #577275 !important; font-size: 10px; line-height: 1.6; }
+.previewFooter { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 26px; color: #658183; font-size: 9px; }
+:global([data-seeker-theme="dark"]) .preview { background: radial-gradient(ellipse at top right, #4fa4b024, transparent 65%), #172b30; }
+:global([data-seeker-theme="dark"]) .preview h2, :global([data-seeker-theme="dark"]) .benefits strong { color: #d8efed !important; }
+:global([data-seeker-theme="dark"]) .preview > p, :global([data-seeker-theme="dark"]) .benefits p { color: #a2c3c3 !important; }
+:global([data-seeker-theme="dark"]) :is(.previewEyebrow, .previewFooter, .status, .currentLabel, .companyIcon) { color: #8ad1d6; }
+:global([data-seeker-theme="dark"]) .floatingCheck { border-color: #172b30; }
+@media (max-width: 1100px) { .main { padding: 28px; } .preview { padding: 30px 24px 24px; } .currentLabel { display: none; } }
+@media (max-width: 767px) { .page { padding: 26px 20px 36px; } .card { grid-template-columns: 1fr; border-radius: 19px; } .main { padding: 26px 23px; } .title { max-width: none; } .preview { border-left: 0; border-top: 1px solid #4fa4b026; } .illustration { display: none; } .benefits { margin-top: 25px; } .preview h2 br { display: none; } .preview > p { max-width: none; } }

@@ -5,7 +5,13 @@ import {
   AlertCircle,
   ShieldCheck,
   ArrowRight,
+  Check,
+  Briefcase,
+  Users,
+  FileText,
+  LockKeyhole,
 } from "lucide-react";
+import styles from "./RecruiterLockedPanel.module.css";
 import type { RecruiterCompanyAccess } from "@/lib/recruiterCompanyAccess";
 
 const COPY = {
@@ -111,65 +117,76 @@ export default function RecruiterLockedPanel({
   const isRejected = access.status === "rejected";
   const isMissing = !access.hasCompany;
 
+  const currentStep = isMissing || isRejected ? 0 : 1;
+  const steps = [
+    { title: "Company details", body: "Tell us about your business and where you work." },
+    { title: "Profile review", body: "Our team verifies your company information." },
+    { title: "Start hiring", body: "Post roles and connect with your next great hire." },
+  ];
+
   return (
-    <div className="mx-auto max-w-2xl px-5 py-12 sm:px-8 lg:px-10">
-      <div className="rounded-[28px] border border-[#ebe9f5] bg-white p-8 text-center shadow-[0_12px_40px_-24px_rgba(26,26,46,0.35)] sm:p-10">
-        <div
-          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl text-white ${
-            isRejected
-              ? "bg-[#dc2626]"
-              : isMissing
-                ? "bg-[#5850ec]"
-                : "bg-[#d97706]"
-          }`}
-        >
-          {isRejected ? (
-            <AlertCircle className="h-7 w-7" />
-          ) : isMissing ? (
-            <Building2 className="h-7 w-7" />
-          ) : (
-            <ShieldCheck className="h-7 w-7" />
-          )}
-        </div>
-
-        <h1 className="mt-6 text-2xl font-bold tracking-tight text-[#0f172a]">
-          {copy.title}
-        </h1>
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-[#64748b]">
-          {copy.body}
-        </p>
-        {isRejected && access.rejectionReason ? (
-          <p className="mx-auto mt-3 max-w-lg rounded-2xl bg-[#fef2f2] px-4 py-3 text-sm text-[#991b1b]">
-            {access.rejectionReason}
-          </p>
-        ) : null}
-
-        <div className="mx-auto mt-6 grid max-w-md gap-2 text-left text-sm text-[#475569]">
-          <div className="flex items-start gap-2 rounded-xl bg-[#f8fafc] px-3 py-2.5">
-            <span className="mt-0.5 font-bold text-[#5850ec]">1.</span>
-            <span>Complete your company profile with accurate business details.</span>
-          </div>
-          <div className="flex items-start gap-2 rounded-xl bg-[#f8fafc] px-3 py-2.5">
-            <span className="mt-0.5 font-bold text-[#5850ec]">2.</span>
-            <span>Wait for an admin to review and approve your account.</span>
-          </div>
-          <div className="flex items-start gap-2 rounded-xl bg-[#f8fafc] px-3 py-2.5">
-            <span className="mt-0.5 font-bold text-[#5850ec]">3.</span>
-            <span>
-              Once approved, you can post jobs, review applications, and contact
-              candidates.
-            </span>
-          </div>
-        </div>
-
-        <Link
-          href="/dashboard/recruiter/company"
-          className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-[#5850ec] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(88,80,236,0.35)] hover:bg-[#4f46e5]"
-        >
-          <Building2 className="h-4 w-4" />
-          {copy.cta}
-        </Link>
+    <main className={styles.page}>
+      <div className={styles.intro}>
+        <span className={styles.eyebrow}>LET’S BUILD YOUR TEAM</span>
+        <span className={styles.stepCount}>Step {currentStep + 1} of 3</span>
       </div>
-    </div>
+      <section className={styles.card} aria-labelledby="company-setup-title">
+        <div className={styles.main}>
+          <span className={styles.status} data-state={isRejected ? "rejected" : "setup"}>
+            {isRejected ? <AlertCircle size={14} /> : <span className={styles.statusDot} />}
+            {isRejected ? "Action required" : isMissing ? "Set up your workspace" : "Review in progress"}
+          </span>
+          <div className={styles.companyIcon}>
+            {isRejected ? <AlertCircle size={29} /> : isMissing ? <Building2 size={29} /> : <ShieldCheck size={29} />}
+          </div>
+          <h1 id="company-setup-title" className={styles.title}>{copy.title}</h1>
+          <p className={styles.description}>
+            {isMissing
+              ? "Great hires start with a great introduction. Add your company details to get your hiring workspace ready."
+              : copy.body}
+          </p>
+          {isRejected && access.rejectionReason ? (
+            <div className={styles.rejection}><strong>Review feedback</strong><p>{access.rejectionReason}</p></div>
+          ) : null}
+          <ol className={styles.steps} aria-label="Company setup progress">
+            {steps.map((step, index) => (
+              <li key={step.title} className={styles.step} data-state={index < currentStep ? "complete" : index === currentStep ? "current" : "upcoming"} aria-current={index === currentStep ? "step" : undefined}>
+                <span className={styles.stepNumber}>{index < currentStep ? <Check size={16} /> : `0${index + 1}`}</span>
+                <div><h2>{step.title}</h2><p>{step.body}</p></div>
+                {index === currentStep ? <span className={styles.currentLabel}>{isRejected ? "Update" : isMissing ? "Up next" : "In review"}</span> : null}
+              </li>
+            ))}
+          </ol>
+          <Link href="/dashboard/recruiter/company" className={styles.cta}>
+            {isMissing ? "Complete company profile" : copy.cta}<ArrowRight size={17} />
+          </Link>
+          <p className={styles.footnote}><ShieldCheck size={14} /> Hiring tools unlock after admin approval.</p>
+        </div>
+        <aside className={styles.preview} aria-label="Your hiring workspace benefits">
+          <span className={styles.previewEyebrow}>BUILT FOR YOUR NEXT CHAPTER</span>
+          <h2>A home for your<br />next great team.</h2>
+          <p>Everything you need to turn open roles into great hires.</p>
+          <div className={styles.illustration} aria-hidden="true">
+            <div className={styles.orbit} />
+            <div className={styles.profileCard}>
+              <span className={styles.profileIcon}><Building2 size={30} /></span>
+              <span className={styles.profileLine} /><span className={styles.profileLineShort} />
+              <span className={styles.profileBadge}><ShieldCheck size={13} /> Ready to grow</span>
+            </div>
+            <span className={styles.floatingCheck}><Check size={23} /></span>
+          </div>
+          <ul className={styles.benefits}>
+            {[
+              { icon: Briefcase, title: "Post opportunities", copy: "Give your next hire a place to start." },
+              { icon: FileText, title: "Manage applications", copy: "Keep every candidate in the picture." },
+              { icon: Users, title: "Find your people", copy: "Connect with talent that fits your team." },
+            ].map(({ icon: Icon, title, copy: body }) => (
+              <li key={title}><span><Icon size={18} /></span><div><strong>{title}</strong><p>{body}</p></div></li>
+            ))}
+          </ul>
+          <div className={styles.previewFooter}><LockKeyhole size={13} /> Available once your company is approved</div>
+        </aside>
+      </section>
+    </main>
   );
 }

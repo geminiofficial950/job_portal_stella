@@ -1,0 +1,22 @@
+.stepper { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.stepCurrent { color: var(--seeker-text, #0f2744); }
+.stepNumber { background: #2563eb; color: #fff; }
+.nextButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.nextButton:hover:not(:disabled) { background: #1d4ed8; color: #fff; }
+.nextButton:disabled { opacity: 0.6; cursor: not-allowed; }
+@media (max-width: 640px) {
+  .stepper { gap: 6px; }
+  .stepper button { font-size: 11px; }
+}

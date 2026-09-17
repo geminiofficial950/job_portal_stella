@@ -1,5 +1,5 @@
 /* Recruiter legacy components use the same inherited palette as the seeker workspace. */
-.toolbar { display: flex; justify-content: flex-end; align-items: center; min-height: 76px; margin: 0 40px; border-bottom: 1px solid var(--seeker-line); }
+.toolbar { margin: 0 36px; }
 .content { color: var(--seeker-text); }
 .content :is(h1, h2, h3, h4) { color: var(--seeker-text); }
 .content :is([class*="border-[#"], [class*="border-slate-"], [class*="border-white/"], [class*="divide-"] > *) { border-color: var(--seeker-line); }
@@ -14,6 +14,8 @@
 .content :is([style*="background:#ecebff"], [style*="background: #ecebff"]) { background: var(--seeker-raised) !important; }
 .content :is([style*="background:#5850ec"], [style*="background: #5850ec"]) { background: var(--seeker-accent) !important; color: #fff; }
 .content :is(button, a, span):is([class~="bg-[#5850ec]"], [class~="bg-[#1e3a5f]"], [class~="bg-[#00082C]"], [class*="bg-gradient-"]) { background: var(--seeker-accent); color: #fff; }
+.content :is(button, a)[class*="bg-[#dc2626]"],
+.content :is(button, a)[class*="bg-[#b91c1c]"] { color: #fff; }
 .content :is(section, div)[class*="bg-gradient-"] { background: var(--seeker-raised); }
 .content :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea, [contenteditable="true"]) { background: var(--seeker-surface); color: var(--seeker-text); border-color: var(--seeker-line); }
 .content :is(input, textarea)::placeholder { color: var(--seeker-muted); }
@@ -27,5 +29,4 @@
 .content :is([class~="bg-[#fee2e2]"], [class~="bg-[#fff5f5]"]) { background: #f7e5e3; color: #9b3838; }
 .content [class~="bg-[#fef3c7]"] { background: #fbf0d5; color: #855c16; }
 .content :is([class~="bg-[#dbeafe]"], [class~="bg-[#ede9fe]"][class~="text-[#5b21b6]"]) { background: var(--seeker-raised); color: var(--seeker-link); }
-@media (max-width: 767px) { .toolbar { min-height: 68px; margin-inline: 20px; }.content { padding-bottom: 76px; } }
-
+@media (max-width: 767px) { .toolbar { margin-inline: 20px; flex-wrap: wrap; padding-block: 10px; }.content { padding-bottom: 76px; } }

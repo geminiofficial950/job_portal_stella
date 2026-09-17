@@ -39,9 +39,7 @@ export default function RecruiterSidebar({
     <DashboardSidebarShell
       sidebarClassName={styles.sidebar}
       menuButtonClassName={styles.menuButton}
-      brandEyebrow="Hiring Workspace"
-      brandTitle="Recruiter Panel"
-      brandIcon={Briefcase}
+      brandLogo
       groups={[
         {
           label: "Main Menu",

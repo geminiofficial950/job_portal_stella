@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { Building2, Loader2, Save, Upload, Asterisk } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, Check, Loader2, Save, Upload, Asterisk } from "lucide-react";
+import styles from "./CompanyProfileForm.module.css";
 
 type CompanyStatus = "pending" | "approved" | "rejected";
 
@@ -32,6 +33,9 @@ const emptyForm = {
 };
 
 const sizeOptions = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"];
+const STEPS = ["Company details", "Logo", "About"];
+const fieldClass =
+  "w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20 transition-all";
 
 function FieldLabel({
   children,
@@ -89,6 +93,7 @@ export default function CompanyProfileForm() {
   const [uploading, setUploading] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -162,36 +167,45 @@ export default function CompanyProfileForm() {
     }
   }
 
+  function stepError(index: number) {
+    if (index === 0) {
+      if (!form.name.trim() || form.name.trim().length < 2) return "Company name is required";
+      if (!form.phone.trim()) return "Phone is required";
+      if (!form.industry.trim()) return "Industry is required";
+      if (!form.size.trim()) return "Company size is required";
+      if (!form.location.trim()) return "Location is required";
+    }
+    if (index === 1 && !form.logoUrl.trim()) return "Company logo is required";
+    if (index === 2 && !form.about.trim()) return "About company is required";
+    return "";
+  }
+
+  function goToStep(index: number) {
+    if (index === step || uploading) return;
+    if (index > step) {
+      const error = stepError(step);
+      if (error) {
+        toast.error(error);
+        return;
+      }
+    }
+    setStep(index);
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (step < STEPS.length - 1) {
+      goToStep(step + 1);
+      return;
+    }
 
-    if (!form.name.trim() || form.name.trim().length < 2) {
-      toast.error("Company name is required");
-      return;
-    }
-    if (!form.phone.trim()) {
-      toast.error("Phone is required");
-      return;
-    }
-    if (!form.industry.trim()) {
-      toast.error("Industry is required");
-      return;
-    }
-    if (!form.size.trim()) {
-      toast.error("Company size is required");
-      return;
-    }
-    if (!form.location.trim()) {
-      toast.error("Location is required");
-      return;
-    }
-    if (!form.logoUrl.trim()) {
-      toast.error("Company logo is required");
-      return;
-    }
-    if (!form.about.trim()) {
-      toast.error("About company is required");
-      return;
+    for (let index = 0; index < STEPS.length; index += 1) {
+      const error = stepError(index);
+      if (error) {
+        setStep(index);
+        toast.error(error);
+        return;
+      }
     }
 
     setSaving(true);
@@ -266,161 +280,231 @@ export default function CompanyProfileForm() {
 
       <form
         onSubmit={onSubmit}
-        className="space-y-4 rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm"
+        className="space-y-5 rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm"
       >
-        <label className="block">
-          <FieldLabel required>Company name</FieldLabel>
-          <input
-            required
-            minLength={2}
-            value={form.name}
-            onChange={(e) => updateField("name", e.target.value)}
-            className="w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626] focus:ring-2 focus:ring-[#dc2626]/20 transition-all"
-            placeholder="Gemini Education Pty Ltd"
-          />
-        </label>
+        <ol className="grid grid-cols-3 gap-3">
+          {STEPS.map((label, index) => {
+            const current = index === step;
+            const complete = index < step;
+            return (
+              <li key={label}>
+                <button
+                  type="button"
+                  disabled={index > step || saving || uploading}
+                  aria-current={current ? "step" : undefined}
+                  onClick={() => goToStep(index)}
+                  className={`flex w-full items-center gap-2 border-b-2 pb-3 text-left text-sm disabled:cursor-not-allowed ${
+                    current
+                      ? `border-[#2563eb] font-semibold ${styles.stepCurrent}`
+                      : complete
+                        ? "border-[#93c5fd] text-[#2563eb]"
+                        : "border-[#e6eaf2] text-[#64748b]"
+                  }`}
+                >
+                  <span
+                    className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs ${
+                      current
+                        ? styles.stepNumber
+                        : complete
+                          ? "bg-[#dbeafe] text-[#2563eb]"
+                          : "border border-[#e6eaf2] text-[#64748b]"
+                    }`}
+                  >
+                    {complete ? <Check className="h-3.5 w-3.5" /> : index + 1}
+                  </span>
+                  <span className="min-w-0">{label}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+        <h2 className="text-lg font-semibold text-[#0f2744]">
+          Step {step + 1} of {STEPS.length}: {STEPS[step]}
+        </h2>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <FieldLabel>Website</FieldLabel>
-            <input
-              type="text"
-              value={form.website}
-              onChange={(e) => updateField("website", e.target.value)}
-              className="w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626]"
-              placeholder="https://"
-            />
-          </label>
-          <label className="block">
-            <FieldLabel required>Phone</FieldLabel>
-            <input
-              required
-              value={form.phone}
-              onChange={(e) => updateField("phone", e.target.value)}
-              className="w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626]"
-              placeholder="03 xxxx xxxx"
-            />
-          </label>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <FieldLabel required>Industry</FieldLabel>
-            <input
-              required
-              value={form.industry}
-              onChange={(e) => updateField("industry", e.target.value)}
-              className="w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626]"
-              placeholder="Aged care / Disability"
-            />
-          </label>
-          <label className="block">
-            <FieldLabel required>Company size</FieldLabel>
-            <select
-              required
-              value={form.size}
-              onChange={(e) => updateField("size", e.target.value)}
-              className="w-full rounded-lg border border-[#cdd3e0] bg-white px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626]"
-            >
-              <option value="">Select size</option>
-              {sizeOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt} employees
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <label className="block">
-          <FieldLabel required>Location</FieldLabel>
-          <input
-            required
-            value={form.location}
-            onChange={(e) => updateField("location", e.target.value)}
-            className="w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626]"
-            placeholder="Melbourne, VIC"
-          />
-        </label>
-
-        <div className="block">
-          <FieldLabel required>Company logo</FieldLabel>
-          <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[#e6eaf2] bg-[#f8fafc] p-4">
-            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl border border-[#e6eaf2] bg-white">
-              {form.logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={form.logoUrl}
-                  alt="Company logo preview"
-                  className="h-full w-full object-contain"
-                />
-              ) : (
-                <Building2 className="h-6 w-6 text-[#6b7a9e]" />
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
+        {step === 0 ? (
+          <>
+            <label className="block">
+              <FieldLabel required>Company name</FieldLabel>
               <input
-                ref={fileRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp,image/gif"
-                onChange={onLogoChange}
-                className="block w-full text-sm text-[#4a5878] file:mr-3 file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-[#dc2626] file:to-[#b91c1c] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:opacity-90 transition-all"
-                disabled={uploading}
+                required
+                minLength={2}
+                value={form.name}
+                onChange={(e) => updateField("name", e.target.value)}
+                className={fieldClass}
+                placeholder="Gemini Education Pty Ltd"
               />
-              <p className="mt-2 text-xs text-[#6b7a9e]">
-                JPG, PNG, WEBP or GIF · max 2MB · uploads to Cloudinary
-              </p>
-              {uploading ? (
-                <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-[#1e293b]">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  Uploading…
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <FieldLabel>Website</FieldLabel>
+                <input
+                  type="text"
+                  value={form.website}
+                  onChange={(e) => updateField("website", e.target.value)}
+                  className={fieldClass}
+                  placeholder="https://"
+                />
+              </label>
+              <label className="block">
+                <FieldLabel required>Phone</FieldLabel>
+                <input
+                  required
+                  value={form.phone}
+                  onChange={(e) => updateField("phone", e.target.value)}
+                  className={fieldClass}
+                  placeholder="03 xxxx xxxx"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <FieldLabel required>Industry</FieldLabel>
+                <input
+                  required
+                  value={form.industry}
+                  onChange={(e) => updateField("industry", e.target.value)}
+                  className={fieldClass}
+                  placeholder="Aged care / Disability"
+                />
+              </label>
+              <label className="block">
+                <FieldLabel required>Company size</FieldLabel>
+                <select
+                  required
+                  value={form.size}
+                  onChange={(e) => updateField("size", e.target.value)}
+                  className={`${fieldClass} bg-white`}
+                >
+                  <option value="">Select size</option>
+                  {sizeOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt} employees
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label className="block">
+              <FieldLabel required>Location</FieldLabel>
+              <input
+                required
+                value={form.location}
+                onChange={(e) => updateField("location", e.target.value)}
+                className={fieldClass}
+                placeholder="Melbourne, VIC"
+              />
+            </label>
+          </>
+        ) : null}
+
+        {step === 1 ? (
+          <div className="block">
+            <FieldLabel required>Company logo</FieldLabel>
+            <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[#e6eaf2] bg-[#f8fafc] p-4">
+              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl border border-[#e6eaf2] bg-white">
+                {form.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={form.logoUrl}
+                    alt="Company logo preview"
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <Building2 className="h-6 w-6 text-[#6b7a9e]" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  onChange={onLogoChange}
+                  className="sr-only"
+                  disabled={uploading}
+                />
+                <button
+                  type="button"
+                  className={styles.fileButton}
+                  disabled={uploading}
+                  onClick={() => fileRef.current?.click()}
+                >
+                  {uploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  {uploading ? "Uploading…" : "Choose file"}
+                </button>
+                <p className="mt-2 text-xs text-[#6b7a9e]">
+                  JPG, PNG, WEBP or GIF · max 2MB
                 </p>
+              </div>
+              {form.logoUrl ? (
+                <button
+                  type="button"
+                  onClick={() => updateField("logoUrl", "")}
+                  className="text-sm font-medium text-[#b42318]"
+                >
+                  Remove
+                </button>
               ) : null}
             </div>
-            {form.logoUrl ? (
-              <button
-                type="button"
-                onClick={() => updateField("logoUrl", "")}
-                className="text-sm font-medium text-[#b42318] hover:underline"
-              >
-                Remove
-              </button>
-            ) : (
-              <span className="inline-flex items-center gap-1 text-xs text-[#6b7a9e]">
-                <Upload className="h-3.5 w-3.5" />
-                Choose file
-              </span>
-            )}
           </div>
-        </div>
+        ) : null}
 
-        <label className="block">
-          <FieldLabel required>About company</FieldLabel>
-          <textarea
-            required
-            rows={5}
-            maxLength={2000}
-            value={form.about}
-            onChange={(e) => updateField("about", e.target.value)}
-            className="w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626]"
-            placeholder="Tell candidates who you are and what you offer."
-          />
-        </label>
+        {step === 2 ? (
+          <label className="block">
+            <FieldLabel required>About company</FieldLabel>
+            <textarea
+              required
+              rows={5}
+              maxLength={2000}
+              value={form.about}
+              onChange={(e) => updateField("about", e.target.value)}
+              className={fieldClass}
+              placeholder="Tell candidates who you are and what you offer."
+            />
+          </label>
+        ) : null}
 
-        <button
-          type="submit"
-          disabled={saving || uploading}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#dc2626] to-[#b91c1c] px-5 py-3 text-sm font-bold text-white shadow-md hover:opacity-90 hover:scale-[1.02] disabled:opacity-60 transition-all"
-        >
-          {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+        <div className="flex items-center justify-between gap-3 border-t border-[#e6eaf2] pt-5">
+          <button
+            type="button"
+            disabled={step === 0 || saving || uploading}
+            onClick={() => setStep((current) => current - 1)}
+            className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-[#475569] disabled:opacity-40"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+          {step < STEPS.length - 1 ? (
+            <button
+              type="submit"
+              disabled={saving || uploading}
+              className={styles.nextButton}
+            >
+              Next
+              <ArrowRight className="h-4 w-4" />
+            </button>
           ) : (
-            <Save className="h-4 w-4" />
+            <button
+              type="submit"
+              disabled={saving || uploading}
+              className={styles.nextButton}
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {company ? "Save & submit for approval" : "Create & submit for approval"}
+            </button>
           )}
-          {company
-            ? "Save & Submit for Approval"
-            : "Create & Submit for Approval"}
-        </button>
+        </div>
       </form>
     </div>
   );

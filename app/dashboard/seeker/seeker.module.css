@@ -2664,14 +2664,14 @@
     0 0 12px rgb(79 164 176 / 28%) !important;
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
-  color: #d7f0f2 !important;
+  color: #0c3c44 !important;
 }
 .creamCanvas .sidebar nav a svg {
   width: 18px !important;
   height: 18px !important;
-  stroke-width: 1.65 !important;
-  color: #d7f0f2 !important;
-  stroke: #d7f0f2 !important;
+  stroke-width: 2.15 !important;
+  color: #0c3c44 !important;
+  stroke: #0c3c44 !important;
   filter: none;
 }
 .creamCanvas .sidebar nav a:not([aria-current="page"]):hover {
@@ -2704,8 +2704,8 @@
   backdrop-filter: blur(20px) saturate(190%);
 }
 .creamCanvas .sidebar nav a:hover svg {
-  color: #ffffff !important;
-  stroke: #ffffff !important;
+  color: #0c3c44 !important;
+  stroke: #0c3c44 !important;
 }
 /* Active: exact brand teal #4FA4B0 */
 .creamCanvas .sidebar nav a[aria-current="page"] {
@@ -2736,8 +2736,8 @@
 }
 .creamCanvas .sidebar nav a[aria-current="page"] > svg {
   background: transparent !important;
-  color: #ffffff !important;
-  stroke: #ffffff !important;
+  color: #0c3c44 !important;
+  stroke: #0c3c44 !important;
   padding: 0 !important;
   border-radius: 0 !important;
 }
@@ -2780,11 +2780,11 @@
     0 0 0 0.5px rgb(255 255 255 / 10%) !important;
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   backdrop-filter: blur(18px) saturate(180%);
-  color: #d7f0f2 !important;
+  color: #0c3c44 !important;
 }
 .creamCanvas .sidebar [data-sidebar-footer] a svg {
-  color: #d7f0f2 !important;
-  stroke: #d7f0f2 !important;
+  color: #0c3c44 !important;
+  stroke: #0c3c44 !important;
 }
 .creamCanvas .sidebar [data-sidebar-footer] button {
   color: #fda4af !important;

@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Asterisk, Loader2, Save, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Asterisk, Check, Loader2, Save, X } from "lucide-react";
 import RichTextEditor from "./RichTextEditor";
+import styles from "./PostJobForm.module.css";
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -36,7 +37,8 @@ function FieldLabel({
 }
 
 const inputClass =
-  "w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#dc2626]";
+  "w-full rounded-lg border border-[#cdd3e0] px-3.5 py-3 text-[15px] outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20";
+const STEPS = ["Role", "Pay", "Skills", "Details", "Publish"];
 
 const emptyForm = {
   title: "",
@@ -61,6 +63,7 @@ const emptyForm = {
 export default function PostJobForm() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [step, setStep] = useState(0);
   const [form, setForm] = useState(emptyForm);
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
@@ -114,20 +117,52 @@ export default function PostJobForm() {
     setSkills((prev) => prev.filter((s) => s !== skill));
   }
 
+  function stepError(index: number) {
+    if (index === 0) {
+      if (form.title.trim().length < 3) return "Job title is required";
+      if (!form.category.trim()) return "Category is required";
+      if (!form.location.trim()) return "Location is required";
+    }
+    if (index === 1) {
+      if (form.salaryMin === "" || form.salaryMax === "") return "Salary min and max are required";
+      if (Number(form.salaryMax) < Number(form.salaryMin)) return "Salary max must be at least the minimum";
+      if (!form.salaryCurrency.trim()) return "Currency is required";
+      if (!form.vacancies || Number(form.vacancies) < 1) return "Vacancies must be at least 1";
+    }
+    if (index === 3) {
+      if (stripHtml(form.description).length < 20) return "Description is required (min 20 characters)";
+      if (stripHtml(form.requirements).length < 10) return "Requirements are required";
+      if (stripHtml(form.responsibilities).length < 10) return "Responsibilities are required";
+    }
+    return "";
+  }
+
+  function goToStep(index: number) {
+    if (index === step || saving) return;
+    if (index > step) {
+      const error = stepError(step);
+      if (error) {
+        toast.error(error);
+        return;
+      }
+    }
+    setStep(index);
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (step < STEPS.length - 1) {
+      goToStep(step + 1);
+      return;
+    }
 
-    if (stripHtml(form.description).length < 20) {
-      toast.error("Description is required (min 20 characters)");
-      return;
-    }
-    if (stripHtml(form.requirements).length < 10) {
-      toast.error("Requirements are required");
-      return;
-    }
-    if (stripHtml(form.responsibilities).length < 10) {
-      toast.error("Responsibilities are required");
-      return;
+    for (let index = 0; index < STEPS.length; index += 1) {
+      const error = stepError(index);
+      if (error) {
+        setStep(index);
+        toast.error(error);
+        return;
+      }
     }
 
     // Flush any text still in the input
@@ -176,8 +211,49 @@ export default function PostJobForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="mt-8 space-y-4 rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm"
+      className="space-y-5 rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm"
     >
+      <ol className={styles.stepper}>
+        {STEPS.map((label, index) => {
+          const current = index === step;
+          const complete = index < step;
+          return (
+            <li key={label}>
+              <button
+                type="button"
+                disabled={index > step || saving}
+                aria-current={current ? "step" : undefined}
+                onClick={() => goToStep(index)}
+                className={`flex w-full items-center gap-2 border-b-2 pb-3 text-left text-sm disabled:cursor-not-allowed ${
+                  current
+                    ? `border-[#2563eb] font-semibold ${styles.stepCurrent}`
+                    : complete
+                      ? "border-[#93c5fd] text-[#2563eb]"
+                      : "border-[#e6eaf2] text-[#64748b]"
+                }`}
+              >
+                <span
+                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs ${
+                    current
+                      ? styles.stepNumber
+                      : complete
+                        ? "bg-[#dbeafe] text-[#2563eb]"
+                        : "border border-[#e6eaf2] text-[#64748b]"
+                  }`}
+                >
+                  {complete ? <Check className="h-3.5 w-3.5" /> : index + 1}
+                </span>
+                <span className="min-w-0">{label}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+      <h2 className="text-lg font-semibold text-[#0f172a]">
+        Step {step + 1} of {STEPS.length}: {STEPS[step]}
+      </h2>
+
+      {step === 0 ? <>
       <label className="block">
         <FieldLabel required>Job title</FieldLabel>
         <input
@@ -255,7 +331,9 @@ export default function PostJobForm() {
           </select>
         </label>
       </div>
+      </> : null}
 
+      {step === 1 ? <>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
           <FieldLabel required>Salary min</FieldLabel>
@@ -325,10 +403,12 @@ export default function PostJobForm() {
           />
         </label>
       </div>
+      </> : null}
 
+      {step === 2 ? (
       <div className="block">
         <FieldLabel>Skills</FieldLabel>
-        <div className="rounded-lg border border-[#cdd3e0] px-3 py-2.5 focus-within:border-[#dc2626] focus-within:ring-2 focus-within:ring-[#dc2626]/20 transition-all">
+        <div className="rounded-lg border border-[#cdd3e0] px-3 py-2.5 focus-within:border-[#2563eb] focus-within:ring-2 focus-within:ring-[#2563eb]/20 transition-all">
           <div className="flex flex-wrap gap-2">
             {skills.map((skill) => (
               <span
@@ -369,7 +449,9 @@ export default function PostJobForm() {
           Press Enter or comma to add each skill as a tag.
         </p>
       </div>
+      ) : null}
 
+      {step === 3 ? <>
       <div className="block">
         <FieldLabel required>Description</FieldLabel>
         <RichTextEditor
@@ -399,7 +481,9 @@ export default function PostJobForm() {
           minHeight="150px"
         />
       </div>
+      </> : null}
 
+      {step === 4 ? <>
       <label className="block">
         <FieldLabel>Benefits</FieldLabel>
         <textarea
@@ -436,19 +520,30 @@ export default function PostJobForm() {
           </select>
         </label>
       </div>
+      </> : null}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#dc2626] to-[#dc2626] px-6 py-3 text-sm font-bold text-white shadow-md hover:opacity-90 hover:scale-[1.01] disabled:opacity-60 transition-all"
-      >
-        {saving ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+      <div className="flex items-center justify-between gap-3 border-t border-[#e6eaf2] pt-5">
+        <button
+          type="button"
+          disabled={step === 0 || saving}
+          onClick={() => setStep((current) => current - 1)}
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-[#475569] disabled:opacity-40"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+        {step < STEPS.length - 1 ? (
+          <button type="submit" disabled={saving} className={styles.nextButton}>
+            Next
+            <ArrowRight className="h-4 w-4" />
+          </button>
         ) : (
-          <Save className="h-4 w-4" />
+          <button type="submit" disabled={saving} className={styles.nextButton}>
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {saving ? "Posting…" : "Post job"}
+          </button>
         )}
-        Post Job
-      </button>
+      </div>
     </form>
   );
 }

@@ -227,7 +227,7 @@ export default function RecruiterSettingsForm() {
       <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="mb-5 flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none">
-            <UserRound className="h-4 w-4 text-white" />
+            <UserRound className="h-4 w-4" />
           </span>
           <h2 className="font-bold text-[#1e293b] tracking-tight">Profile</h2>
         </div>
@@ -280,7 +280,7 @@ export default function RecruiterSettingsForm() {
       <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="mb-5 flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#f59e0b] to-[#fb923c] shadow-md">
-            <Bell className="h-4 w-4 text-white" />
+            <Bell className="h-4 w-4" />
           </span>
           <h2 className="font-bold text-[#1e293b] tracking-tight">Notifications</h2>
         </div>
@@ -348,7 +348,7 @@ export default function RecruiterSettingsForm() {
       <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="mb-5 flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#475569] shadow-none">
-            <Briefcase className="h-4 w-4 text-white" />
+            <Briefcase className="h-4 w-4" />
           </span>
           <h2 className="font-bold text-[#1e293b] tracking-tight">Hiring Preferences</h2>
         </div>
@@ -442,7 +442,7 @@ export default function RecruiterSettingsForm() {
       <section className="rounded-2xl border border-[#e6eaf2] bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#ec4899] to-[#f472b6] shadow-md">
-            <Users className="h-4 w-4 text-white" />
+            <Users className="h-4 w-4" />
           </span>
           <h2 className="font-bold text-[#1e293b] tracking-tight">Team Access</h2>
         </div>

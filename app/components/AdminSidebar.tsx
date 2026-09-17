@@ -6,19 +6,19 @@ import {
   Building2,
   Briefcase,
   UserCog,
-  Shield,
   BadgeCheck,
   GraduationCap,
   Mail,
 } from "lucide-react";
 import DashboardSidebarShell from "./DashboardSidebarShell";
+import styles from "@/app/dashboard/seeker/seeker.module.css";
 
 export default function AdminSidebar() {
   return (
     <DashboardSidebarShell
-      brandEyebrow="Platform Control"
-      brandTitle="Admin Panel"
-      brandIcon={Shield}
+      sidebarClassName={styles.sidebar}
+      menuButtonClassName={styles.menuButton}
+      brandLogo
       groups={[
         {
           label: "Main Menu",

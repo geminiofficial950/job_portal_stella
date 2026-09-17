@@ -10,7 +10,7 @@ import styles from "./Footer.module.css";
 const columns = [
   { title: "For Job Seekers", links: [ ["Jobs", "/jobs"], ["Resume & Profile", "/profile/setup"], ["Career Support", "/#benefits"], ["Talent Network", "/#talent-network"] ] },
   { title: "Company", links: [ ["Our Community", "/#talent-network"], ["Learning", "/courses"], ["Events", "/events"], ["Careers", "/jobs"] ] },
-  { title: "Support", links: [ ["Help Center", "/contact"], ["Contact Us", "/contact"], ["Privacy Policy", "/privacy"], ["Terms of Service", "/terms"] ] },
+  { title: "Support", links: [ ["Contact Us", "/contact"], ["Privacy Policy", "/privacy"], ["Terms of Service", "/terms"] ] },
 ];
 
 export default function Footer() {
